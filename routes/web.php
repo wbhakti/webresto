@@ -33,6 +33,7 @@ Route::get('/logout', 'App\Http\Controllers\AdminController@logout')->name('logo
 Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
 
 Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');
+Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
 Route::get('/dashboard/mastermenu', 'App\Http\Controllers\AdminController@MasterMenu')->name('MasterMenu');
 Route::get('/dashboard/masterkategori', 'App\Http\Controllers\AdminController@MasterKategori')->name('MasterKategori');
 

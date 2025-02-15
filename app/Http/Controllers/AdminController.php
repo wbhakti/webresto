@@ -69,6 +69,36 @@ class AdminController extends Controller
         }
     }
 
+    public function postmerchant(Request $request)
+    {
+        try {
+
+            if($request->input('proses') == 'edit'){
+
+                if ($request->hasFile('img_merchant')){
+                    $file = $request->file('img_merchant');
+                    $fileName = $file->getClientOriginalName();
+
+                    return redirect()->route('MasterMerchant')->with('success');
+
+                }else{
+                    return redirect()->route('MasterMerchant')->with('success');
+                }
+            }
+            else if($request->input('proses') == 'delete'){
+                
+                return redirect()->route('MasterMerchant')->with('success');
+            }
+            else{
+                return redirect()->route('MasterMerchant')->with('success', 'gagal');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('MasterMerchant')->with('error', 'gagal save merchant');
+        }
+    }
+
     public function MasterMenu()
     {
         try {

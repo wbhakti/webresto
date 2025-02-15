@@ -84,42 +84,6 @@
         </div>
     </div>
     <hr>
-    <div align="center">
-        <button id="toggleButton" class="btn btn-success">Add New Merchant</button>
-    </div>
-    <br>
-    <div id="myForm" style="display: none;">
-        <div class="col-xl-8 col-lg-7 mx-auto">
-            <!-- Project Card Example -->
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form method="POST" action="/postmerchant" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row justify-content-center">
-                            <div class="form-group col-sm-6">
-                                <label for="nama"><b>Nama Merchant</b></label>
-                                <input type="text" name="nama" class="form-control" required />
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="img_merchant"><b>Image Merchant (900x400)</b></label>
-                                <input type="file" name="img_merchant" class="form-control" accept="image/*" required />
-                            </div>
-                        </div>
-                        <div class="row justify-content-center">
-                            <div class="form-group col-sm-6">
-                                <label for="deskripsi"><b>Desc Merchant</b></label>
-                                <textarea name="deskripsi" class="form-control" rows="4" required></textarea>
-                            </div>
-                        </div>
-                        <br />
-                        <div align="center">
-                            <button type="submit" name="proses" value="save" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
