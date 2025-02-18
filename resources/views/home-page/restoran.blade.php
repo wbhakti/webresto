@@ -75,7 +75,7 @@
                                     <div class="bi-star-fill"></div>
                                 </div>
                                 <!-- Product price-->
-                                Rp {{ $item->harga }}
+                                Rp {{ number_format($item->harga , 0, ',', '.') }}
                             </div>
                         </div>
                         <!-- Product actions-->

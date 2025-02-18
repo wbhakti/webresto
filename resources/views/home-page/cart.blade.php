@@ -133,11 +133,11 @@
                     <table class="table table-hover align-middle">
                         <thead class="table-primary">
                             <tr>
-                                <th class="font-heading">Nama Produk</th>
-                                <th class="font-heading">Harga</th>
-                                <th class="font-heading">Jumlah</th>
-                                <th class="font-heading">Total</th>
-                                <th></th>
+                                <th colspan="2" class="font-heading">Nama Produk</th>
+                                <th colspan="2" class="font-heading">Harga</th>
+                                <th colspan="3" class="font-heading">Jumlah</th>
+                                <th colspan="2" class="font-heading">Total</th>
+                                <th colspan="2"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -145,26 +145,27 @@
                             @foreach ($cart as $id => $item)
                             @php $total = $item['price'] * $item['quantity']; @endphp
                             <tr>
-                                <td class="font-isi-nama">
+                                <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
                                         <img src="{{ $item['image'] ?? asset('img/default-img.jpeg') }}" alt="{{ $item['name'] }}" class="img-fluid me-3 table-image">
                                         <span>{{ $item['name'] }}</span>
                                     </div>
                                 </td>
-                                <td class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
-                                <td class="font-isi-jumlah">
+                                <td colspan="2" class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+                                <td colspan="3" class="font-isi-jumlah">
                                     <div class="input-group">
                                         <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1)">-</button>
                                         <input type="text" class="form-control text-center jml-input" value="{{ $item['quantity'] }}" readonly id="quantity-{{ $id }}">
                                         <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1)">+</button>
                                     </div>
                                 </td>
-                                <td class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }}</td>
-                                <td>
+                                <td colspan="2" class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                                <td colspan="2"> 
                                     <form action="{{ route('cart.remove', $id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm btn-small">Hapus</button>
+                                        <!-- <i class="bi-trash"></i> -->
+                                        <button type="submit" class="bi-trash"></button>
                                     </form>
                                 </td>
                             </tr>
@@ -173,8 +174,8 @@
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <th colspan="4" class="text-end font-isi-grandtotal">Total Keseluruhan</th>
-                                <th id="grand-total" class="font-isi-grandtotal">Rp {{ number_format($grandTotal, 0, ',', '.') }}</th>
+                                <th colspan="8" class="text-end font-isi-grandtotal">Total Keseluruhan</th>
+                                <th colspan="3"id="grand-total" class="font-isi-grandtotal">Rp {{ number_format($grandTotal, 0, ',', '.') }}</th>
                             </tr>
                         </tfoot>
                     </table>
