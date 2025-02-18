@@ -97,7 +97,7 @@
             @endforeach
 
             // Format Pesan WhatsApp
-            let waMessage = `Halo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
+            let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
                             `ID Transaksi: ${idTransaksi}%0A` +
                             `Nama: ${nama}%0A` +
                             `Nomor Meja: ${meja}%0A` +
@@ -105,7 +105,7 @@
                             `Total Tagihan: ${totalTagihan}%0A%0A` +
                             `*Detail Pesanan:*%0A` + pesanDetail;
 
-            let waLink = `https://wa.me/6285268472993?text=${waMessage}`;
+            let waLink = `https://wa.me/62822222212344?text=${waMessage}`;
 
             // Buka WhatsApp otomatis di tab baru
             window.open(waLink, '_blank');
@@ -153,7 +153,7 @@
                                 `Bukti Transfer: ${imageUrl}%0A%0A` +
                                 `*Detail Pesanan:*%0A` + pesanDetail;
 
-                let waLink = `https://wa.me/6285268472993?text=${waMessage}`;
+                let waLink = `https://wa.me/62822222212344?text=${waMessage}`;
 
                 document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
 

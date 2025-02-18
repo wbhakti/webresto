@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Food Order</title>
+        <title>Menu Kopian</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -20,16 +20,16 @@
                 padding-top: 56px; /* Sesuaikan nilai ini dengan tinggi navbar */
             }
             .custom-navbar {
-                background-color: #FFF212; 
+                background-color: #0103c2; 
                 color: white;
             }
             .custom-navbar .btn-outline-dark {
-                color: #033800;
-                border-color: #033800;
+                color: #fff;
+                border-color: #fff;
             }
             .custom-navbar .btn-outline-dark:hover {
-                background-color: #033800;
-                color: #842029;
+                background-color: #fff;
+                color: #000;
             }
         </style>
     </head>
@@ -37,7 +37,7 @@
         <!-- Navigation-->
         <nav class="navbar custom-navbar fixed-top">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="{{ url('/') }}" style="color: #033800;"><b>Home</b></a>
+                <a class="navbar-brand" href="{{ url('/') }}" style="color: #fff;"><b>Home</b></a>
                 <form class="d-flex" action="/cart" method="GET">
                     <button class="btn btn-outline-dark" type="submit">
                         <i class="bi-cart-fill me-1"></i>
@@ -52,8 +52,8 @@
         @yield('content')
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark" style="background-color: #FFF212 !important;">
-            <div class="container"><p class="m-0 text-center">Copyright &copy; Klajek 2024</p></div>
+        <footer class="py-5 bg-dark" style="background-color: #0103c2 !important;">
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopian 2025</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
