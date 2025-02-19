@@ -114,98 +114,122 @@ class CartController extends Controller
 
     public function checkout(Request $request)
     {   
-        session()->forget('cart');
+        try{
 
-        $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
+            session()->forget('cart');
 
-        // Simpan data ke database
-        DB::table('transactions')->insert([
-            'id_transaksi' => $idTransaksi,
-            'customer' => $request->input('nama'),
-            'meja' => $request->input('meja'),
-            'details' => $request->input('details'),
-            'total_bayar' => $request->input('total'),
-            'metode_bayar' => $request->input('metode_pembayaran'),
-            'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
-        ]);
+            $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
 
-        return redirect()->route('success', ['id' => $idTransaksi]);
+            // Simpan data ke database
+            DB::table('transactions')->insert([
+                'id_transaksi' => $idTransaksi,
+                'customer' => $request->input('nama'),
+                'meja' => $request->input('meja'),
+                'details' => $request->input('details'),
+                'total_bayar' => $request->input('total'),
+                'metode_bayar' => $request->input('metode_pembayaran'),
+                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
+            ]);
+
+            return redirect()->route('success', ['id' => $idTransaksi]);
+
+        }catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('menu')->with('error', 'gagal checkout');
+        }
     }
 
     public function success($id)
     {
-        $transaction = DB::table('transactions')->where('id_transaksi', $id)->first();
+        try{
 
-        if (!$transaction) {
-            abort(404);
-        }
+            $transaction = DB::table('transactions')->where('id_transaksi', $id)->first();
 
-        // Ambil data dari request
-        $nama = $transaction->customer;
-        $meja = $transaction->meja;
-        $totalTagihan = $transaction->total_bayar;
-        $details = json_decode($transaction->details, true);
+            if (!$transaction) {
+                abort(404);
+            }
 
-        if($transaction->metode_bayar == 'qris'){
+            // Ambil data dari request
+            $nama = $transaction->customer;
+            $meja = $transaction->meja;
+            $totalTagihan = $transaction->total_bayar;
+            $details = json_decode($transaction->details, true);
 
-            $qrisImage = asset('img/qris-contoh.png');
-            $textHeading = 'Order berhasil dibuat!';
-            $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
+            if($transaction->metode_bayar == 'qris'){
 
-            return view('home-page.checkout', [
-                'cartCount' => 0,
-                'qrisImage' => $qrisImage,
-                'isQRIS' => true,
-                'head' => $textHeading,
-                'body' => $textBody,
-                'nama' => $nama,
-                'meja' => $meja,
-                'metodePembayaran' => 'QRIS',
-                'totalTagihan' => $totalTagihan,
-                'details' => $details,
-                'idtransaksi' => $id
-            ]);
+                $qrisImage = asset('img/qris-contoh.png');
+                $textHeading = 'Order berhasil dibuat!';
+                $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
 
-        }else{
-            
-            $qrisImage = asset('img/qris-contoh.png');
-            $textHeading = 'Order berhasil dibuat!';
-            $textBody = 'Segera lakukan pembayaran dikasir!';
+                return view('home-page.checkout', [
+                    'cartCount' => 0,
+                    'qrisImage' => $qrisImage,
+                    'isQRIS' => true,
+                    'head' => $textHeading,
+                    'body' => $textBody,
+                    'nama' => $nama,
+                    'meja' => $meja,
+                    'metodePembayaran' => 'QRIS',
+                    'totalTagihan' => $totalTagihan,
+                    'details' => $details,
+                    'idtransaksi' => $id
+                ]);
 
-            return view('home-page.checkout', [
-                'cartCount' => 0,
-                'qrisImage' => $qrisImage,
-                'isQRIS' => false,
-                'head' => $textHeading,
-                'body' => $textBody,
-                'nama' => $nama,
-                'meja' => $meja,
-                'metodePembayaran' => 'TUNAI',
-                'totalTagihan' => $totalTagihan,
-                'details' => $details,
-                'idtransaksi' => $id
-            ]);
+            }else{
+                
+                $qrisImage = asset('img/qris-contoh.png');
+                $textHeading = 'Order berhasil dibuat!';
+                $textBody = 'Segera lakukan pembayaran dikasir!';
+
+                return view('home-page.checkout', [
+                    'cartCount' => 0,
+                    'qrisImage' => $qrisImage,
+                    'isQRIS' => false,
+                    'head' => $textHeading,
+                    'body' => $textBody,
+                    'nama' => $nama,
+                    'meja' => $meja,
+                    'metodePembayaran' => 'TUNAI',
+                    'totalTagihan' => $totalTagihan,
+                    'details' => $details,
+                    'idtransaksi' => $id
+                ]);
+            }
+
+        }catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('menu')->with('error', 'status transaksi gagal');
         }
     }
 
     public function upload(Request $request)
     {
-        if ($request->hasFile('bukti_pembayaran')) {
-            $file = $request->file('bukti_pembayaran');
-            $filename = 'buktitransfer_'.$request->input('idtransaksi').'.jpg';
-            $file->move(public_path('invoice'), $filename);
+        try{
 
-            DB::table('transactions')
-            ->where('id_transaksi', $request->input('idtransaksi'))
-            ->update([ 'bukti_bayar' => $filename, ]);
+            if ($request->hasFile('bukti_pembayaran')) {
+                $file = $request->file('bukti_pembayaran');
+                $filename = 'buktitransfer_'.$request->input('idtransaksi').'.jpg';
+                $file->move(public_path('invoice'), $filename);
+    
+                DB::table('transactions')
+                ->where('id_transaksi', $request->input('idtransaksi'))
+                ->update([ 'bukti_bayar' => $filename, ]);
+    
+                return response()->json([
+                    'success' => true,
+                    'imageUrl' => asset('invoice/' . $filename)
+                ]);
+            }
+    
+            return response()->json(['success' => false]);
 
+        }catch (\Exception $e) {
+            Log::error('Gagal upload bukti pembayaran: ' . $e->getMessage());
             return response()->json([
-                'success' => true,
-                'imageUrl' => asset('invoice/' . $filename)
-            ]);
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengupload file.'
+            ], 500);
         }
-
-        return response()->json(['success' => false]);
     }
     
 }

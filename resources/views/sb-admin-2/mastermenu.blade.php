@@ -63,9 +63,8 @@
                                     data-nama="{{ $item->nama }}"
                                     data-harga="{{ $item->harga }}"
                                     data-kategori="{{ $item->kategori }}"
-                                    data-imagemenu="{{ $item->image }}"
-                                    data-sku="{{ $item->sku }}">Edit</button>
-                                <!-- Form untuk tombol Delete -->
+                                    data-imagemenu="{{ $item->image }}">Edit</button>
+                                
                                 <form method="POST" action="/postmenu" style="display: inline;">
                                     @csrf
                                     <input type="hidden" name="menu_id" value="{{ $item->id }}">
@@ -118,7 +117,7 @@
                             </div>
                             <div class="form-group col-sm-6">
                                 <label for="img_menu"><b>Image Menu (900x400)</b></label>
-                                <input type="file" name="img_menu" class="form-control" accept="image/*" />
+                                <input type="file" name="img_menu" class="form-control" accept="image/*" required />
                             </div>
                         </div>
                         <br />
@@ -146,9 +145,6 @@
                         @csrf
                         <input type="hidden" name="proses" value="edit">
                         <input type="hidden" name="menu_id" id="editRowid">
-                        <input type="hidden" name="merchant_id" id="merchantid">
-                        <input type="hidden" name="sku" id="sku">
-
                         <div class="form-group">
                             <label for="editnama"><b>Nama Menu</b></label>
                             <input type="text" name="nama" id="editnama" class="form-control" required />
@@ -229,14 +225,12 @@ $(document).ready(function() {
             var harga = $(this).data('harga');
             var kategori = $(this).data('kategori');
             var img = $(this).data('imagemenu');
-            var sku = $(this).data('sku');
 
             $('#editRowid').val(rowid);
             $('#editnama').val(nama);
             $('#editharga').val(harga);
             $('#editkategori').val(kategori);
-            $('#currentimage').attr('src', "{{ asset('img/') }}" + "/" + img);
-            $('#sku').val(sku);
+            $('#currentImage').attr('src', "{{ asset('img/') }}" + "/" + img);
 
             $('#editModal').modal('show');
         });

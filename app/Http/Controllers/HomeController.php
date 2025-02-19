@@ -11,39 +11,46 @@ class HomeController extends Controller
 
     public function menu(Request $request)
     {
-        $dataKategori = [];
-        $dataproduk = [];
+        try{
 
-        $reset = $request->query('reset');
-        if ($reset === 'Y') {
-            session()->forget('cart');
-        }
+            $dataKategori = [];
+            $dataproduk = [];
 
-        $cart = session()->get('cart', []);
-        $cartCount = count($cart);
-
-        $dataproduk = DB::table('menus')
-        ->join('categories', 'menus.kategori', '=', 'categories.id')
-        ->select('menus.*', 'categories.nama as nama_kategori')
-        ->get();
-
-        $kategori = $request->query('kategori');
-        
-        if (!empty($kategori)) {
-            if ($kategori !== "all") {
-                $dataproduk = $dataproduk->where('nama_kategori', $kategori);
+            $reset = $request->query('reset');
+            if ($reset === 'Y') {
+                session()->forget('cart');
             }
+
+            $cart = session()->get('cart', []);
+            $cartCount = count($cart);
+
+            $dataproduk = DB::table('menus')
+            ->join('categories', 'menus.kategori', '=', 'categories.id')
+            ->select('menus.*', 'categories.nama as nama_kategori')
+            ->get();
+
+            $kategori = $request->query('kategori');
+            
+            if (!empty($kategori)) {
+                if ($kategori !== "all") {
+                    $dataproduk = $dataproduk->where('nama_kategori', $kategori);
+                }
+            }
+
+            $merchant = DB::table('merchants')->first();
+            $dataKategori = DB::table('categories')->get();
+
+            return view('home-page/restoran', [
+                'kategori' => $dataKategori, 
+                'produk' => $dataproduk,
+                'merchant' => $merchant,
+                'cartCount' => $cartCount
+            ]);
+
+        }catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            abort(500);
         }
-
-        $merchant = DB::table('merchants')->first();
-        $dataKategori = DB::table('categories')->get();
-
-        return view('home-page/restoran', [
-            'kategori' => $dataKategori, 
-            'produk' => $dataproduk,
-            'merchant' => $merchant,
-            'cartCount' => $cartCount
-        ]);
     }
 
 }

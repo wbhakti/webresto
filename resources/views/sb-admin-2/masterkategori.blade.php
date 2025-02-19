@@ -51,8 +51,7 @@
                         <td>
                             <button type="button" class="btn btn-primary mb-2 btn-edit"
                                     data-rowid="{{ $item->id }}"
-                                    data-nama="{{ $item->nama }}"
-                                    data-merchantid="{{ $item->merchant_id }}">Edit</button>
+                                    data-nama="{{ $item->nama }}">Edit</button>
                                 <form method="POST" action="/postkategori" style="display: inline;">
                                     @csrf
                                     <input type="hidden" name="kategori_id" value="{{ $item->id }}">
@@ -113,7 +112,6 @@
                         @csrf
                         <input type="hidden" name="proses" value="edit">
                         <input type="hidden" name="kategori_id" id="editRowid">
-                        <input type="hidden" name="merchant_id" id="editMerchantid">
                         <div class="form-group">
                             <label for="editNama"><b>Nama Kategori</b></label>
                             <input type="text" name="nama" id="editNama" class="form-control" required />
@@ -170,11 +168,9 @@ $(document).ready(function() {
         $(document).on('click', '.btn-edit', function() {
             var rowid = $(this).data('rowid');
             var nama = $(this).data('nama');
-            var merchantid = $(this).data('merchantid');
             
             $('#editRowid').val(rowid);
             $('#editNama').val(nama);
-            $('#editMerchantid').val(merchantid);
 
             $('#editModal').modal('show');
         });

@@ -62,13 +62,6 @@
                                             data-nama="{{ $item->nama }}"
                                             data-deskripsi="{{ $item->deskripsi }}"
                                             data-oldimage="{{ $item->image }}">Edit</button>
-                                    
-                                        <!-- Form untuk tombol Delete -->
-                                        <form method="POST" action="/postmerchant" style="display: inline;">
-                                            @csrf
-                                            <input type="hidden" name="merchant_id" value="{{ $item->id }}">
-                                            <button type="submit" name="proses" value="delete" class="btn btn-danger mb-2">Delete</button>
-                                        </form>
                                     </div>                                    
                                 </div>
                             </td>

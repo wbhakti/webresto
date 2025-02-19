@@ -59,8 +59,8 @@
                     <tr>
                         <th>No</th>
                         <th>ID Transaksi</th>
+                        <th>Tanggal Transaksi</th>
                         <th>Pembeli</th>
-                        <th>Metode Bayar</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -70,8 +70,8 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $item->id_transaksi }}</td>
+                                <td>{{ $item->addtime }}</td>
                                 <td>{{ $item->customer }}</td>
-                                <td>{{ $item->metode_bayar }}</td>
                                 <td>
                                     <div class="button-group">
                                         <button type="button" class="btn btn-info mb-2 btn-detail"
@@ -80,6 +80,8 @@
                                                 data-total="{{ $item->total_bayar }}"
                                                 data-metode="{{ $item->metode_bayar }}"
                                                 data-meja="{{ $item->meja }}"
+                                                data-bukti="{{ $item->bukti_bayar }}"
+                                                data-tgl="{{ $item->addtime }}"
                                                 data-menu='@json($item->details)'>Detail</button>                                
                                     </div>
                                 </td>                                
@@ -108,11 +110,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <p><b>Tgl Transaksi:</b> <span id="detailTgl"></span></p>
                     <p><b>ID Transaksi:</b> <span id="detailId"></span></p>
                     <p><b>Nama Pembeli:</b> <span id="detailNama"></span></p>
                     <p><b>Nomor Meja:</b> <span id="detailMeja"></span></p>
                     <p><b>Total Bayar:</b> <span id="detailTotal"></span></p>
                     <p><b>Metode Bayar:</b> <span id="detailMetode"></span></p>
+                    <p><b>Bukti Bayar:</b> 
+                        <a id="detailBuktiLink" href="#" target="_blank">
+                            <img id="detailBuktiImg" src="" alt="Bukti Bayar" style="max-width: 100px; max-height: 100px;">
+                        </a>
+                    </p>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -155,12 +163,24 @@
 <script src="{{ asset('vendor/datatables/dataTables.bootstrap4.min.js') }}"></script>
 
 <script>
+    $(document).ready(function() {
+        $('#dataTable').dataTable({
+            "lengthMenu": [10, 20, 50, 100],
+            "pageLength": 100,
+            searching: true
+        });
+    });
+</script>
+
+<script>
     $(document).on('click', '.btn-detail', function() {
     var id = $(this).data('id');
     var nama = $(this).data('nama');
     var total = $(this).data('total');
     var metode = $(this).data('metode');
     var meja = $(this).data('meja');
+    var bukti = $(this).data('bukti');
+    var tgl = $(this).data('tgl');
     var menuData = $(this).data('menu'); // Ambil data menu
 
     $('#detailId').text(id);
@@ -168,6 +188,15 @@
     $('#detailTotal').text(total);
     $('#detailMetode').text(metode);
     $('#detailMeja').text(meja);
+    $('#detailTgl').text(tgl);
+
+    if (bukti) {
+        $('#detailBuktiLink').attr('href', "{{ asset('invoice/') }}" + "/" + bukti);
+        $('#detailBuktiImg').attr('src', "{{ asset('invoice/') }}" + "/" + bukti).show();
+    } else {
+        $('#detailBuktiLink').attr('href', '#');
+        $('#detailBuktiImg').hide();
+    }
 
     try {
         var menuArray = JSON.parse(JSON.parse(menuData));
