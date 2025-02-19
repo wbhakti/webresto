@@ -157,7 +157,7 @@ class CartController extends Controller
 
             if($transaction->metode_bayar == 'qris'){
 
-                $qrisImage = asset('img/qris-contoh.png');
+                $qrisImage = asset('img/qris-kopian.jpeg');
                 $textHeading = 'Order berhasil dibuat!';
                 $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
 
@@ -177,7 +177,7 @@ class CartController extends Controller
 
             }else{
                 
-                $qrisImage = asset('img/qris-contoh.png');
+                $qrisImage = asset('img/qris-kopian.png');
                 $textHeading = 'Order berhasil dibuat!';
                 $textBody = 'Segera lakukan pembayaran dikasir!';
 
@@ -215,9 +215,11 @@ class CartController extends Controller
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
     
+                $mimage = 'webkopian/public/invoice/'. $filename;
+                
                 return response()->json([
                     'success' => true,
-                    'imageUrl' => asset('invoice/' . $filename)
+                    'imageUrl' => url($mimage),
                 ]);
             }
     
