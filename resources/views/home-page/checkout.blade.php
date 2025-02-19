@@ -142,7 +142,7 @@
                                 `Total Tagihan: ${totalTagihan}%0A%0A` +
                                 `*Detail Pesanan:*%0A` + pesanDetail;
 
-                let waLink = `https://wa.me/62822222212344?text=${waMessage}`;
+                let waLink = `https://wa.me/6282222212344?text=${waMessage}`;
 
                 window.open(waLink, '_blank');
                 modal.hide();
@@ -196,7 +196,7 @@
                                     `Bukti Transfer: ${imageUrl}%0A%0A` +
                                     `*Detail Pesanan:*%0A` + pesanDetail;
 
-                    let waLink = `https://wa.me/62822222212344?text=${waMessage}`;
+                    let waLink = `https://wa.me/6282222212344?text=${waMessage}`;
 
                     document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
 
