@@ -191,8 +191,8 @@
     $('#detailTgl').text(tgl);
 
     if (bukti) {
-        $('#detailBuktiLink').attr('href', "{{ asset('invoice/') }}" + "/" + bukti);
-        $('#detailBuktiImg').attr('src', "{{ asset('invoice/') }}" + "/" + bukti).show();
+        $('#detailBuktiLink').attr('href', "{{ url('webkopian/public/invoice') }}" + "/" + bukti);
+        $('#detailBuktiImg').attr('src', "{{ url('webkopian/public/invoice') }}" + "/" + bukti).show();
     } else {
         $('#detailBuktiLink').attr('href', '#');
         $('#detailBuktiImg').hide();

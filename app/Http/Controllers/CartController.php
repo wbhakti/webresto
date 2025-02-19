@@ -207,10 +207,50 @@ class CartController extends Controller
         try{
 
             if ($request->hasFile('bukti_pembayaran')) {
-                $file = $request->file('bukti_pembayaran');
+                $image = $request->file('bukti_pembayaran');
                 $filename = 'buktitransfer_'.$request->input('idtransaksi').'.jpg';
-                $file->move(public_path('invoice'), $filename);
-    
+
+                //kompres image
+                $mimeType = $image->getMimeType();
+                list($width, $height) = getimagesize($image->getRealPath());
+                $newWidth = 600;
+                $newHeight = 400;
+                $tmp = imagecreatetruecolor($newWidth, $newHeight);
+
+                if ($mimeType === 'image/jpeg') {
+                    $source = imagecreatefromjpeg($image->getRealPath());
+                } elseif ($mimeType === 'image/png'){
+                    $source = imagecreatefrompng($image->getRealPath());
+                    imagealphablending($tmp, false);
+                    imagesavealpha($tmp, true);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                    ]);
+                }
+
+                // Resize gambar
+                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+                // Tambahkan teks
+                $font = public_path('arial.ttf');
+                $fontSize = 25;
+                $textColor = imagecolorallocate($tmp, 255, 255, 255);
+                $timestamp = 'kopian : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $xTimestamp = 20;
+                $yTimestamp = 50;
+
+                imagettftext($tmp, $fontSize, 0, $xTimestamp, $yTimestamp, $textColor, $font, $timestamp);
+
+                if ($mimeType === 'image/jpeg') {
+                    imagejpeg($tmp, public_path('invoice') . '/' . $filename, 80); // JPEG kualitas 80%
+                } elseif ($mimeType === 'image/png') {
+                    imagepng($tmp, public_path('invoice') . '/' . $filename, 8); // PNG kompresi level 8
+                }
+
+                imagedestroy($tmp);
+                imagedestroy($source);
+
                 DB::table('transactions')
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
