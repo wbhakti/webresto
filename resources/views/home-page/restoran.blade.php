@@ -60,7 +60,7 @@
                 @foreach ($produk as $item)
                 <div class="col mb-5">
                     <div class="card h-100">
-                        <img class="card-img-top" src="{{ asset('img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
+                        <img class="card-img-top" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
                         <!-- Product details-->
                         <div class="card-body p-4">
                             <div class="text-center">
@@ -104,7 +104,7 @@
                             </div>
                             <div class="modal-body">
                                 <p><strong>Harga:</strong> Rp {{ $item->harga }}</p>
-                                <img src="{{ asset('img/' . $item->image) }}" alt="{{ $item->nama }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';"/>
+                                <img src="{{ url('public/img/' . $item->image) }}" alt="{{ $item->nama }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';"/>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

@@ -54,7 +54,7 @@
                         <td>{{ $item->harga }}</td>
                         <td>{{ $item->kategori }}</td>
                         <td>
-                            <img src="{{ asset('img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
+                            <img src="{{ url('public/img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
                         </td>
                         <div class="button-group">
                         <td>
@@ -230,7 +230,7 @@ $(document).ready(function() {
             $('#editnama').val(nama);
             $('#editharga').val(harga);
             $('#editkategori').val(kategori);
-            $('#currentImage').attr('src', "{{ asset('img/') }}" + "/" + img);
+            $('#currentImage').attr('src', "{{ url('public/img/') }}" + img);
 
             $('#editModal').modal('show');
         });

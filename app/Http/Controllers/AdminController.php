@@ -134,7 +134,7 @@ class AdminController extends Controller
     public function postmenu(Request $request)
     {
         try {
-
+            
             if (!session()->has('user_id')) {
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
@@ -143,8 +143,8 @@ class AdminController extends Controller
 
                 if ($request->hasFile('img_menu')){
                     $file = $request->file('img_menu');
-                    $filename = $file->getClientOriginalName().'.jpg';
-                    $file->move(public_path('img'), $filename);
+                    $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
+                    $file->move(base_path('../public/img'), $filename);
 
                     DB::table('menus')
                     ->where('id', $request->input('menu_id'))
@@ -175,10 +175,11 @@ class AdminController extends Controller
                 return redirect()->route('MasterMenu')->with('success', 'berhasil hapus data');
             }
             else{
-
+                
                 $file = $request->file('img_menu');
-                $filename = $file->getClientOriginalName().'.jpg';
-                $file->move(public_path('img'), $filename);
+                $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
+                //$file->move(public_path('img'), $filename);
+                $file->move(base_path('../public/img'), $filename);
 
                 DB::table('menus')->insert([
                     'nama' => $request->input('nama'),
