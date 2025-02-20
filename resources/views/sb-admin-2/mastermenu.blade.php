@@ -230,7 +230,7 @@ $(document).ready(function() {
             $('#editnama').val(nama);
             $('#editharga').val(harga);
             $('#editkategori').val(kategori);
-            $('#currentImage').attr('src', "{{ url('public/img/') }}" + img);
+            $('#currentImage').attr('src', "{{ url('public/img/') }}" + "/" + img);
 
             $('#editModal').modal('show');
         });
