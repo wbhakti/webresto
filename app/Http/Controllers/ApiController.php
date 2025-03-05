@@ -15,13 +15,13 @@ class ApiController  extends Controller
 
             // Validasi input
             $validatedData = $request->validate([
-                'email' => 'required|string',
+                'phone_number' => 'required|string',
                 'password' => 'required|string'
             ]);
 
-            $passHash = base64_encode(hash_hmac('sha256', $validatedData['email'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
+            $passHash = base64_encode(hash_hmac('sha256', $validatedData['phone_number'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
             $user = DB::table('customers')
-                ->where('email', $validatedData['email'])
+                ->where('nomor_hp', $validatedData['phone_number'])
                 ->where('password', $passHash)
                 ->first();
 
@@ -29,7 +29,7 @@ class ApiController  extends Controller
 
                 $expiresAt = Carbon::now()->addHours(1)->timestamp;
                 $tokenData = json_encode([
-                    'user_id' => $user->email,
+                    'user_id' => $user->nomor_hp,
                     'expires_at' => $expiresAt
                 ]);
                 $token = $this->encryptAES128($tokenData);
@@ -54,7 +54,7 @@ class ApiController  extends Controller
             }
         } catch (\Exception $e) {
             //dd($e);
-            Log::error($request->input('username') . ' Error occurred : ' . $e->getMessage());
+            Log::error($request->input('phone_number') . ' Error occurred : ' . $e->getMessage());
 
             return response()->json([
                 'endpoint' => 'login',
@@ -71,14 +71,25 @@ class ApiController  extends Controller
 
             // Validasi input
             $validatedData = $request->validate([
-                'email' => 'required|string|max:100',
-                'password' => 'required|string|max:6'
+                'fullname' => 'required|string|max:100',
+                'phone_number' => 'required|string|max:15',
+                'password' => 'required|string|max:12'
             ]);
 
-            $passHash = base64_encode(hash_hmac('sha256', $validatedData['email'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
-            
+            // Cek nomor HP sudah ada
+            $isPhoneExist = DB::table('customers')->where('nomor_hp', $validatedData['phone_number'])->exists();
+            if ($isPhoneExist) {
+                return response()->json([
+                    'endpoint' => 'register',
+                    'responseCode' => '1',
+                    'responseMessage' => 'phone number already registered'
+                ], 200);
+            }
+
+            $passHash = base64_encode(hash_hmac('sha256', $validatedData['phone_number'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
             DB::table('customers')->insert([
-                'email' => $validatedData['email'],
+                'nama_lengkap' => $validatedData['fullname'],
+                'nomor_hp'=> $validatedData['phone_number'],
                 'password' => $passHash
             ]);
 
@@ -90,7 +101,7 @@ class ApiController  extends Controller
 
         } catch (\Exception $e) {
             //dd($e);
-            Log::error('registrationuser Error occurred : ' . $e->getMessage());
+            Log::error('RegistrationUser Error occurred : ' . $e->getMessage());
 
             return response()->json([
                 'endpoint' => 'register',
@@ -185,7 +196,7 @@ class ApiController  extends Controller
 
             //cek token di table
             $user = DB::table('customers')
-            ->where('email', $tokenData['user_id'])
+            ->where('nomor_hp', $tokenData['user_id'])
             ->where('token', $token)
             ->first();
 
