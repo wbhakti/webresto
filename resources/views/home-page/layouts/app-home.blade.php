@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Menu Kopian</title>
+        <title>Daftar Menu</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -53,7 +53,7 @@
         
         <!-- Footer-->
         <footer class="py-5 bg-dark" style="background-color: #0103c2 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopian 2025</p></div>
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Stargroup 2025</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
