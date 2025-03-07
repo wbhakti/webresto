@@ -23,4 +23,8 @@ Route::middleware('apikey')->group(function () {
     Route::post('/login', [ApiController::class, 'LoginUser']);
     Route::post('/register', [ApiController::class, 'RegistrationUser']);
     Route::post('/history', [ApiController::class, 'History']);
+    Route::post('/checkout', [ApiController::class, 'Checkout']);
+    Route::post('/upload-struk', [ApiController::class, 'UploadStruk']);
+    Route::post('/detail-order', [ApiController::class, 'Detail']);
+    Route::get('/menu', [ApiController::class, 'Menu']);
 });

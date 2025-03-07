@@ -41,15 +41,15 @@ class ApiController  extends Controller
                     'endpoint' => 'login',
                     'responseCode' => '0',
                     'responseMessage' => 'login success',
-                    'token' => $token
+                    'token' => $token,
+                    'firebase_id' => $user->id_firebase
                 ], 200);
                 
             } else {
                 return response()->json([
                     'endpoint' => 'login',
                     'responseCode' => '1',
-                    'responseMessage' => 'login failed [user tidak ditemukan]',
-                    'token' => null
+                    'responseMessage' => 'login failed [user tidak ditemukan]'
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -59,8 +59,7 @@ class ApiController  extends Controller
             return response()->json([
                 'endpoint' => 'login',
                 'responseCode' => '1',
-                'responseMessage' => 'login failed [exception error]',
-                'token' => null
+                'responseMessage' => 'login failed [exception error]'
             ], 200);
         }
     }
@@ -73,7 +72,8 @@ class ApiController  extends Controller
             $validatedData = $request->validate([
                 'fullname' => 'required|string|max:100',
                 'phone_number' => 'required|string|max:15',
-                'password' => 'required|string|max:12'
+                'password' => 'required|string|max:12',
+                'firebase_id' => 'required|string'
             ]);
 
             // Cek nomor HP sudah ada
@@ -90,7 +90,8 @@ class ApiController  extends Controller
             DB::table('customers')->insert([
                 'nama_lengkap' => $validatedData['fullname'],
                 'nomor_hp'=> $validatedData['phone_number'],
-                'password' => $passHash
+                'password' => $passHash,
+                'id_firebase' => $validatedData['firebase_id'],
             ]);
 
             return response()->json([
@@ -111,14 +112,234 @@ class ApiController  extends Controller
         }
     }
 
-    public function History(Request $request)
+    public function Checkout(Request $request)
     {
         try {
+
+            $validatedData = $request->validate([
+                'nama' => 'required|string',
+                'nomor_hp' => 'required|string|max:15',
+                'meja' => 'required|string',
+                'detail_order' => 'required|string',
+                'total_bayar' => 'required|string',
+                'metode_bayar' => 'required|string'
+            ]);
 
             $tokenCheck = $this->validateToken($request->input('token'));
             if ($tokenCheck['status']) {
 
-                $dataTransaksi = DB::table('transactions')->where('id_transaksi', $request->input('id_transaksi'))->first();
+                $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
+
+                // Simpan data ke database
+                DB::table('transactions')->insert([
+                    'id_transaksi' => $idTransaksi,
+                    'customer' => $validatedData['nama'],
+                    'nomor_hp' => $validatedData['nomor_hp'],
+                    'meja' => $validatedData['meja'],
+                    'details' => $validatedData['detail_order'],
+                    'total_bayar' => $validatedData['total_bayar'],
+                    'metode_bayar' => $validatedData['metode_bayar'],
+                    'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
+                ]);
+
+                return response()->json([
+                    'endpoint' => 'checkout',
+                    'responseCode' => '0',
+                    'responseMessage' => 'checkout success',
+                    'id_transaksi' => $idTransaksi
+                ], 200);
+                
+            }else{
+
+                return response()->json([
+                    'endpoint' => 'checkout',
+                    'responseCode' => '1',
+                    'responseMessage' => $tokenCheck['message']
+                ], 200);
+
+            }
+
+        } catch (\Exception $e) {
+            
+            Log::error('checkout Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'checkout',
+                'responseCode' => '1',
+                'responseMessage' => 'checkout failed [exception error]'
+            ], 200);
+
+        }
+    }
+
+    public function UploadStruk(Request $request)
+    {
+        try{
+
+            $validatedData = $request->validate([
+                'id_transaksi' => 'required|string'
+            ]);
+
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                if ($request->hasFile('bukti_pembayaran')) {
+                    $image = $request->file('bukti_pembayaran');
+                    $filename = 'buktitransfer_'.$validatedData['id_transaksi'].'.jpg';
+    
+                    //kompres image
+                    $mimeType = $image->getMimeType();
+                    list($width, $height) = getimagesize($image->getRealPath());
+                    $newWidth = 600;
+                    $newHeight = 400;
+                    $tmp = imagecreatetruecolor($newWidth, $newHeight);
+    
+                    if ($mimeType === 'image/jpeg') {
+                        $source = imagecreatefromjpeg($image->getRealPath());
+                    } elseif ($mimeType === 'image/png'){
+                        $source = imagecreatefrompng($image->getRealPath());
+                        imagealphablending($tmp, false);
+                        imagesavealpha($tmp, true);
+                    } else {
+                        return response()->json([
+                            'endpoint' => 'upload-struk',
+                            'responseCode' => '1',
+                            'responseMessage' => 'format file tidak valid'
+                        ], 200);
+                    }
+    
+                    // Resize gambar
+                    imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+    
+                    // Tambahkan teks
+                    $font = public_path('arial.ttf');
+                    $fontSize = 25;
+                    $textColor = imagecolorallocate($tmp, 255, 255, 255);
+                    $timestamp = 'kopian : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                    $xTimestamp = 20;
+                    $yTimestamp = 50;
+    
+                    imagettftext($tmp, $fontSize, 0, $xTimestamp, $yTimestamp, $textColor, $font, $timestamp);
+    
+                    if ($mimeType === 'image/jpeg') {
+                        imagejpeg($tmp, public_path('invoice') . '/' . $filename, 80); // JPEG kualitas 80%
+                    } elseif ($mimeType === 'image/png') {
+                        imagepng($tmp, public_path('invoice') . '/' . $filename, 8); // PNG kompresi level 8
+                    }
+    
+                    imagedestroy($tmp);
+                    imagedestroy($source);
+    
+                    DB::table('transactions')
+                    ->where('id_transaksi', $validatedData['id_transaksi'])
+                    ->update([ 'bukti_bayar' => $filename, ]);
+        
+                    $mimage = 'webkopian/public/invoice/'. $filename;
+                    
+                    return response()->json([
+                        'endpoint' => 'upload-struk',
+                        'responseCode' => '0',
+                        'responseMessage' => 'upload success',
+                        'id_transaksi' => $validatedData['id_transaksi'],
+                        'image_url' => url($mimage)
+                    ], 200);
+
+                }else{
+
+                    return response()->json([
+                        'endpoint' => 'upload-struk',
+                        'responseCode' => '1',
+                        'responseMessage' => 'image file tidak valid'
+                    ], 200);
+
+                }
+
+            }else{
+
+                return response()->json([
+                    'endpoint' => 'upload-struk',
+                    'responseCode' => '1',
+                    'responseMessage' => $tokenCheck['message']
+                ], 200);
+
+            }
+
+        }catch (\Exception $e) {
+            Log::error('Gagal upload bukti pembayaran: ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'upload-struk',
+                'responseCode' => '1',
+                'responseMessage' => 'upload failed [exception error]'
+            ], 200);
+        }
+    }
+
+    public function Detail(Request $request)
+    {
+        try {
+
+            // Validasi input
+            $validatedData = $request->validate([
+                'id_transaksi' => 'required|string|max:100'
+            ]);
+
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $dataTransaksi = DB::table('transactions')->where('id_transaksi', $validatedData['id_transaksi'])->first();
+                if ($dataTransaksi) {
+                    return response()->json([
+                        'endpoint' => 'detail-order',
+                        'responseCode' => '0',
+                        'responseMessage' => 'success',
+                        'data' => $dataTransaksi
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'endpoint' => 'detail-order',
+                        'responseCode' => '1',
+                        'responseMessage' => 'detail-order not found',
+                        'data' => null
+                    ], 200);
+                }
+            }else{
+
+                return response()->json([
+                    'endpoint' => 'detail-order',
+                    'responseCode' => '1',
+                    'responseMessage' => $tokenCheck['message'],
+                    'data' => null
+                ], 200);
+
+            }
+
+        } catch (\Exception $e) {
+            
+            Log::error('detail-order Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'detail-order',
+                'responseCode' => '1',
+                'responseMessage' => 'detail-order failed [exception error]',
+                'data' => null
+            ], 200);
+
+        }
+    }
+
+    public function History(Request $request)
+    {
+        try {
+
+            $validatedData = $request->validate([
+                'phone_number' => 'required|string|max:15'
+            ]);
+
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $dataTransaksi = DB::table('transactions')->where('nomor_hp', $validatedData['phone_number'])->get();
                 if ($dataTransaksi) {
                     return response()->json([
                         'endpoint' => 'history',
@@ -153,6 +374,41 @@ class ApiController  extends Controller
                 'endpoint' => 'history',
                 'responseCode' => '1',
                 'responseMessage' => 'history failed [exception error]',
+                'data' => null
+            ], 200);
+
+        }
+    }
+
+    public function Menu()
+    {
+        try {
+
+            $dataMenu = DB::table('menus')->get();
+            if ($dataMenu) {
+                return response()->json([
+                    'endpoint' => 'menu',
+                    'responseCode' => '0',
+                    'responseMessage' => 'success',
+                    'data' => $dataMenu
+                ], 200);
+            }else{
+                return response()->json([
+                    'endpoint' => 'menu',
+                    'responseCode' => '1',
+                    'responseMessage' => 'not found',
+                    'data' => null
+                ], 200);
+            }
+
+        } catch (\Exception $e) {
+            
+            Log::error('menu Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'menu',
+                'responseCode' => '1',
+                'responseMessage' => 'menu failed [exception error]',
                 'data' => null
             ], 200);
 
