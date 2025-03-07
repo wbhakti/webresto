@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Daftar Menu</title>
+        <title>Menu Star Village</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -20,7 +20,7 @@
                 padding-top: 56px; /* Sesuaikan nilai ini dengan tinggi navbar */
             }
             .custom-navbar {
-                background-color: #0103c2; 
+                background-color: #AA845A; 
                 color: white;
             }
             .custom-navbar .btn-outline-dark {
@@ -52,8 +52,8 @@
         @yield('content')
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark" style="background-color: #0103c2 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Stargroup 2025</p></div>
+        <footer class="py-5 bg-dark" style="background-color: #AA845A !important;">
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Star Village 2025</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
