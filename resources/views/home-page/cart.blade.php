@@ -203,7 +203,7 @@
                             </label>
                             <select class="form-select py-2" id="meja" name="meja" required>
                                 <option value="" selected disabled>Pilih Nomor Meja</option>
-                                @for ($i = 1; $i <= 20; $i++) 
+                                @for ($i = 1; $i <= 29; $i++) 
                                     <option value="{{ $i }}">Meja {{ $i }}</option>
                                 @endfor
                             </select>
