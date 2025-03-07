@@ -27,6 +27,7 @@ class HomeController extends Controller
             $dataproduk = DB::table('menus')
             ->join('categories', 'menus.kategori', '=', 'categories.id')
             ->select('menus.*', 'categories.nama as nama_kategori')
+            ->where('menus.is_delete', '0')
             ->get();
 
             $kategori = $request->query('kategori');
@@ -38,7 +39,7 @@ class HomeController extends Controller
             }
 
             $merchant = DB::table('merchants')->first();
-            $dataKategori = DB::table('categories')->get();
+            $dataKategori = DB::table('categories')->where('is_delete', '0')->get();
 
             return view('home-page/restoran', [
                 'kategori' => $dataKategori, 

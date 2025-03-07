@@ -149,6 +149,10 @@ class CartController extends Controller
                 abort(404);
             }
 
+            $merchant = DB::table('merchants')->first();
+            $phone_wa = $merchant->phone_number; 
+            $qrisImage = asset('img/'. $merchant->qris_image );
+
             // Ambil data dari request
             $nama = $transaction->customer;
             $meja = $transaction->meja;
@@ -157,11 +161,11 @@ class CartController extends Controller
 
             if($transaction->metode_bayar == 'qris'){
 
-                $qrisImage = asset('img/qris-kopian.jpeg');
                 $textHeading = 'Order berhasil dibuat!';
                 $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
 
                 return view('home-page.checkout', [
+                    'phone_wa' => $phone_wa,
                     'cartCount' => 0,
                     'qrisImage' => $qrisImage,
                     'isQRIS' => true,
@@ -176,12 +180,11 @@ class CartController extends Controller
                 ]);
 
             }else{
-                
-                $qrisImage = asset('img/qris-kopian.png');
                 $textHeading = 'Order berhasil dibuat!';
                 $textBody = 'Segera lakukan pembayaran dikasir!';
 
                 return view('home-page.checkout', [
+                    'phone_wa' => $phone_wa,
                     'cartCount' => 0,
                     'qrisImage' => $qrisImage,
                     'isQRIS' => false,
