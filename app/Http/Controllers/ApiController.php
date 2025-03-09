@@ -415,6 +415,41 @@ class ApiController  extends Controller
         }
     }
 
+    public function Merchant()
+    {
+        try {
+
+            $dataMerchant = DB::table('merchants')->get();
+            if ($dataMerchant) {
+                return response()->json([
+                    'endpoint' => 'merchants',
+                    'responseCode' => '0',
+                    'responseMessage' => 'success',
+                    'data' => $dataMerchant
+                ], 200);
+            }else{
+                return response()->json([
+                    'endpoint' => 'merchants',
+                    'responseCode' => '1',
+                    'responseMessage' => 'not found',
+                    'data' => null
+                ], 200);
+            }
+
+        } catch (\Exception $e) {
+            
+            Log::error('merchants Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'merchants',
+                'responseCode' => '1',
+                'responseMessage' => 'merchants failed [exception error]',
+                'data' => null
+            ], 200);
+
+        }
+    }
+
     function encryptAES128($plaintext)
     {
         $key = 'CaNElo#BagUS@123';
