@@ -27,4 +27,5 @@ Route::middleware('apikey')->group(function () {
     Route::post('/upload-struk', [ApiController::class, 'UploadStruk']);
     Route::post('/detail-order', [ApiController::class, 'Detail']);
     Route::get('/menu', [ApiController::class, 'Menu']);
+    Route::get('/merchant', [ApiController::class, 'Merchant']);
 });
