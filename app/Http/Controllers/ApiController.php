@@ -434,8 +434,8 @@ class ApiController  extends Controller
     {
         try {
 
-            $dataMerchant = DB::table('merchants')->get();
-            if ($dataMerchant) {
+            $data = DB::table('merchants')->get();
+            if ($dataMerchant = $data->first()) {
                 return response()->json([
                     'endpoint' => 'merchants',
                     'responseCode' => '0',
