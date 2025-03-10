@@ -384,20 +384,34 @@ class ApiController  extends Controller
     {
         try {
 
+            $dataCat = DB::table('categories')->get();
             $dataMenu = DB::table('menus')->get();
-            if ($dataMenu) {
-                return response()->json([
-                    'endpoint' => 'menu',
-                    'responseCode' => '0',
-                    'responseMessage' => 'success',
-                    'data' => $dataMenu
-                ], 200);
+            
+            if ($dataCat) {
+                if ($dataMenu) {
+                    return response()->json([
+                        'endpoint' => 'menu',
+                        'responseCode' => '0',
+                        'responseMessage' => 'success',
+                        'dataCategory' => $dataMenu,
+                        'dataMenu' => $dataMenu
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'endpoint' => 'menu',
+                        'responseCode' => '1',
+                        'responseMessage' => 'menu not found',
+                        'dataCategory' => null,
+                        'dataMenu' => null
+                    ], 200);
+                }
             }else{
                 return response()->json([
                     'endpoint' => 'menu',
                     'responseCode' => '1',
-                    'responseMessage' => 'not found',
-                    'data' => null
+                    'responseMessage' => 'category not found',
+                    'dataCategory' => null,
+                    'dataMenu' => null
                 ], 200);
             }
 
@@ -409,7 +423,8 @@ class ApiController  extends Controller
                 'endpoint' => 'menu',
                 'responseCode' => '1',
                 'responseMessage' => 'menu failed [exception error]',
-                'data' => null
+                'dataCategory' => null,
+                'dataMenu' => null
             ], 200);
 
         }
