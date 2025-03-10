@@ -393,7 +393,7 @@ class ApiController  extends Controller
                         'endpoint' => 'menu',
                         'responseCode' => '0',
                         'responseMessage' => 'success',
-                        'dataCategory' => $dataMenu,
+                        'dataCategory' => $dataCat,
                         'dataMenu' => $dataMenu
                     ], 200);
                 } else {
