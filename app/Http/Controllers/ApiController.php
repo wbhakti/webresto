@@ -42,7 +42,11 @@ class ApiController  extends Controller
                     'responseCode' => '0',
                     'responseMessage' => 'login success',
                     'token' => $token,
-                    'firebase_id' => $user->id_firebase
+                    'firebase_id' => $user->id_firebase,
+                    'data' => [
+                        'nama_lengkap' => $user->nama_lengkap,
+                        'nomor_hp' => $user->nomor_hp
+                    ]
                 ], 200);
                 
             } else {
@@ -97,7 +101,11 @@ class ApiController  extends Controller
             return response()->json([
                 'endpoint' => 'register',
                 'responseCode' => '0',
-                'responseMessage' => 'register success'
+                'responseMessage' => 'register success',
+                'data' => [
+                    'nama_lengkap' => $validatedData['fullname'],
+                    'nomor_hp' => $validatedData['phone_number']
+                ]
             ], 200);
 
         } catch (\Exception $e) {
