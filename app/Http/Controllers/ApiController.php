@@ -41,8 +41,13 @@ class ApiController  extends Controller
                     'endpoint' => 'login',
                     'responseCode' => '0',
                     'responseMessage' => 'login success',
-                    'token' => $token,
-                    'firebase_id' => $user->id_firebase
+                    'user' => [
+                        'id' => $user->rowid,
+                        'nama_lengkap' => $user->nama_lengkap,
+                        'nomor_hp' => $user->nomor_hp,
+                        'firebase_id' => $user->id_firebase,
+                        'token' => $token,
+                    ]
                 ], 200);
                 
             } else {
@@ -94,10 +99,32 @@ class ApiController  extends Controller
                 'id_firebase' => $validatedData['firebase_id'],
             ]);
 
+            $user = DB::table('customers')
+                ->where('nomor_hp', $validatedData['phone_number'])
+                ->where('password', $passHash)
+                ->first();
+
+            $expiresAt = Carbon::now()->addHours(1)->timestamp;
+            $tokenData = json_encode([
+                'user_id' => $user->nomor_hp,
+                'expires_at' => $expiresAt
+            ]);
+            $token = $this->encryptAES128($tokenData);
+
+            //update ke DB
+            DB::table('customers')->where('rowid', $user->rowid)->update([ 'token' => $token]);
+
             return response()->json([
                 'endpoint' => 'register',
                 'responseCode' => '0',
-                'responseMessage' => 'register success'
+                'responseMessage' => 'register success',
+                'user' => [
+                    'id' => $user->rowid,
+                    'nama_lengkap' => $user->nama_lengkap,
+                    'nomor_hp' => $user->nomor_hp,
+                    'firebase_id' => $user->id_firebase,
+                    'token' => $token,
+                ]
             ], 200);
 
         } catch (\Exception $e) {
