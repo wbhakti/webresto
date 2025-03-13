@@ -180,9 +180,9 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'checkout',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message']
-                ], 200);
+                ], 401);
 
             }
 
@@ -285,9 +285,9 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'upload-struk',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message']
-                ], 200);
+                ], 401);
 
             }
 
@@ -334,10 +334,10 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'detail-order',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
 
             }
 
@@ -386,10 +386,10 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'history',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
 
             }
 
@@ -407,39 +407,53 @@ class ApiController  extends Controller
         }
     }
 
-    public function Menu()
+    public function Menu(Request $request)
     {
         try {
 
-            $dataCat = DB::table('categories')->get();
-            $dataMenu = DB::table('menus')->get();
-            
-            if ($dataCat) {
-                if ($dataMenu) {
-                    return response()->json([
-                        'endpoint' => 'menu',
-                        'responseCode' => '0',
-                        'responseMessage' => 'success',
-                        'dataCategory' => $dataCat,
-                        'dataMenu' => $dataMenu
-                    ], 200);
-                } else {
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $dataCat = DB::table('categories')->get();
+                $dataMenu = DB::table('menus')->get();
+                
+                if ($dataCat) {
+                    if ($dataMenu) {
+                        return response()->json([
+                            'endpoint' => 'menu',
+                            'responseCode' => '0',
+                            'responseMessage' => 'success',
+                            'dataCategory' => $dataCat,
+                            'dataMenu' => $dataMenu
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'endpoint' => 'menu',
+                            'responseCode' => '1',
+                            'responseMessage' => 'menu not found',
+                            'dataCategory' => null,
+                            'dataMenu' => null
+                        ], 200);
+                    }
+                }else{
                     return response()->json([
                         'endpoint' => 'menu',
                         'responseCode' => '1',
-                        'responseMessage' => 'menu not found',
+                        'responseMessage' => 'category not found',
                         'dataCategory' => null,
                         'dataMenu' => null
                     ], 200);
                 }
+                
             }else{
+
                 return response()->json([
                     'endpoint' => 'menu',
-                    'responseCode' => '1',
-                    'responseMessage' => 'category not found',
-                    'dataCategory' => null,
-                    'dataMenu' => null
-                ], 200);
+                    'responseCode' => '21',
+                    'responseMessage' => $tokenCheck['message'],
+                    'data' => null
+                ], 401);
+
             }
 
         } catch (\Exception $e) {
@@ -457,25 +471,39 @@ class ApiController  extends Controller
         }
     }
 
-    public function Merchant()
+    public function Merchant(Request $request)
     {
         try {
 
-            $data = DB::table('merchants')->get();
-            if ($dataMerchant = $data->first()) {
-                return response()->json([
-                    'endpoint' => 'merchants',
-                    'responseCode' => '0',
-                    'responseMessage' => 'success',
-                    'data' => $dataMerchant
-                ], 200);
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $data = DB::table('merchants')->get();
+                if ($dataMerchant = $data->first()) {
+                    return response()->json([
+                        'endpoint' => 'merchants',
+                        'responseCode' => '0',
+                        'responseMessage' => 'success',
+                        'data' => $dataMerchant
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'endpoint' => 'merchants',
+                        'responseCode' => '1',
+                        'responseMessage' => 'not found',
+                        'data' => null
+                    ], 200);
+                }
+                
             }else{
+
                 return response()->json([
                     'endpoint' => 'merchants',
-                    'responseCode' => '1',
-                    'responseMessage' => 'not found',
+                    'responseCode' => '21',
+                    'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
+
             }
 
         } catch (\Exception $e) {
