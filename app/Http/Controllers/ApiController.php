@@ -261,7 +261,7 @@ class ApiController  extends Controller
                     ->where('id_transaksi', $validatedData['id_transaksi'])
                     ->update([ 'bukti_bayar' => $filename, ]);
         
-                    $mimage = 'webkopian/public/invoice/'. $filename;
+                    $mimage = 'webkopinggir/public/invoice/'. $filename;
                     
                     return response()->json([
                         'endpoint' => 'upload-struk',

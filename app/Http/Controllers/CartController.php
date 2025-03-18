@@ -258,7 +258,7 @@ class CartController extends Controller
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
     
-                $mimage = 'webkopian/public/invoice/'. $filename;
+                $mimage = 'webkopinggir/public/invoice/'. $filename;
                 
                 return response()->json([
                     'success' => true,
