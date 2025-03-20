@@ -240,7 +240,7 @@ class ApiController  extends Controller
     
                     DB::table('transactions')
                     ->where('id_transaksi', $validatedData['id_transaksi'])
-                    ->update([ 'bukti_bayar' => $filename, ]);
+                    ->update([ 'bukti_bayar' => $filename, 'status' => 'KONFIRMASI', ]);
         
                     $mimage = 'webkopian/public/invoice/'. $filename;
                     
@@ -467,6 +467,65 @@ class ApiController  extends Controller
                 'endpoint' => 'merchants',
                 'responseCode' => '1',
                 'responseMessage' => 'merchants failed [exception error]',
+                'data' => null
+            ], 200);
+
+        }
+    }
+
+    public function Status(Request $request)
+    {
+        try {
+
+            $validatedData = $request->validate([
+                'phone_number' => 'required|string|max:15',
+                'id_transaksi' => 'required|string|max:100'
+            ]);
+
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $dataTransaksi = DB::table('transactions')
+                ->where('nomor_hp', $validatedData['phone_number'])
+                ->where('id_transaksi', $validatedData['id_transaksi'])
+                ->first();
+
+                if ($dataTransaksi) {
+                    return response()->json([
+                        'endpoint' => 'status',
+                        'responseCode' => '0',
+                        'responseMessage' => 'status found',
+                        'data' => [
+                            'status' => $dataTransaksi->status ?? 'BELUM_BAYAR'
+                        ]
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'endpoint' => 'status',
+                        'responseCode' => '1',
+                        'responseMessage' => 'status not found',
+                        'data' => null
+                    ], 200);
+                }
+            }else{
+
+                return response()->json([
+                    'endpoint' => 'status',
+                    'responseCode' => '1',
+                    'responseMessage' => $tokenCheck['message'],
+                    'data' => null
+                ], 200);
+
+            }
+
+        } catch (\Exception $e) {
+            
+            Log::error('status Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'status',
+                'responseCode' => '1',
+                'responseMessage' => 'status failed [exception error]',
                 'data' => null
             ], 200);
 

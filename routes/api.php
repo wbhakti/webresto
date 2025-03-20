@@ -28,4 +28,5 @@ Route::middleware('apikey')->group(function () {
     Route::post('/detail-order', [ApiController::class, 'Detail']);
     Route::get('/menu', [ApiController::class, 'Menu']);
     Route::get('/merchant', [ApiController::class, 'Merchant']);
+    Route::post('/status-order', [ApiController::class, 'Status']);
 });
