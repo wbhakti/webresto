@@ -167,6 +167,7 @@ class ApiController  extends Controller
                     'total_bayar' => $validatedData['total_bayar'],
                     'metode_bayar' => $validatedData['metode_bayar'],
                     'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
+                    'status' => 'BELUM_BAYAR',
                 ]);
 
                 return response()->json([
@@ -561,7 +562,7 @@ class ApiController  extends Controller
                     'responseCode' => '1',
                     'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
 
             }
 

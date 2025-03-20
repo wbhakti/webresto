@@ -82,6 +82,7 @@
                                                 data-meja="{{ $item->meja }}"
                                                 data-bukti="{{ $item->bukti_bayar }}"
                                                 data-tgl="{{ $item->addtime }}"
+                                                data-status="{{ $item->status }}"
                                                 data-menu='@json($item->details)'>Detail</button>                                
                                     </div>
                                 </td>                                
@@ -116,6 +117,7 @@
                     <p><b>Nomor Meja:</b> <span id="detailMeja"></span></p>
                     <p><b>Total Bayar:</b> <span id="detailTotal"></span></p>
                     <p><b>Metode Bayar:</b> <span id="detailMetode"></span></p>
+                    <p><b>Status:</b> <span id="detailStatus"></span></p>
                     <p><b>Bukti Bayar:</b> 
                         <a id="detailBuktiLink" href="#" target="_blank">
                             <img id="detailBuktiImg" src="" alt="Bukti Bayar" style="max-width: 100px; max-height: 100px;">
@@ -138,6 +140,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="btnLunas">LUNAS</button>
                 </div>
             </div>
         </div>
@@ -182,6 +185,7 @@
     var bukti = $(this).data('bukti');
     var tgl = $(this).data('tgl');
     var menuData = $(this).data('menu'); // Ambil data menu
+    var status = $(this).data('status');
 
     $('#detailId').text(id);
     $('#detailNama').text(nama);
@@ -189,6 +193,7 @@
     $('#detailMetode').text(metode);
     $('#detailMeja').text(meja);
     $('#detailTgl').text(tgl);
+    $('#detailStatus').text(status);
 
     if (bukti) {
         $('#detailBuktiLink').attr('href', "{{ url('webkopian/public/invoice') }}" + "/" + bukti);
@@ -218,7 +223,44 @@
         $('#detailMenuTable').html("<tr><td colspan='4'>Format menu tidak valid.</td></tr>");
     }
 
+    let btnLunas = $('#btnLunas');
+    btnLunas.data('id', id);
+    if (status === "KONFIRMASI") {
+        btnLunas.show().prop('disabled', false);
+    }  else {
+        btnLunas.hide();
+    }
+
     $('#detailModal').modal('show');
+});
+
+$('#btnLunas').on('click', function() {
+    var transaksiId = $(this).data('id');
+
+    if (!transaksiId) {
+        alert("ID transaksi tidak ditemukan!");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('updatestatus') }}",
+        type: "POST",
+        data: {
+            id: transaksiId,
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(response) {
+            alert(response.message);
+            $('#detailStatus').text("LUNAS");
+            $('#btnLunas').prop('disabled', true);
+            $('#detailModal').modal('hide');
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating status:", error);
+            alert("Gagal memperbarui status transaksi. Coba lagi!");
+        }
+    });
 });
 
 </script>    

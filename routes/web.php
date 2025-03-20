@@ -41,3 +41,5 @@ Route::post('/postkategori', 'App\Http\Controllers\AdminController@postkategori'
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
 Route::get('/reportTransaction', 'App\Http\Controllers\AdminController@ReportTransaction')->name('ReportTransaction');
+
+Route::post('/updatestatus', 'App\Http\Controllers\AdminController@UpdateStatus')->name('updatestatus');

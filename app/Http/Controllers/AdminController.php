@@ -292,4 +292,27 @@ class AdminController extends Controller
         }
     }
 
+    public function UpdateStatus(Request $request)
+    {
+        try {
+            if (!session()->has('user_id')) {
+                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
+            }
+    
+            $updated = DB::table('transactions')
+                ->where('id_transaksi', $request->input('id'))
+                ->update(['status' => 'LUNAS']);
+    
+            if ($updated) {
+                return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Data tidak ditemukan']);
+            }
+    
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
+        }
+    }
+
 }
