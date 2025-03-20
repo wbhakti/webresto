@@ -41,11 +41,12 @@ class ApiController  extends Controller
                     'endpoint' => 'login',
                     'responseCode' => '0',
                     'responseMessage' => 'login success',
-                    'token' => $token,
-                    'firebase_id' => $user->id_firebase,
-                    'data' => [
+                    'user' => [
+                        'id' => $user->rowid,
                         'nama_lengkap' => $user->nama_lengkap,
-                        'nomor_hp' => $user->nomor_hp
+                        'nomor_hp' => $user->nomor_hp,
+                        'firebase_id' => $user->id_firebase,
+                        'token' => $token,
                     ]
                 ], 200);
                 
@@ -98,13 +99,31 @@ class ApiController  extends Controller
                 'id_firebase' => $validatedData['firebase_id'],
             ]);
 
+            $user = DB::table('customers')
+                ->where('nomor_hp', $validatedData['phone_number'])
+                ->where('password', $passHash)
+                ->first();
+
+            $expiresAt = Carbon::now()->addHours(1)->timestamp;
+            $tokenData = json_encode([
+                'user_id' => $user->nomor_hp,
+                'expires_at' => $expiresAt
+            ]);
+            $token = $this->encryptAES128($tokenData);
+
+            //update ke DB
+            DB::table('customers')->where('rowid', $user->rowid)->update([ 'token' => $token]);
+
             return response()->json([
                 'endpoint' => 'register',
                 'responseCode' => '0',
                 'responseMessage' => 'register success',
-                'data' => [
-                    'nama_lengkap' => $validatedData['fullname'],
-                    'nomor_hp' => $validatedData['phone_number']
+                'user' => [
+                    'id' => $user->rowid,
+                    'nama_lengkap' => $user->nama_lengkap,
+                    'nomor_hp' => $user->nomor_hp,
+                    'firebase_id' => $user->id_firebase,
+                    'token' => $token,
                 ]
             ], 200);
 
@@ -161,9 +180,9 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'checkout',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message']
-                ], 200);
+                ], 401);
 
             }
 
@@ -266,9 +285,9 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'upload-struk',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message']
-                ], 200);
+                ], 401);
 
             }
 
@@ -315,10 +334,10 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'detail-order',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
 
             }
 
@@ -367,10 +386,10 @@ class ApiController  extends Controller
 
                 return response()->json([
                     'endpoint' => 'history',
-                    'responseCode' => '1',
+                    'responseCode' => '21',
                     'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
 
             }
 
@@ -388,39 +407,53 @@ class ApiController  extends Controller
         }
     }
 
-    public function Menu()
+    public function Menu(Request $request)
     {
         try {
 
-            $dataCat = DB::table('categories')->get();
-            $dataMenu = DB::table('menus')->get();
-            
-            if ($dataCat) {
-                if ($dataMenu) {
-                    return response()->json([
-                        'endpoint' => 'menu',
-                        'responseCode' => '0',
-                        'responseMessage' => 'success',
-                        'dataCategory' => $dataCat,
-                        'dataMenu' => $dataMenu
-                    ], 200);
-                } else {
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $dataCat = DB::table('categories')->get();
+                $dataMenu = DB::table('menus')->get();
+                
+                if ($dataCat) {
+                    if ($dataMenu) {
+                        return response()->json([
+                            'endpoint' => 'menu',
+                            'responseCode' => '0',
+                            'responseMessage' => 'success',
+                            'dataCategory' => $dataCat,
+                            'dataMenu' => $dataMenu
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'endpoint' => 'menu',
+                            'responseCode' => '1',
+                            'responseMessage' => 'menu not found',
+                            'dataCategory' => null,
+                            'dataMenu' => null
+                        ], 200);
+                    }
+                }else{
                     return response()->json([
                         'endpoint' => 'menu',
                         'responseCode' => '1',
-                        'responseMessage' => 'menu not found',
+                        'responseMessage' => 'category not found',
                         'dataCategory' => null,
                         'dataMenu' => null
                     ], 200);
                 }
+                
             }else{
+
                 return response()->json([
                     'endpoint' => 'menu',
-                    'responseCode' => '1',
-                    'responseMessage' => 'category not found',
-                    'dataCategory' => null,
-                    'dataMenu' => null
-                ], 200);
+                    'responseCode' => '21',
+                    'responseMessage' => $tokenCheck['message'],
+                    'data' => null
+                ], 401);
+
             }
 
         } catch (\Exception $e) {
@@ -438,25 +471,39 @@ class ApiController  extends Controller
         }
     }
 
-    public function Merchant()
+    public function Merchant(Request $request)
     {
         try {
 
-            $data = DB::table('merchants')->get();
-            if ($dataMerchant = $data->first()) {
-                return response()->json([
-                    'endpoint' => 'merchants',
-                    'responseCode' => '0',
-                    'responseMessage' => 'success',
-                    'data' => $dataMerchant
-                ], 200);
+            $tokenCheck = $this->validateToken($request->input('token'));
+            if ($tokenCheck['status']) {
+
+                $data = DB::table('merchants')->get();
+                if ($dataMerchant = $data->first()) {
+                    return response()->json([
+                        'endpoint' => 'merchants',
+                        'responseCode' => '0',
+                        'responseMessage' => 'success',
+                        'data' => $dataMerchant
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'endpoint' => 'merchants',
+                        'responseCode' => '1',
+                        'responseMessage' => 'not found',
+                        'data' => null
+                    ], 200);
+                }
+                
             }else{
+
                 return response()->json([
                     'endpoint' => 'merchants',
-                    'responseCode' => '1',
-                    'responseMessage' => 'not found',
+                    'responseCode' => '21',
+                    'responseMessage' => $tokenCheck['message'],
                     'data' => null
-                ], 200);
+                ], 401);
+
             }
 
         } catch (\Exception $e) {
