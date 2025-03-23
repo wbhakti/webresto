@@ -206,7 +206,7 @@
                                 @for ($i = 1; $i <= 29; $i++) 
                                     <option value="{{ $i }}">Meja {{ $i }}</option>
                                 @endfor
-                                <option value="21">Take Away</option>
+                                <option value="29">Take Away</option>
                             </select>
                         </div>
                 
