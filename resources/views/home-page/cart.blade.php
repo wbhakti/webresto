@@ -147,7 +147,7 @@
                             <tr>
                                 <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ $item['image'] ?? asset('img/default-img.jpeg') }}" alt="{{ $item['name'] }}" class="img-fluid me-3 table-image">
+                                        <img src="{{ url('public/img/' . $item['image']) }}" alt="{{ $item['name'] }}" class="img-fluid me-3 table-image">
                                         <span>{{ $item['name'] }}</span>
                                     </div>
                                 </td>
@@ -206,6 +206,7 @@
                                 @for ($i = 1; $i <= 27; $i++) 
                                     <option value="{{ $i }}">Meja {{ $i }}</option>
                                 @endfor
+                                <option value="Take Away">Take Away</option>
                             </select>
                         </div>
                 
