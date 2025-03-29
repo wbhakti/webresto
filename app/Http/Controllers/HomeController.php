@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\DB;
 class HomeController extends Controller
 {
 
+    public function termconditions()
+    {
+        return view('home-page/termsandconditions');
+    }
+
     public function menu(Request $request)
     {
         try{
