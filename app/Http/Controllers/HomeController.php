@@ -14,6 +14,11 @@ class HomeController extends Controller
         return view('home-page/termsandconditions');
     }
 
+    public function contact()
+    {
+        return view('home-page/contact');
+    }
+
     public function menu(Request $request)
     {
         try{

@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', 'App\Http\Controllers\HomeController@menu')->name('menu');
 Route::get('/restoran', 'App\Http\Controllers\HomeController@menu')->name('menu');
 Route::get('/syaratDanKetentuan', 'App\Http\Controllers\HomeController@termconditions')->name('termconditions');
+Route::get('/contact', 'App\Http\Controllers\HomeController@contact')->name('contact');
 
 //cart
 Route::post('/cart/add', 'App\Http\Controllers\CartController@addToCart')->name('cart.add');
