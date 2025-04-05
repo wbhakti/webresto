@@ -412,9 +412,6 @@ class ApiController  extends Controller
     {
         try {
 
-            $tokenCheck = $this->validateToken($request->input('token'));
-            if ($tokenCheck['status']) {
-
                 $dataCat = DB::table('categories')->get();
                 $dataMenu = DB::table('menus')->get();
                 
@@ -445,17 +442,6 @@ class ApiController  extends Controller
                         'dataMenu' => null
                     ], 200);
                 }
-                
-            }else{
-
-                return response()->json([
-                    'endpoint' => 'menu',
-                    'responseCode' => '21',
-                    'responseMessage' => $tokenCheck['message'],
-                    'data' => null
-                ], 401);
-
-            }
 
         } catch (\Exception $e) {
             
@@ -476,9 +462,6 @@ class ApiController  extends Controller
     {
         try {
 
-            $tokenCheck = $this->validateToken($request->input('token'));
-            if ($tokenCheck['status']) {
-
                 $data = DB::table('merchants')->get();
                 if ($dataMerchant = $data->first()) {
                     return response()->json([
@@ -495,17 +478,6 @@ class ApiController  extends Controller
                         'data' => null
                     ], 200);
                 }
-                
-            }else{
-
-                return response()->json([
-                    'endpoint' => 'merchants',
-                    'responseCode' => '21',
-                    'responseMessage' => $tokenCheck['message'],
-                    'data' => null
-                ], 401);
-
-            }
 
         } catch (\Exception $e) {
             
