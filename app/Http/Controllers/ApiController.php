@@ -23,6 +23,7 @@ class ApiController  extends Controller
             $user = DB::table('customers')
                 ->where('nomor_hp', $validatedData['phone_number'])
                 ->where('password', $passHash)
+                ->where('is_delete', 0)
                 ->first();
 
             if ($user) {
