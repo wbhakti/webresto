@@ -139,6 +139,59 @@ class ApiController  extends Controller
         }
     }
 
+    public function DeleteUser(Request $request)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'phone_number' => 'required|string',
+                'password' => 'required|string'
+            ]);
+
+            $passHash = base64_encode(hash_hmac('sha256', $validatedData['phone_number'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
+            $user = DB::table('customers')
+                ->where('nomor_hp', $validatedData['phone_number'])
+                ->where('password', $passHash)
+                ->first();
+
+            if ($user) {
+
+                $expiresAt = Carbon::now()->addHours(1)->timestamp;
+                $tokenData = json_encode([
+                    'user_id' => $user->nomor_hp,
+                    'expires_at' => $expiresAt
+                ]);
+                $token = $this->encryptAES128($tokenData);
+
+                //update ke DB
+                DB::table('customers')->where('rowid', $user->rowid)->update([ 'is_delete' => 1]);
+
+                return response()->json([
+                    'endpoint' => 'delete',
+                    'responseCode' => '0',
+                    'responseMessage' => 'Delete account success'
+                    ]
+                , 200);
+                
+            } else {
+                return response()->json([
+                    'endpoint' => 'delete',
+                    'responseCode' => '1',
+                    'responseMessage' => 'delete failed [user tidak ditemukan]'
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            //dd($e);
+            Log::error($request->input('phone_number') . ' Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'delete',
+                'responseCode' => '1',
+                'responseMessage' => 'delete failed [exception error]'
+            ], 200);
+        }
+    }
+
     public function Checkout(Request $request)
     {
         try {
