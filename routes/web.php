@@ -38,6 +38,7 @@ Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@Ma
 Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
 Route::get('/dashboard/mastermenu', 'App\Http\Controllers\AdminController@MasterMenu')->name('MasterMenu');
 Route::post('/postmenu', 'App\Http\Controllers\AdminController@postmenu');
+Route::post('/ActivedMenu', 'App\Http\Controllers\AdminController@ActivedMenu');
 Route::get('/dashboard/masterkategori', 'App\Http\Controllers\AdminController@MasterKategori')->name('MasterKategori');
 Route::post('/postkategori', 'App\Http\Controllers\AdminController@postkategori');
 

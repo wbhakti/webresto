@@ -38,6 +38,7 @@ class HomeController extends Controller
             ->join('categories', 'menus.kategori', '=', 'categories.id')
             ->select('menus.*', 'categories.nama as nama_kategori')
             ->where('menus.is_delete', '0')
+            ->where('menus.is_active', '0')
             ->get();
 
             $kategori = $request->query('kategori');
