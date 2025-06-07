@@ -53,9 +53,10 @@
                         <td>{{ $item->nama }}</td>
                         <td>{{ $item->harga }}</td>
                         <td>{{ $item->kategori }}</td>
-                        <td>
+                        <td>{{ $item->is_active }}</td>
+                        <!-- <td>
                             <img src="{{ url('public/img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
-                        </td>
+                        </td> -->
                         <div class="button-group">
                         <td>
                             <button type="button" class="btn btn-primary mb-2 btn-edit"
@@ -70,6 +71,23 @@
                                     <input type="hidden" name="menu_id" value="{{ $item->id }}">
                                     <button type="submit" name="proses" value="delete" class="btn btn-danger mb-2">Delete</button>
                                 </form> 
+
+                                
+                                @if($item->is_active == 1) 
+                                <form method="POST" action="/ActivedMenu" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="menu_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="actived" class="btn btn-warning mb-2">Non Aktif</button>
+                                </form> 
+                                @else
+                                <form method="POST" action="/ActivedMenu" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="menu_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="not_actived" class="btn btn-success mb-2">Aktif</button>
+                                </form> 
+                                @endif
+
+                                
                         </td>
                                                                
                         </div>

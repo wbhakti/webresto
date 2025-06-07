@@ -315,4 +315,30 @@ class AdminController extends Controller
         }
     }
 
+    public function ActivedMenu(Request $request)
+    {
+        try {
+            if (!session()->has('user_id')) {
+                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
+            }
+    
+            if ($request->input('proses') == 'actived'){
+                DB::table('menus')
+                ->where('id', $request->input('menu_id'))
+                ->update(['is_active' => '0']);
+                return redirect()->route('MasterMenu')->with('success', 'berhasil aktifkan menu');
+            } else if ($request->input('proses') == 'not_actived'){
+                DB::table('menus')
+                ->where('id', $request->input('menu_id'))
+                ->update(['is_active' => '1']);
+
+                return redirect()->route('MasterMenu')->with('success', 'berhasil non-aktifkan menu');
+            }
+    
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
+        }
+    }
+
 }
