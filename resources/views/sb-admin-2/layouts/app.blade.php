@@ -73,10 +73,19 @@
                 </div>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url('dashboard/transaction') }}">
-                    <i class="fas fa-fw fa-chart-area"></i>
+                <!-- <a class="nav-link" href="{{ url('dashboard/transaction') }}"> -->
+                    <!-- <i class="fas fa-fw fa-chart-area"></i> -->
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                aria-expanded="true" aria-controls="collapseThree">
+                    <i class="fas fa-fw fa-cog"></i>
                     <span>Order</span>
                 </a>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
+                        <a class="collapse-item" href="{{ url('dashboard/settingorder') }}">Setting Order</a>
+                    </div>
+                </div>
             </li>
 
             <!-- Divider -->

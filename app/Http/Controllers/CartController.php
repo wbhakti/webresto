@@ -11,6 +11,14 @@ class CartController extends Controller
 {
     public function addToCart(Request $request)
     {
+
+        $order = DB::table('configuration')->where('parameter', 'close_order')->first();
+        if($order->value == 'closed'){
+            return response()->json([
+                'message' => 'Mohon Maaf Sudah Close Order'
+            ]);
+        }
+
         $merchantId = $request->input('merchantId');
         $productId = $request->input('id');
         $productName = $request->input('name');
