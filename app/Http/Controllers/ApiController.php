@@ -467,7 +467,7 @@ class ApiController  extends Controller
         try {
 
                 $dataCat = DB::table('categories')->get();
-                $dataMenu = DB::table('menus')->get();
+                $dataMenu = DB::table('menus')->where('is_delete', '0')->where('is_active', '0')->get();
                 
                 if ($dataCat) {
                     if ($dataMenu) {
