@@ -36,10 +36,13 @@ Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@Ma
 Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
 Route::get('/dashboard/mastermenu', 'App\Http\Controllers\AdminController@MasterMenu')->name('MasterMenu');
 Route::post('/postmenu', 'App\Http\Controllers\AdminController@postmenu');
+Route::post('/ActivedMenu', 'App\Http\Controllers\AdminController@ActivedMenu');
+Route::post('/CloseOrder', 'App\Http\Controllers\AdminController@CloseOrder');
 Route::get('/dashboard/masterkategori', 'App\Http\Controllers\AdminController@MasterKategori')->name('MasterKategori');
 Route::post('/postkategori', 'App\Http\Controllers\AdminController@postkategori');
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
+Route::get("/dashboard/settingorder", 'App\Http\Controllers\AdminController@settingorder')->name('settingorder');
 Route::get('/reportTransaction', 'App\Http\Controllers\AdminController@ReportTransaction')->name('ReportTransaction');
 
 Route::post('/updatestatus', 'App\Http\Controllers\AdminController@UpdateStatus')->name('updatestatus');

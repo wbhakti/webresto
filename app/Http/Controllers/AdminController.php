@@ -315,4 +315,76 @@ class AdminController extends Controller
         }
     }
 
+    public function ActivedMenu(Request $request)
+    {
+        try {
+            if (!session()->has('user_id')) {
+                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
+            }
+    
+            if ($request->input('proses') == 'actived'){
+                DB::table('menus')
+                ->where('id', $request->input('menu_id'))
+                ->update(['is_active' => '0']);
+                return redirect()->route('MasterMenu')->with('success', 'berhasil aktifkan menu');
+            } else if ($request->input('proses') == 'not_actived'){
+                DB::table('menus')
+                ->where('id', $request->input('menu_id'))
+                ->update(['is_active' => '1']);
+
+                return redirect()->route('MasterMenu')->with('success', 'berhasil non-aktifkan menu');
+            }
+    
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
+        }
+    }
+
+    public function settingorder()
+    {
+        try {
+
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            $closeorder = DB::table('configuration')->where('parameter', 'close_order')->first();
+            return view('sb-admin-2/settingorder', [
+                'data' => $closeorder
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal memuat data setting: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('error', 'gagal load setting');
+        }
+    }
+
+    public function CloseOrder(Request $request)
+    {
+        try {
+            if (!session()->has('user_id')) {
+                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
+            }
+    
+            if ($request->input('proses') == 'open'){
+                DB::table('configuration')
+                ->where('parameter', 'close_order')
+                ->update(['value' => 'open']);
+
+                return redirect()->route('settingorder')->with('success', 'berhasil open order');
+            } else if ($request->input('proses') == 'closed'){
+                DB::table('configuration')
+                ->where('parameter', 'close_order')
+                ->update(['value' => 'closed']);
+
+                return redirect()->route('settingorder')->with('success', 'berhasil close order');
+            }
+    
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
+        }
+    }
+
 }
