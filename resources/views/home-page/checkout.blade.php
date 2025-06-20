@@ -52,7 +52,7 @@
                     <img src="{{ $qrisImage }}" alt="QRIS Payment" class="img-fluid" style="max-width: 300px;">
                     <div class="text-left">
                         <p class="fw-bold"><br>Panduan Bayar QRIS</p>
-                        <p class="text-muted mt-2">1. Scan QRIS di atas <br>2. Lakukan input pembayaran sesuai <b>Total Tagihan</b> <br>3. Upload bukti pembayaran <br>4. Setelah Upload berhasil akan di arahkan ke aplikasi <i>Whatsapp</i><br>5. Lanjutkan proses dengan mengirim pesan pada aplikasi <i>Whatsapp</i></p>
+                        <p class="text-muted mt-2">1. Scan <b>QRIS</b> di atas <br>2. Lakukan input pembayaran sesuai <b>Total Tagihan</b> <br>3. <b><i>Upload</i></b> bukti pembayaran <br>4. Setelah <b><i>Upload</i></b> berhasil akan di arahkan ke aplikasi <b><i>Whatsapp</i></b><br>5. Lanjutkan proses dengan mengirim pesan pada aplikasi <b><i>Whatsapp</i></b></p>
                     </div>
 
                     <!-- Form Upload Bukti Pembayaran -->
