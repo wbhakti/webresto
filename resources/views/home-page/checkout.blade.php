@@ -5,7 +5,7 @@
 <!-- Header -->
 <header class="bg-dark py-5">
     <div class="text-center text-white">
-        <h1 class="display-4 fw-bolder">Terima Kasih</h1>
+        <h1 class="display-4 fw-bolder">Konfirmasi Pembayaran</h1>
     </div>
 </header>
 
@@ -17,7 +17,7 @@
         </div>
     </div>
 
-    <div class="container text-center">
+    <div class="container">
         <div class="card p-4 shadow-sm">
             <h5 class="fw-bold">📝 Info Pemesanan</h5>
             <hr>
@@ -47,13 +47,16 @@
 
             <!-- QRIS Payment -->
             @if ($isQRIS)
-                <div class="text-center mt-4">
+                <div class="mt-4">
                     <p class="fw-bold">🔍 Scan QRIS untuk pembayaran:</p>
                     <img src="{{ $qrisImage }}" alt="QRIS Payment" class="img-fluid" style="max-width: 300px;">
-                    <p class="text-muted mt-2">Harap lakukan pembayaran sesuai total tagihan.</p>
+                    <div class="text-left">
+                        <p class="fw-bold"><br>Panduan Bayar QRIS</p>
+                        <p class="text-muted mt-2">1. Scan <b>QRIS</b> di atas <br>2. Lakukan input pembayaran sesuai <b>Total Tagihan</b> <br>3. <b><i>Upload</i></b> bukti pembayaran <br>4. Setelah <b><i>Upload</i></b> berhasil akan di arahkan ke aplikasi <b><i>Whatsapp</i></b><br>5. Lanjutkan proses dengan mengirim pesan pada aplikasi <b><i>Whatsapp</i></b></p>
+                    </div>
 
                     <!-- Form Upload Bukti Pembayaran -->
-                    <div class="mt-4">
+                    <div class="text-center mt-4">
                         <label class="fw-bold">📸 Upload Bukti Pembayaran:</label>
                         <form id="uploadBuktiForm" enctype="multipart/form-data">
                             @csrf
@@ -101,7 +104,7 @@
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
                     <h4 class="alert-heading">Upload Berhasil</h4>
-                    <p>Bukti transaksi sudah berhasil dikirim, silahkan klik konfirmasi!</p>
+                    <p>Bukti transaksi sudah berhasil dikirim, silahkan klik konfirmasi untuk melanjutkan pemesanan!</p>
                 </div>
             </div>
             <div class="modal-footer">
