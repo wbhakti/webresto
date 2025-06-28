@@ -218,6 +218,7 @@
                             <select class="form-select py-2" id="metode_pembayaran" name="metode_pembayaran" required>
                                 <option value="" selected disabled>Pilih Metode Pembayaran</option>
                                 <option selected="selected" value="qris">QRIS</option>
+                                <option value="qris">CASH</option>
                             </select>
                         </div>
                     </div>
