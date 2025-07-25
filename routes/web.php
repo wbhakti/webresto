@@ -31,7 +31,8 @@ Route::get('/login', 'App\Http\Controllers\AdminController@Login')->name('Login'
 Route::post('/postlogin', 'App\Http\Controllers\AdminController@postlogin');
 Route::get('/logout', 'App\Http\Controllers\AdminController@logout')->name('logout');
 Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
-
+Route::get('/dashboard/masterpromo', 'App\Http\Controllers\AdminController@MasterPromo')->name('MasterPromo');
+Route::post('/postPopupPromo', 'App\Http\Controllers\AdminController@postPopupPromo');
 Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');
 Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
 Route::get('/dashboard/mastermenu', 'App\Http\Controllers\AdminController@MasterMenu')->name('MasterMenu');
