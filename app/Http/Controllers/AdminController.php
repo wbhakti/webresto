@@ -387,4 +387,81 @@ class AdminController extends Controller
         }
     }
 
+    public function MasterPromo()
+    {
+        try {
+
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            $dataPromo = DB::table('configuration')->where('parameter', 'popup_banner')->get();
+            return view('sb-admin-2/masterpromo', [
+                'data' => $dataPromo
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal memuat data promo: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('error', 'Gagal memuat data merchant');
+        }
+    }
+
+    public function postPopupPromo(Request $request)
+    {
+        try {
+            
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            if($request->input('proses') == 'edit'){
+
+                if ($request->hasFile('img_promo')){
+                    $file = $request->file('img_promo');
+                    $filename = 'promo_'.date('YmdHis').'.jpg';
+                    $file->move(base_path('../public/img'), $filename);
+
+                    DB::table('configuration')
+                    ->where('id', $request->input('id_promo'))
+                    ->update([ 
+                        'value' => $filename,
+                        'description' => $request->input('editTitle')
+                    ]);
+
+                }else{
+
+                    DB::table('configuration')
+                    ->where('id', $request->input('id_promo'))
+                    ->update([ 
+                        'description' => $request->input('editTitle')
+                    ]);
+                }
+
+                return redirect()->route('MasterPromo')->with('success', 'berhasil edit promo');
+            }
+            else if ($request->input('proses') == 'delete'){
+
+                DB::table('configuration')->where('id', $request->input('id_promo'))->delete();
+
+                return redirect()->route('MasterPromo')->with('success', 'berhasil hapus promo');
+            }
+            else{
+                $file = $request->file('img_promo');
+                $filename = 'promo_'.date('YmdHis').'.jpg';
+                $file->move(base_path('../public/img'), $filename);
+
+                DB::table('configuration')->insert([
+                    'description' => $request->input('description'),
+                    'parameter' => 'popup_banner',
+                    'value' => $filename
+                ]);
+                return redirect()->route('MasterPromo')->with('success', 'berhasil tambah data');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('MasterPromo')->with('error', 'gagal simpan promo');
+        }
+    }
+
 }
