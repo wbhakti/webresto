@@ -130,6 +130,26 @@
                 
             @endif
         </div>
+
+        <!-- modal promo -->
+        @if(!empty($promo->description))
+        <div class="modal fade" id="popupPromo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel{{ $promo->description }}">{{ $promo->description }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="{{ $promo->value }}" alt="{{ $promo->value }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';"/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
         
     </div>
 </section>
@@ -181,6 +201,13 @@
             }
         });
     });
+</script>
+
+<script type="text/javascript">
+    window.onload = () => {
+        const myModal = new bootstrap.Modal('#popupPromo');
+        myModal.show();
+    }
 </script>
 
 

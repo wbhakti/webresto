@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Model\PopupPromo;
 
 class HomeController extends Controller
 {
@@ -52,9 +53,11 @@ class HomeController extends Controller
 
             $merchant = DB::table('merchants')->first();
             $dataKategori = DB::table('categories')->where('is_delete', '0')->get();
+            $datapromo = DB::table('configuration')->where('parameter', 'popup_banner')->first();
 
             return view('home-page/restoran', [
                 'kategori' => $dataKategori, 
+                'promo' => $datapromo, 
                 'produk' => $dataproduk,
                 'merchant' => $merchant,
                 'cartCount' => $cartCount
