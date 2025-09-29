@@ -67,13 +67,13 @@
                                 <!-- Product name with modal trigger-->
                                 <h5 class="fw-bolder" style="font-size: 14px;">{{ $item->nama }}</h5>
                                 <!-- Product reviews-->
-                                <div class="d-flex justify-content-center small text-warning mb-2">
+                                <!-- <div class="d-flex justify-content-center small text-warning mb-2">
                                     <div class="bi-star-fill"></div>
                                     <div class="bi-star-fill"></div>
                                     <div class="bi-star-fill"></div>
                                     <div class="bi-star-fill"></div>
                                     <div class="bi-star-fill"></div>
-                                </div>
+                                </div> -->
                                 <!-- Product price-->
                                 Rp {{ number_format($item->harga , 0, ',', '.') }}
                             </div>
