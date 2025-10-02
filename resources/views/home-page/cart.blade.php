@@ -202,7 +202,7 @@
                                 <i class="bi bi-grid-3x3-gap me-2"></i> Nomor Meja
                             </label>
 
-                            @php $inputString = $merchant->tabel_name; 
+                            @php $inputString = $merchant->table_name; 
                             $components = explode(",", $inputString); @endphp
 
                             <select class="form-select py-2" id="meja" name="meja" required>
