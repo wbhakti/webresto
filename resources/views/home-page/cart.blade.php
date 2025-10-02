@@ -201,12 +201,16 @@
                             <label for="meja" class="form-label fw-bold">
                                 <i class="bi bi-grid-3x3-gap me-2"></i> Nomor Meja
                             </label>
+
+                            @php $inputString = $merchant->tabel_name; 
+                            $components = explode(",", $inputString); @endphp
+
                             <select class="form-select py-2" id="meja" name="meja" required>
                                 <option value="" selected disabled>Pilih Nomor Meja</option>
-                                @for ($i = 1; $i <= 29; $i++) 
-                                    <option value="{{ $i }}">Meja {{ $i }}</option>
+                                @for ($i = 0; $i <= count($components) - 1; $i++) 
+                                    <option value="{{ $i }}">{{$components[$i]}}</option>
                                 @endfor
-                                <option value="Take Away">Take Away</option>
+                                <!-- <option value="Take Away">Take Away</option> -->
                             </select>
                         </div>
                 

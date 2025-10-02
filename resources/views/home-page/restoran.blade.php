@@ -59,7 +59,7 @@
             @if($produk->isNotEmpty())
                 @foreach ($produk as $item)
                 <div class="col mb-5">
-                    <div class="card h-100" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}">
+                    <div class="card h-100">
                         <img class="card-img-top" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
                         <!-- Product details-->
                         <div class="card-body p-4">
@@ -79,7 +79,7 @@
                             </div>
                         </div>
                         <!-- Product actions-->
-                        <!-- <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                             <div class="text-center">
                                 <a class="btn btn-outline-dark mt-auto btn-add-to-cart" href="javascript:void(0)" 
                                 data-id="{{ $item->id }}" 
@@ -90,7 +90,7 @@
                                 Add to cart
                                 </a>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
 
