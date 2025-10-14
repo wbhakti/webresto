@@ -467,8 +467,15 @@ class ApiController  extends Controller
         try {
 
                 $dataCat = DB::table('categories')->get();
-                $dataMenu = DB::table('menus')->where('is_delete', '0')->where('is_active', '0')->get();
-                
+                $dataMenu = DB::table('menus')
+                ->join('categories', 'menus.kategori', '=', 'categories.id')
+                ->select('menus.*', 'categories.nama as nama_kategori')
+                ->where('menus.is_delete', '0')
+                ->where('menus.is_active', '0')
+                ->orderBy('categories.id', 'ASC')
+                ->orderBy('menus.sku', 'ASC')
+                ->get();
+                    
                 if ($dataCat) {
                     if ($dataMenu) {
                         return response()->json([

@@ -40,6 +40,7 @@ class HomeController extends Controller
             ->where('menus.is_delete', '0')
             ->where('menus.is_active', '0')
             ->orderBy('categories.id', 'ASC')
+            ->orderBy('menus.sku', 'ASC')
             ->get();
 
             $kategori = $request->query('kategori');
