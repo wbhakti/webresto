@@ -150,12 +150,15 @@ class CartController extends Controller
             session()->forget('cart');
 
             $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
+            $merchant = DB::table('merchants')->first();
+            $components = explode(",", $merchant->table_name);
+            $mmeja = $components[$request->input('meja')];
 
             // Simpan data ke database
             DB::table('transactions')->insert([
                 'id_transaksi' => $idTransaksi,
                 'customer' => $request->input('nama'),
-                'meja' => $request->input('meja'),
+                'meja' => $mmeja,
                 'details' => $request->input('details'),
                 'total_bayar' => $request->input('total'),
                 'discount' => $request->input('discount'),

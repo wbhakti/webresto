@@ -60,12 +60,12 @@
                 @foreach ($produk as $item)
                 <div class="col mb-5">
                     <div class="card h-100">
-                        <img class="card-img-top" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
+                        <img class="card-img-top" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
                         <!-- Product details-->
                         <div class="card-body p-4">
                             <div class="text-center">
                                 <!-- Product name with modal trigger-->
-                                <h5 class="fw-bolder" style="font-size: 14px;">{{ $item->nama }}</h5>
+                                <h5 class="fw-bolder" style="font-size: 14px;" >{{ $item->nama }}</h5>
                                 <!-- Product reviews-->
                                 <!-- <div class="d-flex justify-content-center small text-warning mb-2">
                                     <div class="bi-star-fill"></div>
@@ -108,6 +108,14 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <a class="btn btn-primary btn-add-to-cart" href="javascript:void(0)" 
+                                    data-id="{{ $item->id }}" 
+                                    data-name="{{ $item->nama }}" 
+                                    data-price="{{ $item->harga }}"
+                                    data-idmerchant="{{ $merchant->id }}"
+                                    data-img="{{ $item->image }}">
+                                    Add to Cart
+                                </a>
                             </div>
                         </div>
                     </div>
