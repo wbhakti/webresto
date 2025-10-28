@@ -70,6 +70,7 @@
                         <a class="collapse-item" href="{{ url('dashboard/masterkategori') }}">Kategori</a>
                         <a class="collapse-item" href="{{ url('dashboard/mastermenu') }}">Menu</a>
                         <a class="collapse-item" href="{{ url('dashboard/masterpromo') }}">Popup Promo</a>
+                        <a class="collapse-item" href="{{ url('dashboard/masterdiskon') }}">Setting Diskon</a>
                     </div>
                 </div>
             </li>

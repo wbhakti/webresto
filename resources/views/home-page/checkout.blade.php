@@ -27,7 +27,9 @@
             <p><strong>Nama:</strong> {{ $nama }}</p>
             <p><strong>Nomor Meja:</strong> {{ $meja }}</p>
             <p><strong>Metode Pembayaran:</strong> {{ $metodePembayaran }}</p>
-            <p><strong>Total Tagihan:</strong> Rp {{ number_format($totalTagihan, 0, ',', '.') }}</p>
+            <p><strong>Sub Total Pemesanan:</strong> Rp {{ number_format($totalTagihan, 0, ',', '.') }}</p>
+            <p><strong>Diskon:</strong> Rp {{ number_format($discount, 0, ',', '.') }}</p>
+            <p><strong>Total Pembayaran:</strong> Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}</p>
             
             <hr>
 
@@ -129,7 +131,9 @@
                 let nama = "{{ $nama }}";
                 let meja = "{{ $meja }}";
                 let metodePembayaran = "{{ $metodePembayaran }}";
+                let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
                 let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
+                let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
 
                 // Detail Pesanan
                 let pesanDetail = "";
@@ -143,7 +147,9 @@
                                 `Nama: ${nama}%0A` +
                                 `Nomor Meja: ${meja}%0A` +
                                 `Metode Pembayaran: ${metodePembayaran}%0A` +
-                                `Total Tagihan: ${totalTagihan}%0A%0A` +
+                                `Sub Total Pemesanan: ${totalTagihan}%0A` +
+                                `Diskon: ${totalDiscount}%0A` +
+                                `Total Pembayaran: ${totalPembayaran}%0A%0A` +
                                 `*Detail Pesanan:*%0A` + pesanDetail;
 
                 let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
@@ -183,7 +189,9 @@
                     let nama = "{{ $nama }}";
                     let meja = "{{ $meja }}";
                     let metodePembayaran = "{{ $metodePembayaran }}";
+                    let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
                     let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
+                    let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
 
                     // Detail Pesanan
                     let pesanDetail = "";
@@ -192,14 +200,15 @@
                     @endforeach
 
                     // Format Pesan WhatsApp
-                    let waMessage = `Bukti Pembayaran%0A%0A` +
-                                    `ID Transaksi: ${idTransaksi}%0A` +
-                                    `Nama: ${nama}%0A` +
-                                    `Nomor Meja: ${meja}%0A` +
-                                    `Metode Pembayaran: ${metodePembayaran}%0A` +
-                                    `Total Tagihan: ${totalTagihan}%0A` +
-                                    `Bukti Transfer: ${imageUrl}%0A%0A` +
-                                    `*Detail Pesanan:*%0A` + pesanDetail;
+                    let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
+                                `ID Transaksi: ${idTransaksi}%0A` +
+                                `Nama: ${nama}%0A` +
+                                `Nomor Meja: ${meja}%0A` +
+                                `Metode Pembayaran: ${metodePembayaran}%0A` +
+                                `Sub Total Pemesanan: ${totalTagihan}%0A` +
+                                `Diskon: ${totalDiscount}%0A` +
+                                `Total Pembayaran: ${totalPembayaran}%0A%0A` +
+                                `*Detail Pesanan:*%0A` + pesanDetail;
 
                     let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
 
