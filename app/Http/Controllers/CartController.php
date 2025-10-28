@@ -76,10 +76,28 @@ class CartController extends Controller
         }
 
         // Hit API Merchant
-        $merchant = DB::table('merchants')->first();;
+        $merchant = DB::table('merchants')->first();
         $cartCount = count($cart);
 
-        return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
+        //HIT table discount
+        $discount = 0;
+        $result = DB::table('configuration')->where('parameter', 'diskon')->first();
+
+        if ($result) {
+            $time = $result->description;
+            $timeArr = explode("-",$time);
+            if (count($timeArr) > 1) {
+                $startTime = $timeArr[0];
+                $endTime = $timeArr[1];
+                $today = Carbon::now()->addHours(7)->format('H:i');
+
+                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                    $discount = $result->value;
+                }
+            }
+        }
+
+        return view('home-page/cart', compact('cart', 'merchant', 'discount'), ['cartCount' => $cartCount]);
     }
 
     public function remove($id)
@@ -94,7 +112,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, $discount)
     {
         $cart = session()->get('cart', []);
 
@@ -110,10 +128,15 @@ class CartController extends Controller
                 $grandTotal += $item['price'] * $item['quantity'];
             }
 
+            $resDiscount = $grandTotal * $discount / 100;
+            $total = $grandTotal - $resDiscount;
+
             return response()->json([
                 'success' => true,
                 'itemTotal' => number_format($itemTotal, 0, ',', '.'),
-                'grandTotal' => number_format($grandTotal, 0, ',', '.')
+                'grandTotal' => number_format($grandTotal, 0, ',', '.'),
+                'discount' => number_format($resDiscount, 0, ',', '.'),
+                'total' => number_format($total, 0, ',', '.')
             ]);
         }
 
@@ -135,6 +158,7 @@ class CartController extends Controller
                 'meja' => $request->input('meja'),
                 'details' => $request->input('details'),
                 'total_bayar' => $request->input('total'),
+                'discount' => $request->input('discount'),
                 'metode_bayar' => $request->input('metode_pembayaran'),
                 'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
             ]);
@@ -182,6 +206,7 @@ class CartController extends Controller
                     'nama' => $nama,
                     'meja' => $meja,
                     'metodePembayaran' => 'QRIS',
+                    'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
                     'idtransaksi' => $id
@@ -201,6 +226,7 @@ class CartController extends Controller
                     'nama' => $nama,
                     'meja' => $meja,
                     'metodePembayaran' => 'TUNAI',
+                    'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
                     'idtransaksi' => $id

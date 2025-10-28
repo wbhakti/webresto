@@ -79,7 +79,7 @@
                             </div>
                         </div>
                         <!-- Product actions-->
-                        <!-- <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                             <div class="text-center">
                                 <a class="btn btn-outline-dark mt-auto btn-add-to-cart" href="javascript:void(0)" 
                                 data-id="{{ $item->id }}" 
@@ -90,7 +90,7 @@
                                 Add to cart
                                 </a>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
 
