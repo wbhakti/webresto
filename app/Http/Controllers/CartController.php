@@ -147,24 +147,44 @@ class CartController extends Controller
     {   
         try{
 
-            session()->forget('cart');
-
             $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
             $merchant = DB::table('merchants')->first();
             $components = explode(",", $merchant->table_name);
             $mmeja = $components[$request->input('meja')];
+
+            $cart    = session('cart', []);
+			$details = [];
+			$subtotal = 0;
+
+			foreach ($cart as $id => $item) {
+				$qty   = (int) ($item['quantity'] ?? 0);
+				$price = (int) ($item['price'] ?? 0);
+
+				$details[] = [
+					'menu_id'  => $item['name'] ?? $id,
+					'note'     => '-',
+					'quantity' => $qty,
+					'price'    => $price,
+				];
+				$subtotal += $qty * $price;
+			}
+			
+			$discountPercent = (float) $request->input('discount_percent', 0);
+			$discountValue   = (int) round($subtotal * ($discountPercent / 100));
 
             // Simpan data ke database
             DB::table('transactions')->insert([
                 'id_transaksi' => $idTransaksi,
                 'customer' => $request->input('nama'),
                 'meja' => $mmeja,
-                'details' => $request->input('details'),
-                'total_bayar' => $request->input('total'),
-                'discount' => $request->input('discount'),
+                'details' => json_encode($details),
+                'total_bayar' => $subtotal,
+                'discount' => $discountValue,
                 'metode_bayar' => $request->input('metode_pembayaran'),
                 'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
             ]);
+
+            session()->forget('cart');
 
             return redirect()->route('success', ['id' => $idTransaksi]);
 

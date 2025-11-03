@@ -29,8 +29,7 @@
             <p><strong>Metode Pembayaran:</strong> {{ $metodePembayaran }}</p>
             <p><strong>Sub Total Pemesanan:</strong> Rp {{ number_format($totalTagihan, 0, ',', '.') }}</p>
             <p><strong>Diskon:</strong> Rp {{ number_format($discount, 0, ',', '.') }}</p>
-            <p><strong>Total Pembayaran:</strong> Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}</p>
-            
+            <p><strong>Total Pembayaran: Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }} </strong>  </p>
             <hr>
 
             <!-- Detail Pesanan -->
@@ -42,7 +41,7 @@
                             {{ $item['quantity'] }}x @Rp {{ number_format($item['price'], 0, ',', '.') }} 
                             <br><small class="text-muted">Catatan: {{ $item['note'] }}</small>
                         </div>
-                        <span class="fw-bold">Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</span>
+                        <span class="text-start">Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</span>
                     </li>
                 @endforeach
             </ul>
@@ -208,6 +207,7 @@
                                 `Sub Total Pemesanan: ${totalTagihan}%0A` +
                                 `Diskon: ${totalDiscount}%0A` +
                                 `Total Pembayaran: ${totalPembayaran}%0A%0A` +
+                                `Bukti Transfer: ${imageUrl}%0A%0A` +
                                 `*Detail Pesanan:*%0A` + pesanDetail;
 
                     let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;

@@ -235,9 +235,8 @@
                         </div>
                     </div>
                 
-                    <input type="hidden" name="total" id="total-tagihan">
-                    <input type="hidden" name="discount" id="discount">
-                    <input type="hidden" name="details" id="order-details">
+                    <input type="hidden" name="discount_percent" value="{{ $discount }}">
+
                 
                     <div class="card-footer text-center mt-3">
                         <a href="/" class="btn btn-outline-secondary me-2" style="margin-bottom: 10px;">Lanjut Pilih Menu</a>
@@ -321,24 +320,24 @@
             return false;
         }
 
-        var daftarProduk = [];
-        var totalTagihan = 0;
+        // var daftarProduk = [];
+        // var totalTagihan = 0;
 
-        @foreach ($cart as $item)
-            daftarProduk.push({
-                menu_id: "{{ $item['name'] }}",
-                note: "-",
-                quantity: {{ $item['quantity'] }},
-                price: {{ $item['price'] }}
-            });
-            totalTagihan += {{ $item['price'] * $item['quantity'] }};
-        @endforeach
+        // @foreach ($cart as $item)
+        //     daftarProduk.push({
+        //         menu_id: "{{ $item['name'] }}",
+        //         note: "-",
+        //         quantity: {{ $item['quantity'] }},
+        //         price: {{ $item['price'] }}
+        //     });
+        //     totalTagihan += {{ $item['price'] * $item['quantity'] }};
+        // @endforeach
 
         // Simpan data ke input hidden
-        var totalDiskon = totalTagihan * ({{$discount}} / 100);
-        document.getElementById('total-tagihan').value = totalTagihan;
-        document.getElementById('discount').value = totalDiskon;
-        document.getElementById('order-details').value = JSON.stringify(daftarProduk);
+        // var totalDiskon = totalTagihan * ({{$discount}} / 100);
+        // document.getElementById('total-tagihan').value = totalTagihan;
+        // document.getElementById('discount').value = totalDiskon;
+        // document.getElementById('order-details').value = JSON.stringify(daftarProduk);
     });
 </script>
 
