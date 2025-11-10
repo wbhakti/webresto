@@ -60,7 +60,7 @@
                 @foreach ($produk as $item)
                 <div class="col mb-5">
                     <div class="card h-100">
-                        <img class="card-img-top" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
+                        <img class="card-img-top" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default_forest.png') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
                         <!-- Product details-->
                         <div class="card-body p-4">
                             <div class="text-center">
@@ -104,7 +104,7 @@
                             </div>
                             <div class="modal-body">
                                 <p><strong>Harga:</strong> Rp {{ $item->harga }}</p>
-                                <img src="{{ url('public/img/' . $item->image) }}" alt="{{ $item->nama }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';"/>
+                                <img src="{{ url('public/img/' . $item->image) }}" alt="{{ $item->nama }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default_forest.png') }}';"/>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -141,7 +141,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <img src="{{ url('public/img/' .$promo->value) }}" alt="{{ url('public/img/' .$promo->value) }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';"/>
+                        <img src="{{ url('public/img/' .$promo->value) }}" alt="{{ url('public/img/' .$promo->value) }}" class="img-fluid" onerror="this.onerror=null;this.src='{{ asset('img/default_forest.png') }}';"/>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
