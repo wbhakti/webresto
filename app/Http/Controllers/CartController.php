@@ -180,7 +180,7 @@ class CartController extends Controller
                 'details' => json_encode($details),
                 'total_bayar' => $subtotal,
                 'discount' => $discountValue,
-                'metode_bayar' => $request->input('metode_pembayaran'),
+                'metode_bayar' => 'KASIR',
                 'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
             ]);
 
@@ -214,47 +214,24 @@ class CartController extends Controller
             $totalTagihan = $transaction->total_bayar;
             $details = json_decode($transaction->details, true);
 
-            if($transaction->metode_bayar == 'qris'){
+            $textHeading = 'Order berhasil dibuat!';
+            $textBody = 'Segera lakukan pembayaran dikasir!';
 
-                $textHeading = 'Order berhasil dibuat!';
-                $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
-
-                return view('home-page.checkout', [
-                    'phone_wa' => $phone_wa,
-                    'cartCount' => 0,
-                    'qrisImage' => $qrisImage,
-                    'isQRIS' => true,
-                    'head' => $textHeading,
-                    'body' => $textBody,
-                    'nama' => $nama,
-                    'meja' => $meja,
-                    'metodePembayaran' => 'QRIS',
-                    'discount' => $transaction->discount,
-                    'totalTagihan' => $totalTagihan,
-                    'details' => $details,
-                    'idtransaksi' => $id
-                ]);
-
-            }else{
-                $textHeading = 'Order berhasil dibuat!';
-                $textBody = 'Segera lakukan pembayaran dikasir!';
-
-                return view('home-page.checkout', [
-                    'phone_wa' => $phone_wa,
-                    'cartCount' => 0,
-                    'qrisImage' => $qrisImage,
-                    'isQRIS' => false,
-                    'head' => $textHeading,
-                    'body' => $textBody,
-                    'nama' => $nama,
-                    'meja' => $meja,
-                    'metodePembayaran' => 'TUNAI',
-                    'discount' => $transaction->discount,
-                    'totalTagihan' => $totalTagihan,
-                    'details' => $details,
-                    'idtransaksi' => $id
-                ]);
-            }
+            return view('home-page.checkout', [
+                'phone_wa' => $phone_wa,
+                'cartCount' => 0,
+                'qrisImage' => $qrisImage,
+                'isQRIS' => false,
+                'head' => $textHeading,
+                'body' => $textBody,
+                'nama' => $nama,
+                'meja' => $meja,
+                'metodePembayaran' => 'KASIR',
+                'discount' => $transaction->discount,
+                'totalTagihan' => $totalTagihan,
+                'details' => $details,
+                'idtransaksi' => $id
+            ]);
 
         }catch (\Exception $e) {
             Log::error('Gagal proses data: ' . $e->getMessage());

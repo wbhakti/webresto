@@ -223,17 +223,6 @@
                             </select>
                         </div>
                 
-                        <!-- Metode Pembayaran -->
-                        <div class="mb-3">
-                            <label for="metode_pembayaran" class="form-label fw-bold">
-                                <i class="bi bi-credit-card-2-front me-2"></i> Metode Pembayaran
-                            </label>
-                            <select class="form-select py-2" id="metode_pembayaran" name="metode_pembayaran" required>
-                                <option value="" selected disabled>Pilih Metode Pembayaran</option>
-                                <option selected="selected" value="qris">QRIS</option>
-                                <option value="qris">KASIR</option>
-                            </select>
-                        </div>
                     </div>
                 
                     <input type="hidden" name="discount_percent" value="{{ $discount }}">
@@ -314,31 +303,6 @@
             event.preventDefault();
             return false;
         }
-
-        if (!metodePembayaran || metodePembayaran.value.trim() === "") {
-            alert("Silakan pilih metode pembayaran!");
-            event.preventDefault();
-            return false;
-        }
-
-        // var daftarProduk = [];
-        // var totalTagihan = 0;
-
-        // @foreach ($cart as $item)
-        //     daftarProduk.push({
-        //         menu_id: "{{ $item['name'] }}",
-        //         note: "-",
-        //         quantity: {{ $item['quantity'] }},
-        //         price: {{ $item['price'] }}
-        //     });
-        //     totalTagihan += {{ $item['price'] * $item['quantity'] }};
-        // @endforeach
-
-        // Simpan data ke input hidden
-        // var totalDiskon = totalTagihan * ({{$discount}} / 100);
-        // document.getElementById('total-tagihan').value = totalTagihan;
-        // document.getElementById('discount').value = totalDiskon;
-        // document.getElementById('order-details').value = JSON.stringify(daftarProduk);
     });
 </script>
 
