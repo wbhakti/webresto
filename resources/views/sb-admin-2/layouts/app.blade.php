@@ -20,8 +20,8 @@
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <style>
     .sidebar {
-        background-color: #c71a18;
-        background-image: linear-gradient(180deg, #14162c 10%, #3657b6 100%);
+        background-color: #009933;
+        background-image: linear-gradient(180deg, #009933 10%, #2FF581 100%);
         background-size: cover;
     }
     </style>
@@ -37,7 +37,7 @@
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('dashboard') }}">
-                <div class="sidebar-brand-text mx-2">Food Dashboard<sup></sup></div>
+                <div class="sidebar-brand-text mx-2">Empon Empon Dashboard<sup></sup></div>
             </a>
 
             <!-- Divider -->
