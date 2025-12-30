@@ -181,7 +181,8 @@ class CartController extends Controller
                 'total_bayar' => $subtotal,
                 'discount' => $discountValue,
                 'metode_bayar' => $request->input('metode_pembayaran'),
-                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
+                'qris_dynamic' => $request->input('qris_dynamic'),
+                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s')
             ]);
 
             session()->forget('cart');
@@ -211,6 +212,7 @@ class CartController extends Controller
             // Ambil data dari request
             $nama = $transaction->customer;
             $meja = $transaction->meja;
+            $qrisDynamic = $transaction->qris_dynamic;
             $totalTagihan = $transaction->total_bayar;
             $details = json_decode($transaction->details, true);
 
@@ -222,6 +224,7 @@ class CartController extends Controller
                 return view('home-page.checkout', [
                     'phone_wa' => $phone_wa,
                     'cartCount' => 0,
+                    'qrisDynamic' => $qrisDynamic,
                     'qrisImage' => $qrisImage,
                     'isQRIS' => true,
                     'head' => $textHeading,

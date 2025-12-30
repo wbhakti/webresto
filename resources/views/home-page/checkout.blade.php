@@ -2,6 +2,8 @@
 
 @section('content')
 
+<script src="{{ asset('qriscode/qrcode.min.js')}}"></script>
+
 <!-- Header -->
 <header class="bg-dark py-5">
     <div class="text-center text-white">
@@ -30,6 +32,7 @@
             <p><strong>Sub Total Pemesanan:</strong> Rp {{ number_format($totalTagihan, 0, ',', '.') }}</p>
             <p><strong>Diskon:</strong> Rp {{ number_format($discount, 0, ',', '.') }}</p>
             <p><strong>Total Pembayaran: Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }} </strong>  </p>
+            <!-- <p><strong>QRIS:</strong> {{ $qrisDynamic }}</p> -->
             <hr>
 
             <!-- Detail Pesanan -->
@@ -50,7 +53,30 @@
             @if ($isQRIS)
                 <div class="mt-4">
                     <p class="fw-bold">🔍 Scan QRIS untuk pembayaran:</p>
-                    <img src="{{ $qrisImage }}" alt="QRIS Payment" class="img-fluid" style="max-width: 300px;">
+                    <div class="qr-wrapper">
+                    </div>
+                    <div id="output" class="output-box"></div>
+                    <!-- <img src="{{ $qrisImage }}" alt="QRIS Payment" class="img-fluid" style="max-width: 300px;"> -->
+                    <div id="qrcode"></div>
+                    <script type="text/javascript">
+                        const qrBox = document.getElementById("qrcode");
+                        qrBox.innerHTML = "";
+
+                        let qr = new QRCode(qrBox, {
+                            text: "{{$qrisDynamic}}",
+                            width: 300,
+                            height: 300,
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+
+                        setTimeout(() => {
+                            try { qr.makeImage(); } catch(e) {}
+                        }, 20);
+
+                    </script>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-success mt-2" onclick="downloadQR()">Download QR Code</button>
+                    </div>
                     <div class="text-left">
                         <p class="fw-bold"><br>Panduan Bayar QRIS</p>
                         <p class="text-muted mt-2">1. Scan <b>QRIS</b> di atas <br>2. Lakukan input pembayaran sesuai <b>Total Tagihan</b> <br>3. <b><i>Upload</i></b> bukti pembayaran <br>4. Setelah <b><i>Upload</i></b> berhasil akan di arahkan ke aplikasi <b><i>Whatsapp</i></b><br>5. Lanjutkan proses dengan mengirim pesan pada aplikasi <b><i>Whatsapp</i></b></p>
@@ -114,6 +140,19 @@
         </div>
     </div>
 </div>
+
+
+<script>
+function downloadQR() {
+    const img = document.querySelector("#qrcode img");
+    if (!img) return alert("QR belum dibuat.");
+
+    const link = document.createElement("a");
+    link.download = "qris-dinamis.png";
+    link.href = img.src;
+    link.click();
+}
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {

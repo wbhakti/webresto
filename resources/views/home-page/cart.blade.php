@@ -236,9 +236,9 @@
                         </div>
                     </div>
                 
-                    <input type="hidden" name="discount_percent" value="{{ $discount }}">
+                    <input type="hidden" id="discount_percent" name="discount_percent" value="{{ $discount }}">
+                    <input type="hidden" id="qris_dynamic" name="qris_dynamic">
 
-                
                     <div class="card-footer text-center mt-3">
                         <a href="/" class="btn btn-outline-secondary me-2" style="margin-bottom: 10px;">Lanjut Pilih Menu</a>
                         <button type="submit" id="checkout-button" class="btn btn-primary" style="margin-bottom: 10px;">Proses</button>
@@ -297,11 +297,19 @@
     }
 </script>
 
+<script src="{{ asset('qriscode/qrisDynamic.js')}}"></script>
+
 <script>
     document.getElementById('checkout-button').addEventListener('click', function(event) {
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
+
+        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000278398602150008850027839860303UKE51440014ID.CO.QRIS.WWW0215ID10253704526210303UKE5204581253033605802ID5915KOPINGGIR JALAN6006KLATEN61055743862070703A016304F1DC";
+        const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
+
+        const result = makeDynamicQR(qris, nominal);
+        document.getElementById("qris_dynamic").value = result;
 
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");
@@ -320,6 +328,8 @@
             event.preventDefault();
             return false;
         }
+
+        
 
         // var daftarProduk = [];
         // var totalTagihan = 0;
