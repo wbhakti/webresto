@@ -275,10 +275,25 @@ class CartController extends Controller
 
                 //kompres image
                 $mimeType = $image->getMimeType();
-                list($width, $height) = getimagesize($image->getRealPath());
-                $newWidth = 600;
-                $newHeight = 400;
-                $tmp = imagecreatetruecolor($newWidth, $newHeight);
+                
+                // Set a maximum height and width
+                $width = 600;
+                $height = 1000;
+
+                // Get new dimensions
+                list($width_orig, $height_orig) = getimagesize($image->getRealPath());
+
+                $ratio_orig = $width_orig/$height_orig;
+
+                if ($width/$height > $ratio_orig) {
+                    $width = $height*$ratio_orig;
+                } else {
+                    $height = $width/$ratio_orig;
+                }
+
+                // Resample
+                $tmp = imagecreatetruecolor($width, $height);
+                // $tmp = imagecreatetruecolor($newWidth, $newHeight);
 
                 if ($mimeType === 'image/jpeg') {
                     $source = imagecreatefromjpeg($image->getRealPath());
@@ -293,13 +308,14 @@ class CartController extends Controller
                 }
 
                 // Resize gambar
-                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                // imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 
                 // Tambahkan teks
                 $font = public_path('arial.ttf');
-                $fontSize = 25;
-                $textColor = imagecolorallocate($tmp, 255, 255, 255);
-                $timestamp = 'kopian : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $fontSize = 12;
+                $textColor = imagecolorallocate($tmp, 0, 0, 0);
+                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
