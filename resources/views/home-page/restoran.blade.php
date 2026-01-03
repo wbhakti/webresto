@@ -52,7 +52,7 @@
         
         <!-- List makanan -->
         <div class="text-center">
-            <h4 class="fw-bolder mt-5 mb-4">Pilihan Makanan</h4>
+            <h4 class="fw-bolder mt-5 mb-4">Pilihan Menu</h4>
         </div>
 
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
