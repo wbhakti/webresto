@@ -76,10 +76,28 @@ class CartController extends Controller
         }
 
         // Hit API Merchant
-        $merchant = DB::table('merchants')->first();;
+        $merchant = DB::table('merchants')->first();
         $cartCount = count($cart);
 
-        return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
+        //HIT table discount
+        $discount = 0;
+        $result = DB::table('configuration')->where('parameter', 'diskon')->first();
+
+        if ($result) {
+            $time = $result->description;
+            $timeArr = explode("-",$time);
+            if (count($timeArr) > 1) {
+                $startTime = $timeArr[0];
+                $endTime = $timeArr[1];
+                $today = Carbon::now()->addHours(7)->format('H:i');
+
+                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                    $discount = $result->value;
+                }
+            }
+        }
+
+        return view('home-page/cart', compact('cart', 'merchant', 'discount'), ['cartCount' => $cartCount]);
     }
 
     public function remove($id)
@@ -94,7 +112,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, $discount)
     {
         $cart = session()->get('cart', []);
 
@@ -110,10 +128,15 @@ class CartController extends Controller
                 $grandTotal += $item['price'] * $item['quantity'];
             }
 
+            $resDiscount = $grandTotal * $discount / 100;
+            $total = $grandTotal - $resDiscount;
+
             return response()->json([
                 'success' => true,
                 'itemTotal' => number_format($itemTotal, 0, ',', '.'),
-                'grandTotal' => number_format($grandTotal, 0, ',', '.')
+                'grandTotal' => number_format($grandTotal, 0, ',', '.'),
+                'discount' => number_format($resDiscount, 0, ',', '.'),
+                'total' => number_format($total, 0, ',', '.')
             ]);
         }
 
@@ -124,20 +147,45 @@ class CartController extends Controller
     {   
         try{
 
-            session()->forget('cart');
-
             $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
+            $merchant = DB::table('merchants')->first();
+            $components = explode(",", $merchant->table_name);
+            $mmeja = $components[$request->input('meja')];
+
+            $cart    = session('cart', []);
+			$details = [];
+			$subtotal = 0;
+
+			foreach ($cart as $id => $item) {
+				$qty   = (int) ($item['quantity'] ?? 0);
+				$price = (int) ($item['price'] ?? 0);
+
+				$details[] = [
+					'menu_id'  => $item['name'] ?? $id,
+					'note'     => '-',
+					'quantity' => $qty,
+					'price'    => $price,
+				];
+				$subtotal += $qty * $price;
+			}
+			
+			$discountPercent = (float) $request->input('discount_percent', 0);
+			$discountValue   = (int) round($subtotal * ($discountPercent / 100));
 
             // Simpan data ke database
             DB::table('transactions')->insert([
                 'id_transaksi' => $idTransaksi,
                 'customer' => $request->input('nama'),
-                'meja' => $request->input('meja'),
-                'details' => $request->input('details'),
-                'total_bayar' => $request->input('total'),
+                'meja' => $mmeja,
+                'details' => json_encode($details),
+                'total_bayar' => $subtotal,
+                'discount' => $discountValue,
                 'metode_bayar' => $request->input('metode_pembayaran'),
-                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s'),
+                'qris_dynamic' => $request->input('qris_dynamic'),
+                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s')
             ]);
+
+            session()->forget('cart');
 
             return redirect()->route('success', ['id' => $idTransaksi]);
 
@@ -164,6 +212,7 @@ class CartController extends Controller
             // Ambil data dari request
             $nama = $transaction->customer;
             $meja = $transaction->meja;
+            $qrisDynamic = $transaction->qris_dynamic;
             $totalTagihan = $transaction->total_bayar;
             $details = json_decode($transaction->details, true);
 
@@ -175,6 +224,7 @@ class CartController extends Controller
                 return view('home-page.checkout', [
                     'phone_wa' => $phone_wa,
                     'cartCount' => 0,
+                    'qrisDynamic' => $qrisDynamic,
                     'qrisImage' => $qrisImage,
                     'isQRIS' => true,
                     'head' => $textHeading,
@@ -182,6 +232,7 @@ class CartController extends Controller
                     'nama' => $nama,
                     'meja' => $meja,
                     'metodePembayaran' => 'QRIS',
+                    'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
                     'idtransaksi' => $id
@@ -201,6 +252,7 @@ class CartController extends Controller
                     'nama' => $nama,
                     'meja' => $meja,
                     'metodePembayaran' => 'TUNAI',
+                    'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
                     'idtransaksi' => $id
@@ -223,10 +275,25 @@ class CartController extends Controller
 
                 //kompres image
                 $mimeType = $image->getMimeType();
-                list($width, $height) = getimagesize($image->getRealPath());
-                $newWidth = 600;
-                $newHeight = 400;
-                $tmp = imagecreatetruecolor($newWidth, $newHeight);
+                
+                // Set a maximum height and width
+                $width = 600;
+                $height = 1000;
+
+                // Get new dimensions
+                list($width_orig, $height_orig) = getimagesize($image->getRealPath());
+
+                $ratio_orig = $width_orig/$height_orig;
+
+                if ($width/$height > $ratio_orig) {
+                    $width = $height*$ratio_orig;
+                } else {
+                    $height = $width/$ratio_orig;
+                }
+
+                // Resample
+                $tmp = imagecreatetruecolor($width, $height);
+                // $tmp = imagecreatetruecolor($newWidth, $newHeight);
 
                 if ($mimeType === 'image/jpeg') {
                     $source = imagecreatefromjpeg($image->getRealPath());
@@ -241,13 +308,14 @@ class CartController extends Controller
                 }
 
                 // Resize gambar
-                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                // imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
 
                 // Tambahkan teks
                 $font = public_path('arial.ttf');
-                $fontSize = 25;
-                $textColor = imagecolorallocate($tmp, 255, 255, 255);
-                $timestamp = 'kopian : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $fontSize = 12;
+                $textColor = imagecolorallocate($tmp, 0, 0, 0);
+                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
@@ -266,7 +334,7 @@ class CartController extends Controller
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
     
-                $mimage = 'webkopian/public/invoice/'. $filename;
+                $mimage = 'webkopinggir/public/invoice/'. $filename;
                 
                 return response()->json([
                     'success' => true,

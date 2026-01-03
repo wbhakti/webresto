@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Menu Kopian</title>
+        <title>Kontak</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -37,23 +36,36 @@
         <!-- Navigation-->
         <nav class="navbar custom-navbar fixed-top">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="{{ url('/') }}" style="color: #fff;"><b>Home</b></a>
-                <form class="d-flex" action="/cart" method="GET">
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="bi-cart-fill me-1"></i>
-                        Cart
-                        <span id="cart-badge" class="badge bg-dark text-white ms-1 rounded-pill">{{ $cartCount }}</span>
-                    </button>
-                </form>                    
+                <a class="navbar-brand" href="{{ url('/') }}" style="color: #fff;"><b>Home</b></a>                  
             </div>
         </nav>
         
-        <!-- Section-->
-        @yield('content')
+        <div class="container px-4 px-lg-5 mt-0">
+            <div class="text-left text-black">
+                <br>
+                <p dir="auto" class="body"><strong>Contact Us Now</strong></p>
+                <p dir="auto" class="body"><span style="font-weight: 400">For more information about the Klajek application, please do not hesitate to contact us via the contact below.
+                </span></p>
+                <br>
+            </div>
+            <div class="text-left text-black">
+                <br>
+                <p dir="auto" class="body"><strong>Kopinggir Jalan</strong></p>
+                <p dir="auto" class="body"><span style="font-weight: 400">08123456789
+                </span></p>
+                <br>
+            </div>
+            <div class="text-left text-black">
+                <br>
+                <p dir="auto" class="body"><strong>Email</strong></p>
+                <p dir="auto" class="body"><span style="font-weight: 400">kopinggir.stargroup@gmail.com
+                </span></p>
+                <br>
+            </div>
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark" style="background-color: #0103c2 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopian 2025</p></div>
+        <footer class="py-5 bg-dark" style="background-color: #000 !important;">
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopinggir Jalan by Star Group 2025</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>

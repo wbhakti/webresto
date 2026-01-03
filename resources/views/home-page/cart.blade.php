@@ -154,9 +154,9 @@
                                 <td colspan="2" class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
                                 <td colspan="3" class="font-isi-jumlah">
                                     <div class="input-group">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1)">-</button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1, {{$discount}})">-</button>
                                         <input type="text" class="form-control text-center jml-input" value="{{ $item['quantity'] }}" readonly id="quantity-{{ $id }}">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1)">+</button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1, {{$discount}})">+</button>
                                     </div>
                                 </td>
                                 <td colspan="2" class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }}</td>
@@ -171,11 +171,20 @@
                             </tr>
                             @php $grandTotal += $total; @endphp
                             @endforeach
+                            @php $rpdiscount = ($grandTotal * $discount) / 100 ; @endphp
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
-                                <th colspan="8" class="text-end font-isi-grandtotal">Total Keseluruhan</th>
+                                <th colspan="8" class="text-end font-isi-grandtotal">Sub Total Pesanan</th>
                                 <th colspan="3"id="grand-total" class="font-isi-grandtotal">Rp {{ number_format($grandTotal, 0, ',', '.') }}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="8" class="text-end font-isi-grandtotal">Diskon</th>
+                                <th colspan="3"id="discount-total" name="discount-total" class="font-isi-grandtotal">Rp {{number_format($rpdiscount, 0, ',', '.')}}</th>
+                            </tr>
+                            <tr>
+                                <th colspan="8" class="text-end font-isi-grandtotal">Total Pembayaran</th>
+                                <th colspan="3"id="total-bayar" class="font-isi-grandtotal">Rp {{number_format(($grandTotal - $rpdiscount), 0, ',', '.')}}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -201,12 +210,16 @@
                             <label for="meja" class="form-label fw-bold">
                                 <i class="bi bi-grid-3x3-gap me-2"></i> Nomor Meja
                             </label>
+
+                            @php $inputString = $merchant->table_name; 
+                            $components = explode(",", $inputString); @endphp
+
                             <select class="form-select py-2" id="meja" name="meja" required>
                                 <option value="" selected disabled>Pilih Nomor Meja</option>
-                                @for ($i = 1; $i <= 27; $i++) 
-                                    <option value="{{ $i }}">Meja {{ $i }}</option>
+                                @for ($i = 0; $i <= count($components) - 1; $i++) 
+                                    <option value="{{ $i }}">{{$components[$i]}}</option>
                                 @endfor
-                                <option value="Take Away">Take Away</option>
+                                <!-- <option value="Take Away">Take Away</option> -->
                             </select>
                         </div>
                 
@@ -218,14 +231,14 @@
                             <select class="form-select py-2" id="metode_pembayaran" name="metode_pembayaran" required>
                                 <option value="" selected disabled>Pilih Metode Pembayaran</option>
                                 <option selected="selected" value="qris">QRIS</option>
-                                <option value="qris">CASH</option>
+                                <option value="qris">KASIR</option>
                             </select>
                         </div>
                     </div>
                 
-                    <input type="hidden" name="total" id="total-tagihan">
-                    <input type="hidden" name="details" id="order-details">
-                
+                    <input type="hidden" id="discount_percent" name="discount_percent" value="{{ $discount }}">
+                    <input type="hidden" id="qris_dynamic" name="qris_dynamic">
+
                     <div class="card-footer text-center mt-3">
                         <a href="/" class="btn btn-outline-secondary me-2" style="margin-bottom: 10px;">Lanjut Pilih Menu</a>
                         <button type="submit" id="checkout-button" class="btn btn-primary" style="margin-bottom: 10px;">Proses</button>
@@ -245,7 +258,7 @@
 @endif
 
 <script>
-    function updateQuantity(itemId, change) {
+    function updateQuantity(itemId, change, discount) {
         const quantityInput = document.getElementById(`quantity-${itemId}`);
         let currentQuantity = parseInt(quantityInput.value);
 
@@ -253,7 +266,7 @@
             currentQuantity += change;
             quantityInput.value = currentQuantity;
 
-            fetch(`/update-cart/${itemId}`, {
+            fetch(`/update-cart/${itemId}/${discount}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -273,7 +286,9 @@
                             totalElement.textContent = `Rp ${total}`;
                         }
 
+                        document.getElementById('discount-total').textContent = `Rp ${data.discount}`;
                         document.getElementById('grand-total').textContent = `Rp ${data.grandTotal}`;
+                        document.getElementById('total-bayar').textContent = `Rp ${data.total}`;
                     } else {
                         alert('Gagal memperbarui jumlah item.');
                     }
@@ -282,11 +297,19 @@
     }
 </script>
 
+<script src="{{ asset('qriscode/qrisDynamic.js')}}"></script>
+
 <script>
     document.getElementById('checkout-button').addEventListener('click', function(event) {
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
+
+        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000278398602150008850027839860303UKE51440014ID.CO.QRIS.WWW0215ID10253704526210303UKE5204581253033605802ID5915KOPINGGIR JALAN6006KLATEN61055743862070703A016304F1DC";
+        const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
+
+        const result = makeDynamicQR(qris, nominal);
+        document.getElementById("qris_dynamic").value = result;
 
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");
@@ -306,21 +329,26 @@
             return false;
         }
 
-        var daftarProduk = [];
-        var totalTagihan = 0;
-        @foreach ($cart as $item)
-            daftarProduk.push({
-                menu_id: "{{ $item['name'] }}",
-                note: "-",
-                quantity: {{ $item['quantity'] }},
-                price: {{ $item['price'] }}
-            });
-            totalTagihan += {{ $item['price'] * $item['quantity'] }};
-        @endforeach
+        
+
+        // var daftarProduk = [];
+        // var totalTagihan = 0;
+
+        // @foreach ($cart as $item)
+        //     daftarProduk.push({
+        //         menu_id: "{{ $item['name'] }}",
+        //         note: "-",
+        //         quantity: {{ $item['quantity'] }},
+        //         price: {{ $item['price'] }}
+        //     });
+        //     totalTagihan += {{ $item['price'] * $item['quantity'] }};
+        // @endforeach
 
         // Simpan data ke input hidden
-        document.getElementById('total-tagihan').value = totalTagihan;
-        document.getElementById('order-details').value = JSON.stringify(daftarProduk);
+        // var totalDiskon = totalTagihan * ({{$discount}} / 100);
+        // document.getElementById('total-tagihan').value = totalTagihan;
+        // document.getElementById('discount').value = totalDiskon;
+        // document.getElementById('order-details').value = JSON.stringify(daftarProduk);
     });
 </script>
 

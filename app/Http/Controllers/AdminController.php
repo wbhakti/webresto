@@ -464,4 +464,72 @@ class AdminController extends Controller
         }
     }
 
+    public function MasterDiskon()
+    {
+        try {
+
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            $dataPromo = DB::table('configuration')->where('parameter', 'diskon')->get();
+            return view('sb-admin-2/masterdiskon', [
+                'data' => $dataPromo
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal memuat data diskon: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('error', 'Gagal memuat data merchant');
+        }
+    }
+
+    public function postDiskon(Request $request)
+    {
+        try {
+            
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            if($request->input('proses') == 'edit'){
+
+                $dateStart = $request->input('editAwal');
+                $dateEnd = $request->input('editAkir');
+                $diskon = $request->input('editDiskon');
+                
+                $description = $dateStart.'-'.$dateEnd;
+
+                DB::table('configuration')
+                    ->where('id', $request->input('id_diskon'))
+                    ->update([ 
+                        'value' => $diskon,
+                        'description' => $description
+                    ]);
+
+                return redirect()->route('MasterDiskon')->with('success', 'berhasil edit diskon');
+            }
+            else if ($request->input('proses') == 'delete'){
+
+                DB::table('configuration')->where('id', $request->input('id_promo'))->delete();
+
+                return redirect()->route('MasterDiskon')->with('success', 'berhasil hapus diskon');
+            }
+            else{
+                $dateStart = $request->input('startdiskon');
+                $dateEnd = $request->input('enddiskon');
+                $description = $dateStart.'-'.$dateEnd;
+
+                DB::table('configuration')->insert([
+                    'description' => $description,
+                    'parameter' => 'diskon',
+                    'value' => $request->input('diskon')
+                ]);
+                return redirect()->route('MasterDiskon')->with('success', 'berhasil tambah data');
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('MasterDiskon')->with('error', 'gagal simpan diskon');
+        }
+    }
 }

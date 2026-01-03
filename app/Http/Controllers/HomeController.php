@@ -5,10 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Model\PopupPromo;
 
 class HomeController extends Controller
 {
+
+    public function termconditions()
+    {
+        return view('home-page/termsandconditions');
+    }
+
+    public function contact()
+    {
+        return view('home-page/contact');
+    }
 
     public function menu(Request $request)
     {
@@ -31,6 +40,7 @@ class HomeController extends Controller
             ->where('menus.is_delete', '0')
             ->where('menus.is_active', '0')
             ->orderBy('categories.id', 'ASC')
+            ->orderBy('menus.sku', 'ASC')
             ->get();
 
             $kategori = $request->query('kategori');

@@ -23,6 +23,7 @@ class ApiController  extends Controller
             $user = DB::table('customers')
                 ->where('nomor_hp', $validatedData['phone_number'])
                 ->where('password', $passHash)
+                ->where('is_delete', 0)
                 ->first();
 
             if ($user) {
@@ -135,6 +136,59 @@ class ApiController  extends Controller
                 'endpoint' => 'register',
                 'responseCode' => '1',
                 'responseMessage' => 'register failed [exception error]'
+            ], 200);
+        }
+    }
+
+    public function DeleteUser(Request $request)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'phone_number' => 'required|string',
+                'password' => 'required|string'
+            ]);
+
+            $passHash = base64_encode(hash_hmac('sha256', $validatedData['phone_number'] . ':' . $validatedData['password'], '#@R4dJaAN91n?#@', true));
+            $user = DB::table('customers')
+                ->where('nomor_hp', $validatedData['phone_number'])
+                ->where('password', $passHash)
+                ->first();
+
+            if ($user) {
+
+                $expiresAt = Carbon::now()->addHours(1)->timestamp;
+                $tokenData = json_encode([
+                    'user_id' => $user->nomor_hp,
+                    'expires_at' => $expiresAt
+                ]);
+                $token = $this->encryptAES128($tokenData);
+
+                //update ke DB
+                DB::table('customers')->where('rowid', $user->rowid)->update([ 'is_delete' => 1]);
+
+                return response()->json([
+                    'endpoint' => 'delete',
+                    'responseCode' => '0',
+                    'responseMessage' => 'Delete account success'
+                    ]
+                , 200);
+                
+            } else {
+                return response()->json([
+                    'endpoint' => 'delete',
+                    'responseCode' => '1',
+                    'responseMessage' => 'delete failed [user tidak ditemukan]'
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            //dd($e);
+            Log::error($request->input('phone_number') . ' Error occurred : ' . $e->getMessage());
+
+            return response()->json([
+                'endpoint' => 'delete',
+                'responseCode' => '1',
+                'responseMessage' => 'delete failed [exception error]'
             ], 200);
         }
     }
@@ -262,7 +316,7 @@ class ApiController  extends Controller
                     ->where('id_transaksi', $validatedData['id_transaksi'])
                     ->update([ 'bukti_bayar' => $filename, 'status' => 'KONFIRMASI', ]);
         
-                    $mimage = 'webkopian/public/invoice/'. $filename;
+                    $mimage = 'webkopinggir/public/invoice/'. $filename;
                     
                     return response()->json([
                         'endpoint' => 'upload-struk',
@@ -412,12 +466,16 @@ class ApiController  extends Controller
     {
         try {
 
-            $tokenCheck = $this->validateToken($request->input('token'));
-            if ($tokenCheck['status']) {
-
                 $dataCat = DB::table('categories')->get();
-                $dataMenu = DB::table('menus')->get();
-                
+                $dataMenu = DB::table('menus')
+                ->join('categories', 'menus.kategori', '=', 'categories.id')
+                ->select('menus.*', 'categories.nama as nama_kategori')
+                ->where('menus.is_delete', '0')
+                ->where('menus.is_active', '0')
+                ->orderBy('categories.id', 'ASC')
+                ->orderBy('menus.sku', 'ASC')
+                ->get();
+                    
                 if ($dataCat) {
                     if ($dataMenu) {
                         return response()->json([
@@ -445,17 +503,6 @@ class ApiController  extends Controller
                         'dataMenu' => null
                     ], 200);
                 }
-                
-            }else{
-
-                return response()->json([
-                    'endpoint' => 'menu',
-                    'responseCode' => '21',
-                    'responseMessage' => $tokenCheck['message'],
-                    'data' => null
-                ], 401);
-
-            }
 
         } catch (\Exception $e) {
             
@@ -476,9 +523,6 @@ class ApiController  extends Controller
     {
         try {
 
-            $tokenCheck = $this->validateToken($request->input('token'));
-            if ($tokenCheck['status']) {
-
                 $data = DB::table('merchants')->get();
                 if ($dataMerchant = $data->first()) {
                     return response()->json([
@@ -495,17 +539,6 @@ class ApiController  extends Controller
                         'data' => null
                     ], 200);
                 }
-                
-            }else{
-
-                return response()->json([
-                    'endpoint' => 'merchants',
-                    'responseCode' => '21',
-                    'responseMessage' => $tokenCheck['message'],
-                    'data' => null
-                ], 401);
-
-            }
 
         } catch (\Exception $e) {
             

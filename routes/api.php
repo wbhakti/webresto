@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware('apikey')->group(function () {
     Route::post('/login', [ApiController::class, 'LoginUser']);
     Route::post('/register', [ApiController::class, 'RegistrationUser']);
+    Route::post('/delete', [ApiController::class, 'DeleteUser']);
     Route::post('/history', [ApiController::class, 'History']);
     Route::post('/checkout', [ApiController::class, 'Checkout']);
     Route::post('/upload-struk', [ApiController::class, 'UploadStruk']);
