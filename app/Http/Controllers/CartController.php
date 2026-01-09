@@ -315,7 +315,7 @@ class CartController extends Controller
                 $font = public_path('arial.ttf');
                 $fontSize = 12;
                 $textColor = imagecolorallocate($tmp, 0, 0, 0);
-                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $timestamp = 'starup : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
@@ -334,7 +334,7 @@ class CartController extends Controller
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
     
-                $mimage = 'webkopinggir/public/invoice/'. $filename;
+                $mimage = 'webstarup/public/invoice/'. $filename;
                 
                 return response()->json([
                     'success' => true,

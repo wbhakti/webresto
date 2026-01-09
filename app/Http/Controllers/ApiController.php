@@ -297,7 +297,7 @@ class ApiController  extends Controller
                     $font = public_path('arial.ttf');
                     $fontSize = 25;
                     $textColor = imagecolorallocate($tmp, 255, 255, 255);
-                    $timestamp = 'kopian : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                    $timestamp = 'startup : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                     $xTimestamp = 20;
                     $yTimestamp = 50;
     
@@ -316,7 +316,7 @@ class ApiController  extends Controller
                     ->where('id_transaksi', $validatedData['id_transaksi'])
                     ->update([ 'bukti_bayar' => $filename, 'status' => 'KONFIRMASI', ]);
         
-                    $mimage = 'webkopinggir/public/invoice/'. $filename;
+                    $mimage = 'webstarup/public/invoice/'. $filename;
                     
                     return response()->json([
                         'endpoint' => 'upload-struk',
