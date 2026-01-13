@@ -32,7 +32,7 @@
             <p><strong>Sub Total Pemesanan:</strong> Rp {{ number_format($totalTagihan, 0, ',', '.') }}</p>
             <p><strong>Diskon:</strong> Rp {{ number_format($discount, 0, ',', '.') }}</p>
             <p><strong>Total Pembayaran: Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }} </strong>  </p>
-            <!-- <p><strong>QRIS:</strong> {{ $qrisDynamic }}</p> -->
+            
             <hr>
 
             <!-- Detail Pesanan -->
