@@ -44,7 +44,12 @@
                             {{ $item['quantity'] }}x @Rp {{ number_format($item['price'], 0, ',', '.') }} 
                             <br><small class="text-muted">Catatan: {{ $item['note'] }}</small>
                         </div>
-                        <span class="text-start">Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</span>
+                        <div class="text-end">
+                            <strong>Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</strong>
+                            @if ($item['product_discount'] != 0)
+                            <br><small class="text-muted">-Rp {{ number_format($item['quantity'] * $item['product_discount'], 0, ',', '.') }}</small>
+                            @endif
+                        </div>
                     </li>
                 @endforeach
             </ul>
@@ -176,7 +181,7 @@ function downloadQR() {
                 // Detail Pesanan
                 let pesanDetail = "";
                 @foreach ($details as $item)
-                    pesanDetail += "{{ $item['menu_id'] }} - {{ $item['quantity'] }}x @Rp {{ number_format($item['price'], 0, ',', '.') }}%0A";
+                pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
                 @endforeach
 
                 // Format Pesan WhatsApp
@@ -188,7 +193,7 @@ function downloadQR() {
                                 `Sub Total Pemesanan: ${totalTagihan}%0A` +
                                 `Diskon: ${totalDiscount}%0A` +
                                 `Total Pembayaran: ${totalPembayaran}%0A%0A` +
-                                `*Detail Pesanan:*%0A` + pesanDetail;
+                                `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
 
                 let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
 
@@ -234,7 +239,7 @@ function downloadQR() {
                     // Detail Pesanan
                     let pesanDetail = "";
                     @foreach ($details as $item)
-                        pesanDetail += "{{ $item['menu_id'] }} - {{ $item['quantity'] }}x @Rp {{ number_format($item['price'], 0, ',', '.') }}%0A";
+                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
@@ -247,7 +252,7 @@ function downloadQR() {
                                 `Diskon: ${totalDiscount}%0A` +
                                 `Total Pembayaran: ${totalPembayaran}%0A%0A` +
                                 `Bukti Transfer: ${imageUrl}%0A%0A` +
-                                `*Detail Pesanan:*%0A` + pesanDetail;
+                                `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
 
                     let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
 

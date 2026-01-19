@@ -26,6 +26,26 @@ class CartController extends Controller
         $quantity = $request->input('quantity', 1);
         $img = $request->input('productImage');
 
+        //HIT table discount
+        $productDiscount = 0;
+        $result = DB::table('configuration')->where('parameter', 'diskon')->first();
+        if ($result) {
+            $time = $result->description;
+            $timeArr = explode("-",$time);
+            if (count($timeArr) > 1) {
+                $startTime = $timeArr[0];
+                $endTime = $timeArr[1];
+                $today = Carbon::now()->addHours(7)->format('H:i');
+
+                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                    $discount = $result->value;
+                    if ($request->input('isDiscount') == 1) {
+                        $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                    }
+                }
+            }
+        }
+        
         $cart = session()->get('cart', []);
 
         if (!empty($cart)) {
@@ -41,6 +61,7 @@ class CartController extends Controller
         //sudah ada di cart
         if (isset($cart[$productId])) {
             $cart[$productId]['quantity'] += $quantity;
+            $cart[$productId]['productDiscount'] += $productDiscount;
         } else {
             //produk baru ke cart
             $cart[$productId] = [
@@ -48,6 +69,7 @@ class CartController extends Controller
                 'price' => $productPrice,
                 'quantity' => $quantity,
                 'merchantId' => $merchantId,
+                'productDiscount' => $productDiscount,
                 'image' => $img,
                 'idMenu' => $productId,
             ];
@@ -79,25 +101,7 @@ class CartController extends Controller
         $merchant = DB::table('merchants')->first();
         $cartCount = count($cart);
 
-        //HIT table discount
-        $discount = 0;
-        $result = DB::table('configuration')->where('parameter', 'diskon')->first();
-
-        if ($result) {
-            $time = $result->description;
-            $timeArr = explode("-",$time);
-            if (count($timeArr) > 1) {
-                $startTime = $timeArr[0];
-                $endTime = $timeArr[1];
-                $today = Carbon::now()->addHours(7)->format('H:i');
-
-                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
-                    $discount = $result->value;
-                }
-            }
-        }
-
-        return view('home-page/cart', compact('cart', 'merchant', 'discount'), ['cartCount' => $cartCount]);
+        return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
     }
 
     public function remove($id)
@@ -112,7 +116,7 @@ class CartController extends Controller
         return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
     }
 
-    public function update(Request $request, $id, $discount)
+    public function update(Request $request, $id)
     {
         $cart = session()->get('cart', []);
 
@@ -122,18 +126,21 @@ class CartController extends Controller
             session()->put('cart', $cart);
 
             $itemTotal = $cart[$id]['price'] * $cart[$id]['quantity'];
+            $itemDiscountTotal = $cart[$id]['productDiscount'] * $cart[$id]['quantity'];
 
             $grandTotal = 0;
+            $resDiscount = 0;
             foreach ($cart as $item) {
                 $grandTotal += $item['price'] * $item['quantity'];
+                $resDiscount += $item['productDiscount'] * $item['quantity'];
             }
 
-            $resDiscount = $grandTotal * $discount / 100;
             $total = $grandTotal - $resDiscount;
 
             return response()->json([
                 'success' => true,
                 'itemTotal' => number_format($itemTotal, 0, ',', '.'),
+                'productDiscountTotal' => number_format($itemDiscountTotal, 0, ',', '.'),
                 'grandTotal' => number_format($grandTotal, 0, ',', '.'),
                 'discount' => number_format($resDiscount, 0, ',', '.'),
                 'total' => number_format($total, 0, ',', '.')
@@ -155,22 +162,23 @@ class CartController extends Controller
             $cart    = session('cart', []);
 			$details = [];
 			$subtotal = 0;
+            $subtotaldiscount = 0;
 
 			foreach ($cart as $id => $item) {
 				$qty   = (int) ($item['quantity'] ?? 0);
 				$price = (int) ($item['price'] ?? 0);
+                $discount = (int) ($item['productDiscount'] ?? 0);
 
 				$details[] = [
 					'menu_id'  => $item['name'] ?? $id,
 					'note'     => '-',
 					'quantity' => $qty,
 					'price'    => $price,
+                    'product_discount'    => $discount,
 				];
 				$subtotal += $qty * $price;
+                $subtotaldiscount += $qty * $discount;
 			}
-			
-			$discountPercent = (float) $request->input('discount_percent', 0);
-			$discountValue   = (int) round($subtotal * ($discountPercent / 100));
 
             // Simpan data ke database
             DB::table('transactions')->insert([
@@ -179,7 +187,7 @@ class CartController extends Controller
                 'meja' => $mmeja,
                 'details' => json_encode($details),
                 'total_bayar' => $subtotal,
-                'discount' => $discountValue,
+                'discount' => $subtotaldiscount,
                 'metode_bayar' => $request->input('metode_pembayaran'),
                 'qris_dynamic' => $request->input('qris_dynamic'),
                 'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s')

@@ -152,6 +152,7 @@ class AdminController extends Controller
                         'nama' => $request->input('nama'),
                         'harga' => $request->input('harga'),
                         'kategori' => $request->input('kategori'),
+                        'is_discount' => $request->input('discount'),
                         'image' => $filename,
                     ]);
 
@@ -163,6 +164,7 @@ class AdminController extends Controller
                         'nama' => $request->input('nama'),
                         'harga' => $request->input('harga'),
                         'kategori' => $request->input('kategori'),
+                        'is_discount' => $request->input('discount'),
                     ]);
                 }
 
