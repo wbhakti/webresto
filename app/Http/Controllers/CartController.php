@@ -61,7 +61,7 @@ class CartController extends Controller
         //sudah ada di cart
         if (isset($cart[$productId])) {
             $cart[$productId]['quantity'] += $quantity;
-            $cart[$productId]['productDiscount'] += $productDiscount;
+            $cart[$productId]['totalDiscount'] = $quantity * $productDiscount;
         } else {
             //produk baru ke cart
             $cart[$productId] = [
@@ -70,6 +70,7 @@ class CartController extends Controller
                 'quantity' => $quantity,
                 'merchantId' => $merchantId,
                 'productDiscount' => $productDiscount,
+                'totalDiscount' => $productDiscount,
                 'image' => $img,
                 'idMenu' => $productId,
             ];
@@ -122,6 +123,7 @@ class CartController extends Controller
 
         if (isset($cart[$id])) {
             $cart[$id]['quantity'] = $request->quantity;
+            $cart[$id]['totalDiscount']  =  $request->quantity *  $cart[$id]['productDiscount'];
             
             session()->put('cart', $cart);
 

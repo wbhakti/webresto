@@ -151,9 +151,9 @@
                                 if($item['productDiscount'] == 0) {
                                     $priceDiscount = "";
                                 } else {
-                                    $mPriceDiscount = number_format(($item['productDiscount']), 0, ',', '.');
+                                    $mPriceDiscount = number_format(($item['totalDiscount']), 0, ',', '.');
                                     $priceDiscount = "-Rp $mPriceDiscount" ;
-                                    $rpdiscount += $item['productDiscount'];
+                                    $rpdiscount += $item['totalDiscount'];
                                 }
                             @endphp
 
