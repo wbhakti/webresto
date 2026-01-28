@@ -142,8 +142,21 @@
                         </thead>
                         <tbody>
                             @php $grandTotal = 0; @endphp
+                            @php $rpdiscount = 0; @endphp
                             @foreach ($cart as $id => $item)
                             @php $total = $item['price'] * $item['quantity']; @endphp
+
+                            @php $priceDiscount = ""; @endphp
+                            @php 
+                                if($item['productDiscount'] == 0) {
+                                    $priceDiscount = "";
+                                } else {
+                                    $mPriceDiscount = number_format(($item['totalDiscount']), 0, ',', '.');
+                                    $priceDiscount = "-Rp $mPriceDiscount" ;
+                                    $rpdiscount += $item['totalDiscount'];
+                                }
+                            @endphp
+
                             <tr>
                                 <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
@@ -154,12 +167,12 @@
                                 <td colspan="2" class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
                                 <td colspan="3" class="font-isi-jumlah">
                                     <div class="input-group">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1, {{$discount}})">-</button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1)">-</button>
                                         <input type="text" class="form-control text-center jml-input" value="{{ $item['quantity'] }}" readonly id="quantity-{{ $id }}">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1, {{$discount}})">+</button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1)">+</button>
                                     </div>
                                 </td>
-                                <td colspan="2" class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }}</td>
+                                <td colspan="2" class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }} </br> {{$priceDiscount}}</td>
                                 <td colspan="2"> 
                                     <form action="{{ route('cart.remove', $id) }}" method="POST" style="display:inline;">
                                         @csrf
@@ -171,7 +184,7 @@
                             </tr>
                             @php $grandTotal += $total; @endphp
                             @endforeach
-                            @php $rpdiscount = ($grandTotal * $discount) / 100 ; @endphp
+                            
                         </tbody>
                         <tfoot class="table-light">
                             <tr>
@@ -236,7 +249,6 @@
                         </div>
                     </div>
                 
-                    <input type="hidden" id="discount_percent" name="discount_percent" value="{{ $discount }}">
                     <input type="hidden" id="qris_dynamic" name="qris_dynamic">
 
                     <div class="card-footer text-center mt-3">
@@ -258,7 +270,7 @@
 @endif
 
 <script>
-    function updateQuantity(itemId, change, discount) {
+    function updateQuantity(itemId, change) {
         const quantityInput = document.getElementById(`quantity-${itemId}`);
         let currentQuantity = parseInt(quantityInput.value);
 
@@ -266,7 +278,7 @@
             currentQuantity += change;
             quantityInput.value = currentQuantity;
 
-            fetch(`/update-cart/${itemId}/${discount}`, {
+            fetch(`/update-cart/${itemId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -283,7 +295,13 @@
                         const totalElement = document.getElementById(`total-${itemId}`);
                         if (totalElement) {
                             const total = data.itemTotal;
-                            totalElement.textContent = `Rp ${total}`;
+                            const discount = data.productDiscountTotal;
+                            if (discount == 0) {
+                                totalElement.textContent = `Rp ${total}`;
+                            } else {
+                                totalElement.innerText = `Rp ${total} \n  -Rp ${discount} `;
+                            }
+                            
                         }
 
                         document.getElementById('discount-total').textContent = `Rp ${data.discount}`;
@@ -329,26 +347,6 @@
             return false;
         }
 
-        
-
-        // var daftarProduk = [];
-        // var totalTagihan = 0;
-
-        // @foreach ($cart as $item)
-        //     daftarProduk.push({
-        //         menu_id: "{{ $item['name'] }}",
-        //         note: "-",
-        //         quantity: {{ $item['quantity'] }},
-        //         price: {{ $item['price'] }}
-        //     });
-        //     totalTagihan += {{ $item['price'] * $item['quantity'] }};
-        // @endforeach
-
-        // Simpan data ke input hidden
-        // var totalDiskon = totalTagihan * ({{$discount}} / 100);
-        // document.getElementById('total-tagihan').value = totalTagihan;
-        // document.getElementById('discount').value = totalDiskon;
-        // document.getElementById('order-details').value = JSON.stringify(daftarProduk);
     });
 </script>
 

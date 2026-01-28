@@ -85,6 +85,7 @@
                                 data-name="{{ $item->nama }}" 
                                 data-price="{{ $item->harga }}"
                                 data-idmerchant="{{ $merchant->id }}"
+                                data-discount="{{ $item->is_discount }}"
                                 data-img="{{ $item->image }}">
                                 Add to cart
                                 </a>
@@ -112,6 +113,7 @@
                                     data-name="{{ $item->nama }}" 
                                     data-price="{{ $item->harga }}"
                                     data-idmerchant="{{ $merchant->id }}"
+                                    data-discount="{{ $item->is_discount }}"
                                     data-img="{{ $item->image }}">
                                     Add to Cart
                                 </a>
@@ -166,6 +168,7 @@
         const productPrice = $(this).data('price');
         const merchant = $(this).data('idmerchant');
         const productImage = $(this).data('img');
+        const mDiscount = $(this).data('discount');
 
         $.ajax({
             url: "{{ route('cart.add') }}",
@@ -177,6 +180,7 @@
                 price: productPrice,
                 quantity: 1, // Default
                 merchantId: merchant,
+                isDiscount: mDiscount,
                 productImage: productImage,
             },
             success: function (response) {

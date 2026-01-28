@@ -41,7 +41,7 @@
                         <th>Nama Menu</th>
                         <th>Harga</th>
                         <th>Kategori</th>
-                        <th>Image</th>
+                        <th>Diskon</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -53,7 +53,11 @@
                         <td>{{ $item->nama }}</td>
                         <td>{{ $item->harga }}</td>
                         <td>{{ $item->kategori }}</td>
-                        <td>{{ $item->is_active }}</td>
+                        @if($item->is_discount == 1)
+                            <td>{{ "AKTIF" }}</td>
+                        @else
+                            <td>{{ "NON AKTIF" }}</td>
+                        @endif
                         <!-- <td>
                             <img src="{{ url('public/img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
                         </td> -->
@@ -64,6 +68,7 @@
                                     data-nama="{{ $item->nama }}"
                                     data-harga="{{ $item->harga }}"
                                     data-kategori="{{ $item->kategori }}"
+                                    data-discount="{{ $item->is_discount }}"
                                     data-imagemenu="{{ $item->image }}">Edit</button>
                                 
                                 <form method="POST" action="/postmenu" style="display: inline;">
@@ -180,6 +185,18 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="editdiscount"><b>Diskon Menu</b></label>
+                            <select class="form-control" id="editdiscount" name="discount" required>
+                            @if($item->is_discount == 1)
+                                <option selected="selected" value="1">{{ "AKTIF" }}</option>
+                                <option value="0">{{ "NON AKTIF" }}</option>
+                            @else
+                                <option value="1">{{ "AKTIF" }}</option>
+                                <option selected="selected" value="0">{{ "NON AKTIF" }}</option>
+                            @endif
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="image"><b>Image</b></label>
                             <input type="file" name="img_menu" class="form-control" accept="image/*" />
                         </div>
@@ -242,12 +259,14 @@ $(document).ready(function() {
             var nama = $(this).data('nama');
             var harga = $(this).data('harga');
             var kategori = $(this).data('kategori');
+            var discount = $(this).data('discount');
             var img = $(this).data('imagemenu');
 
             $('#editRowid').val(rowid);
             $('#editnama').val(nama);
             $('#editharga').val(harga);
             $('#editkategori').val(kategori);
+            $('#editdiscount').val(discount);
             $('#currentImage').attr('src', "{{ url('public/img/') }}" + "/" + img);
 
             $('#editModal').modal('show');
