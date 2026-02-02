@@ -17,6 +17,11 @@
         border-color: #033800;
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
+
+    .search-menu {
+        padding-top: 20px;
+    }
+
 </style>
 
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
@@ -49,6 +54,20 @@
                 @endforeach
             </select>            
         </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <!-- <form class="form-group"> -->
+                    <div class="input-group search-menu">
+                        <input class="form-control form-control-lg" id="searchText" type="search" placeholder="Search" aria-label="Search" value={{ request()->query('cari') }}>
+                        <button class="btn btn-primary px-4" id="searchMenu">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                <!-- </form> -->
+        </div>
+
+        
         
         <!-- List makanan -->
         <div class="text-center">
@@ -198,14 +217,33 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const kategoriSelect = document.getElementById('kategoriSelect');
+
         kategoriSelect.addEventListener('change', function () {
             const kategori = this.options[this.selectedIndex].getAttribute('data-kategori');
             if (kategori) {
                 window.location.href = `/restoran/?kategori=${encodeURIComponent(kategori)}`;
             }
         });
+
+        searchMenu.addEventListener('click', function () {
+            const selectElement = document.getElementById('kategoriSelect');
+            const selectedIndex = selectElement.selectedIndex;
+            const selectedValue = selectElement.options[selectedIndex].getAttribute('data-kategori');
+            const cariElement = document.getElementById('searchText').value;
+
+            window.location.href = `/restoran/?kategori=${encodeURIComponent(selectedValue)}&cari=${encodeURIComponent(cariElement)}`;       
+        });
+
     });
 </script>
+
+<!-- <script>
+    const button = document.getElementById("search-menu");
+    button.addEventListener("submit", function() {
+        // document.getElementById("search-text").innerHTML = "Button clicked!";
+        window.location.href = `/restoran/?kategori=all&search=iga`;
+    });
+</script> -->
 
 <script type="text/javascript">
     window.onload = () => {

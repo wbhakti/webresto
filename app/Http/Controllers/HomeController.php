@@ -34,21 +34,41 @@ class HomeController extends Controller
             $cart = session()->get('cart', []);
             $cartCount = count($cart);
 
-            $dataproduk = DB::table('menus')
-            ->join('categories', 'menus.kategori', '=', 'categories.id')
-            ->select('menus.*', 'categories.nama as nama_kategori')
-            ->where('menus.is_delete', '0')
-            ->where('menus.is_active', '0')
-            ->orderBy('categories.id', 'ASC')
-            ->orderBy('menus.sku', 'ASC')
-            ->get();
-
             $kategori = $request->query('kategori');
+            $cari = $request->query('cari');
             
             if (!empty($kategori)) {
                 if ($kategori !== "all") {
-                    $dataproduk = $dataproduk->where('nama_kategori', $kategori);
+                    $dataproduk = DB::table('menus')
+                    ->join('categories', 'menus.kategori', '=', 'categories.id')
+                    ->select('menus.*', 'categories.nama as nama_kategori')
+                    ->where('categories.nama', $kategori)
+                    ->where('menus.nama','LIKE', '%'.$cari.'%')
+                    ->where('menus.is_delete', '0')
+                    ->where('menus.is_active', '0')
+                    ->orderBy('categories.id', 'ASC')
+                    ->orderBy('menus.sku', 'ASC')
+                    ->get();
+                } else {
+                    $dataproduk = DB::table('menus')
+                    ->join('categories', 'menus.kategori', '=', 'categories.id')
+                    ->select('menus.*', 'categories.nama as nama_kategori')
+                    ->where('menus.nama','LIKE', '%'.$cari.'%')
+                    ->where('menus.is_delete', '0')
+                    ->where('menus.is_active', '0')
+                    ->orderBy('categories.id', 'ASC')
+                    ->orderBy('menus.sku', 'ASC')
+                    ->get();
                 }
+            } else {
+                $dataproduk = DB::table('menus')
+                    ->join('categories', 'menus.kategori', '=', 'categories.id')
+                    ->select('menus.*', 'categories.nama as nama_kategori')
+                    ->where('menus.is_delete', '0')
+                    ->where('menus.is_active', '0')
+                    ->orderBy('categories.id', 'ASC')
+                    ->orderBy('menus.sku', 'ASC')
+                    ->get();
             }
 
             $merchant = DB::table('merchants')->first();
