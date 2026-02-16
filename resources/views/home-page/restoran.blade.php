@@ -21,7 +21,7 @@
 
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
     <div class="card" style="min-width: 150px;">
-        <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Favorit</div>
+        <!-- <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Favorit</div> -->
         <img class="card-img-top" src="{{ asset('img/' . $merchant->image) }}" alt="{{ $merchant->nama }}" />
         <div class="card-body d-flex flex-column justify-content-between text-center">
             <div>
