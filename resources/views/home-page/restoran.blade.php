@@ -79,7 +79,7 @@
                             </div>
                         </div>
                         <!-- Product actions-->
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                        <!-- <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                             <div class="text-center">
                                 <a class="btn btn-outline-dark mt-auto btn-add-to-cart" href="javascript:void(0)" 
                                 data-id="{{ $item->id }}" 
@@ -91,7 +91,7 @@
                                 Add to cart
                                 </a>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -109,7 +109,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <a class="btn btn-primary btn-add-to-cart" href="javascript:void(0)" 
+                                <!-- <a class="btn btn-primary btn-add-to-cart" href="javascript:void(0)" 
                                     data-id="{{ $item->id }}" 
                                     data-name="{{ $item->nama }}" 
                                     data-price="{{ $item->harga }}"
@@ -117,7 +117,7 @@
                                     data-discount="{{ $item->is_discount }}"
                                     data-img="{{ $item->image }}">
                                     Add to Cart
-                                </a>
+                                </a> -->
                             </div>
                         </div>
                     </div>

@@ -38,13 +38,13 @@
         <nav class="navbar custom-navbar fixed-top">
             <div class="container px-4 px-lg-5">
                 <a class="navbar-brand" href="{{ url('/') }}" style="color: #fff;"><b>Home</b></a>
-                <form class="d-flex" action="/cart" method="GET">
+                <!-- <form class="d-flex" action="/cart" method="GET">
                     <button class="btn btn-outline-dark" type="submit">
                         <i class="bi-cart-fill me-1"></i>
                         Cart
                         <span id="cart-badge" class="badge bg-dark text-white ms-1 rounded-pill">{{ $cartCount }}</span>
                     </button>
-                </form>                    
+                </form>                     -->
             </div>
         </nav>
         
