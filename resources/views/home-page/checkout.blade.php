@@ -145,6 +145,19 @@
         </div>
     </div>
 </div>
+<!-- Modal Bootstrap UPLOAD-->
+<div class="modal fade" id="modalUpload" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Proses Upload</h4>
+                    <p>Silahkan Tunggu Sedang Upload Bukti Bayar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -208,66 +221,71 @@ function downloadQR() {
     document.getElementById('uploadBuktiForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
-        let formData = new FormData(this);
+        const dialogUpload = document.getElementById('modalUpload');
+        const modalUpload = bootstrap.Modal.getOrCreateInstance(dialogUpload);
+        modalUpload.show();
 
-        fetch("{{ route('upload') }}", {
-            method: "POST",
-            body: formData,
-            headers: {
-                "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+            let formData = new FormData(this);
+            fetch("{{ route('upload') }}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modalUpload.hide();
 
-                let modal = new bootstrap.Modal(document.getElementById("successModalQris"));
-                modal.show();
+                    let modal = new bootstrap.Modal(document.getElementById("successModalQris"));
+                    modal.show();
 
-                document.getElementById("sendWaQris").addEventListener("click", function() {
-                    let imageUrl = data.imageUrl;
-                    // Data Pesanan
-                    let phoneWa = "{{ $phone_wa }}";
-                    let idTransaksi = "{{ $idtransaksi }}";
-                    let nama = "{{ $nama }}";
-                    let meja = "{{ $meja }}";
-                    let metodePembayaran = "{{ $metodePembayaran }}";
-                    let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
-                    let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
-                    let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
+                    document.getElementById("sendWaQris").addEventListener("click", function() {
+                        let imageUrl = data.imageUrl;
+                        // Data Pesanan
+                        let phoneWa = "{{ $phone_wa }}";
+                        let idTransaksi = "{{ $idtransaksi }}";
+                        let nama = "{{ $nama }}";
+                        let meja = "{{ $meja }}";
+                        let metodePembayaran = "{{ $metodePembayaran }}";
+                        let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
+                        let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
+                        let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
 
-                    // Detail Pesanan
-                    let pesanDetail = "";
-                    @foreach ($details as $item)
-                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
-                    @endforeach
+                        // Detail Pesanan
+                        let pesanDetail = "";
+                        @foreach ($details as $item)
+                            pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                        @endforeach
 
-                    // Format Pesan WhatsApp
-                    let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
-                                `ID Transaksi: ${idTransaksi}%0A` +
-                                `Nama: ${nama}%0A` +
-                                `Nomor Meja: ${meja}%0A` +
-                                `Metode Pembayaran: ${metodePembayaran}%0A` +
-                                `Sub Total Pemesanan: ${totalTagihan}%0A` +
-                                `Diskon: ${totalDiscount}%0A` +
-                                `Total Pembayaran: ${totalPembayaran}%0A%0A` +
-                                `Bukti Transfer: ${imageUrl}%0A%0A` +
-                                `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
+                        // Format Pesan WhatsApp
+                        let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
+                                    `ID Transaksi: ${idTransaksi}%0A` +
+                                    `Nama: ${nama}%0A` +
+                                    `Nomor Meja: ${meja}%0A` +
+                                    `Metode Pembayaran: ${metodePembayaran}%0A` +
+                                    `Sub Total Pemesanan: ${totalTagihan}%0A` +
+                                    `Diskon: ${totalDiscount}%0A` +
+                                    `Total Pembayaran: ${totalPembayaran}%0A%0A` +
+                                    `Bukti Transfer: ${imageUrl}%0A%0A` +
+                                    `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
 
-                    let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
+                        let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
 
-                    document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
+                        document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
 
-                    // Buka WhatsApp
-                    window.open(waLink, '_blank');
-                    modal.hide();
-                });
+                        // Buka WhatsApp
+                        window.open(waLink, '_blank');
+                        modal.hide();
+                    });
 
-            } else {
-                alert("Upload gagal! Silakan coba lagi.");
-            }
-        })
-        .catch(error => console.error('Error:', error));
+                } else {
+                    modalUpload.hide();
+                    alert("Upload gagal! Silakan coba lagi.");
+                }
+            })
+            .catch(error => console.error('Error:', error));  
     });
 </script>
 
