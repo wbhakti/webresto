@@ -9,6 +9,16 @@
     <div class="text-center text-white">
         <h1 class="display-4 fw-bolder">Konfirmasi Pembayaran</h1>
     </div>
+    <style>
+     .large-button {
+        width: 300px;
+        height: 50px;
+        padding: 10px 20px; /* Adjusts the clickable area and internal spacing */
+        font-size: 16px; /* Adjusts text size */
+        font-weight: bold;
+        background-color: #F87C63;
+    }
+    </style>
 </header>
 
 <section class="py-5">
@@ -139,8 +149,8 @@
                     <p>Bukti transaksi sudah berhasil dikirim, silahkan klik konfirmasi untuk melanjutkan pemesanan!</p>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="sendWaQris">Konfirmasi</button>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="large-button" id="sendWaQris">Konfirmasi</button>
             </div>
         </div>
     </div>
