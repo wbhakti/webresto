@@ -159,6 +159,20 @@
     </div>
 </div>
 
+<!-- Modal Bootstrap ERROR-->
+<div class="modal fade" id="modalUploadError" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">Transaksi Gagal</h4>
+                    <p>Silahkan Ke Kasir, Terimakasih</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 function downloadQR() {
@@ -236,10 +250,17 @@ function downloadQR() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                 modalUpload.hide();
 
-                let modal = new bootstrap.Modal(document.getElementById("successModalQris"));
-                modal.show();
+                setTimeout(() => {
+                    modalUpload.hide();
+                }, 1000);
+
+                setTimeout(() => {
+                    let modal = new bootstrap.Modal(document.getElementById("successModalQris"));
+                    modal.show();
+                }, 1000);
+
+                
 
                 document.getElementById("sendWaQris").addEventListener("click", function() {
                     let imageUrl = data.imageUrl;
@@ -251,7 +272,7 @@ function downloadQR() {
                     let metodePembayaran = "{{ $metodePembayaran }}";
                     let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
                     let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
-                    let tota   lPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
+                    let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
 
                         // Detail Pesanan
                     let pesanDetail = "";
@@ -281,11 +302,21 @@ function downloadQR() {
                 });
 
             } else {
-                 modalUpload.hide();
-                alert("Upload gagal! Silakan coba lagi.");
+                setTimeout(() => {
+                    modalUpload.hide();
+                    let modal = new bootstrap.Modal(document.getElementById("modalUploadError"));
+                    modal.show();
+                }, 1000);
             }
-        })
-        .catch(error => console.error('Error:', error));  
+        }).catch(error => {
+            console.error('Error:', error);
+            // Error: Optionally hide modal or show error message
+            setTimeout(() => {
+                modalUpload.hide();
+                alert("Upload gagal! Silakan ke kasir.");
+            }, 1000);
+            
+        });  
     });
 </script>
 
