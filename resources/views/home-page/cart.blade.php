@@ -319,6 +319,7 @@
 
 <script>
     document.getElementById('checkout-button').addEventListener('click', function(event) {
+
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
@@ -329,25 +330,30 @@
         const result = makeDynamicQR(qris, nominal);
         document.getElementById("qris_dynamic").value = result;
 
+        const button = document.getElementById('checkout-button');
+        button.disabled = true;
+
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");
+            button.disabled = false;
             event.preventDefault(); // Cegah submit form
             return false;
         }
 
         if (!meja || meja.value.trim() === "") {
             alert("Silakan pilih nomor meja!");
+            button.disabled = false;
             event.preventDefault();
             return false;
         }
 
         if (!metodePembayaran || metodePembayaran.value.trim() === "") {
             alert("Silakan pilih metode pembayaran!");
+            button.disabled = false;
             event.preventDefault();
             return false;
         }
-
-    });
+    }, { once: true });
 </script>
 
 
