@@ -50,7 +50,7 @@
             </div>
             <div class="text-left text-black">
                 <br>
-                <p dir="auto" class="body"><strong>Kopinggir Jalan</strong></p>
+                <p dir="auto" class="body"><strong>CUBIQ</strong></p>
                 <p dir="auto" class="body"><span style="font-weight: 400">08123456789
                 </span></p>
                 <br>
@@ -58,14 +58,14 @@
             <div class="text-left text-black">
                 <br>
                 <p dir="auto" class="body"><strong>Email</strong></p>
-                <p dir="auto" class="body"><span style="font-weight: 400">kopinggir.stargroup@gmail.com
+                <p dir="auto" class="body"><span style="font-weight: 400">cubiq.stargroup@gmail.com
                 </span></p>
                 <br>
             </div>
         
         <!-- Footer-->
         <footer class="py-5 bg-dark" style="background-color: #000 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopinggir Jalan by Star Group 2025</p></div>
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; CUBIQ by Star Group 2026</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
