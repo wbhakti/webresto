@@ -102,7 +102,7 @@
                         <label class="fw-bold">📸 Upload Bukti Pembayaran:</label>
                         <form id="uploadBuktiForm" enctype="multipart/form-data">
                             @csrf
-                            <input type="text" name="idtransaksi" value="{{ $qrisDynamic }}" hidden>
+                            <input type="text" name="idtransaksi" value="{{ $idtransaksi }}" hidden>
                             <input type="text" name="nama" value="{{ $nama }}" hidden>
                             <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" class="form-control mt-2" accept="image/*" required>
                             <button type="submit" class="btn btn-success mt-2">Upload</button>
