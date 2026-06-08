@@ -244,7 +244,6 @@
                             <select class="form-select py-2" id="metode_pembayaran" name="metode_pembayaran" required>
                                 <option value="" selected disabled>Pilih Metode Pembayaran</option>
                                 <option selected="selected" value="qris">QRIS</option>
-                                <option value="kasir">KASIR</option>
                             </select>
                         </div>
                     </div>
@@ -323,7 +322,7 @@
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
-        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000456488202150008850045648820303UKE51440014ID.CO.QRIS.WWW0215ID10265190541380303UKE5204581253033605802ID5910CUBIQ CAFE6008BOYOLALI61055732162070703A016304414B";
+        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000456488002150008850045648800303UKE51440014ID.CO.QRIS.WWW0215ID10265190539160303UKE5204794153033605802ID5911CUBIQ PADEL6008BOYOLALI61055732162070703A016304F7A1";
         const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
 
         const result = makeDynamicQR(qris, nominal);
