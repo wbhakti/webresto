@@ -315,6 +315,7 @@
 </script>
 
 <script src="{{ asset('qriscode/qrisDynamic.js')}}"></script>
+<script src="{{ asset('qriscode/qrisConverter.js')}}"></script>
 
 <script>
     document.getElementById('checkout-button').addEventListener('click', function(event) {
@@ -322,12 +323,11 @@
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
-        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000456488002150008850045648800303UKE51440014ID.CO.QRIS.WWW0215ID10265190539160303UKE5204794153033605802ID5911CUBIQ PADEL6008BOYOLALI61055732162070703A016304F7A1";
+        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000456488202150008850045648820303UKE51440014ID.CO.QRIS.WWW0215ID10265190541380303UKE5204581253033605802ID5910CUBIQ CAFE6008BOYOLALI61055732162070703A016304414B";
         const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
 
-        const result = makeDynamicQR(qris, nominal);
+        const result = makeString(qris, { nominal: nominal });
         document.getElementById("qris_dynamic").value = result;
-
 
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");
