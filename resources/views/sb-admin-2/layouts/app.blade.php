@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>Admin - Dashboard</title>
 
@@ -26,6 +27,45 @@
     }
     </style>
 </head>
+
+<script>
+(async function() {
+    try {
+        const permission = await Notification.requestPermission();
+
+        if (permission !== 'granted') {
+            return;
+        }
+
+        const registration = await navigator.serviceWorker.register('/service-worker.js');
+
+        console.log('Service Worker terdaftar');
+
+        // lanjutkan subscribe push notification
+    } catch (error) {
+        console.error(error);
+    }
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then(function(registration) {
+            console.log('Service Worker berhasil didaftarkan');
+        })
+        .catch(function(error) {
+            console.error('Service Worker gagal:', error);
+        });
+}
+</script>
+
+<script>
+Notification.requestPermission()
+    .then(permission => {
+        console.log(permission);
+    });
+</script>
 
 <body id="page-top">
 
@@ -51,45 +91,58 @@
                 Menu
             </div>
 
-            <!-- Nav Item - Pages Collapse Menu -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url('dashboard') }}">
-                    <i class="fas fa-fw fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                aria-expanded="true" aria-controls="collapseTwo">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Master</span>
-                </a>
-                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ url('dashboard/mastermerchant') }}">Merchant</a>
-                        <a class="collapse-item" href="{{ url('dashboard/masterkategori') }}">Kategori</a>
-                        <a class="collapse-item" href="{{ url('dashboard/mastermenu') }}">Menu</a>
-                        <a class="collapse-item" href="{{ url('dashboard/masterpromo') }}">Popup Promo</a>
-                        <a class="collapse-item" href="{{ url('dashboard/masterdiskon') }}">Setting Diskon</a>
-                    </div>
-                </div>
-            </li>
-            <li class="nav-item">
-                <!-- <a class="nav-link" href="{{ url('dashboard/transaction') }}"> -->
-                    <!-- <i class="fas fa-fw fa-chart-area"></i> -->
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                aria-expanded="true" aria-controls="collapseThree">
-                    <i class="fas fa-fw fa-cog"></i>
-                    <span>Order</span>
-                </a>
-                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
-                        <a class="collapse-item" href="{{ url('dashboard/settingorder') }}">Setting Order</a>
-                    </div>
-                </div>
-            </li>
+            
 
+            <!-- Nav Item - Pages Collapse Menu -->
+            
+            @if(Session::get('role') == 'admin')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url('dashboard') }}">
+                        <i class="fas fa-fw fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+                    aria-expanded="true" aria-controls="collapseTwo">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Master</span>
+                    </a>
+                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item" href="{{ url('dashboard/mastermerchant') }}">Merchant</a>
+                            <a class="collapse-item" href="{{ url('dashboard/masterkategori') }}">Kategori</a>
+                            <a class="collapse-item" href="{{ url('dashboard/mastermenu') }}">Menu</a>
+                            <a class="collapse-item" href="{{ url('dashboard/masterpromo') }}">Popup Promo</a>
+                            <a class="collapse-item" href="{{ url('dashboard/masterdiskon') }}">Setting Diskon</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <!-- <a class="nav-link" href="{{ url('dashboard/transaction') }}"> -->
+                        <!-- <i class="fas fa-fw fa-chart-area"></i> -->
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                    aria-expanded="true" aria-controls="collapseThree">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Order</span>
+                    </a>
+                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
+                            <a class="collapse-item" href="{{ url('dashboard/settingorder') }}">Setting Order</a>
+                        </div>
+                    </div>
+                </li>
+            @else
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url('dashboard/dayTransaction') }}">
+                        <i class="fas fa-fw fa-cog"></i>
+                        <span>Transaksi</span>
+                    </a>
+                </li>
+            @endif
+            
+            
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -116,7 +169,11 @@
                     <!-- Topbar Search -->
                     <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                         <div class="input-group">
-                            <h5 style="color:black;"><b>Welcome Admin!</b></h5>
+                            @if(Session::get('role') == 'admin')
+                                <h5 style="color:black;"><b>Welcome Admin!</b></h5>
+                            @else
+                                <h5 style="color:black;"><b>Welcome Kasir!</b></h5>
+                            @endif
                         </div>
                     </form>
 
@@ -162,7 +219,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; 2024 (Version 231224)</span>
+                        <span>Copyright &copy; 2026 (Version 231226)</span>
                     </div>
                 </div>
             </footer>

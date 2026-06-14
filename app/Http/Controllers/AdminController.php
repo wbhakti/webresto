@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\User;
 
 class AdminController extends Controller
 {
@@ -29,7 +31,7 @@ class AdminController extends Controller
                 ->first();
 
             if ($user) {
-                session(['user_id' => $request->input('username'), 'role' => $user->role]);
+                session(['user_id' => $user->id, 'user_name' => $request->input('username'), 'role' => $user->role]);
                 return redirect()->route('dashboard');
             } else {
                 return back()->with('error', 'Username atau password salah');
@@ -294,6 +296,29 @@ class AdminController extends Controller
         }
     }
 
+    public function dayTransaction()
+    {
+        try {
+
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+            $today = Carbon::now();
+
+            $dataTransaksi = DB::table('transactions')
+                ->where('addtime', '>=', $today)
+                ->get();
+
+            return view('sb-admin-2/transaksi', [
+                'data' => $dataTransaksi
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Gagal memuat data transaksi: ' . $e->getMessage());
+            return redirect()->route('MasterMerchant')->with('error', 'gagal load menu');
+        }
+    }
+
     public function UpdateStatus(Request $request)
     {
         try {
@@ -533,5 +558,35 @@ class AdminController extends Controller
             Log::error('Gagal proses data: ' . $e->getMessage());
             return redirect()->route('MasterDiskon')->with('error', 'gagal simpan diskon');
         }
+    }
+
+    public function subscribe(Request $request)
+    {
+        $adminId = session('user_id');
+
+        if (!$adminId) {
+            return response()->json([
+                'message' => 'Admin belum login'
+            ], 401);
+        }
+
+        $admin = User::find($adminId);
+
+        if (!$admin) {
+            return response()->json([
+                'message' => 'Admin tidak ditemukan'
+            ], 404);
+        }
+
+        $admin->updatePushSubscription(
+            $request->endpoint,
+            $request->keys['p256dh'],
+            $request->keys['auth'],
+            $request->contentEncoding ?? 'aesgcm'
+        );
+
+        return response()->json([
+            'success' => true
+        ]);
     }
 }

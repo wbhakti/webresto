@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Notification;
 
 class CartController extends Controller
 {
@@ -268,6 +271,13 @@ class CartController extends Controller
                     'idtransaksi' => $id
                 ]);
             }
+
+            $admins = User::where('role', 'kasir')->get();
+
+            Notification::send(
+                $admins,
+                new NewOrderNotification($order)
+            );
 
         }catch (\Exception $e) {
             Log::error('Gagal proses data: ' . $e->getMessage());
