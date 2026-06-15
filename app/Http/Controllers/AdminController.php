@@ -307,10 +307,10 @@ class AdminController extends Controller
             if (!session()->has('user_id')) {
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
-            $today = Carbon::now();
+            $today = Carbon::now('Asia/Jakarta');
 
             $dataTransaksi = DB::table('transactions')
-                ->whereDate('addtime', Carbon::today())
+                ->whereDate('addtime', $today )
                 ->get();
 
             return view('sb-admin-2/transaksi', [

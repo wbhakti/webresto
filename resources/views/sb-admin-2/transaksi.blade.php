@@ -1,6 +1,7 @@
 @extends('sb-admin-2.layouts.app')
 
 @section('content')
+
 <!-- CSS custom -->
 <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
 
@@ -308,6 +309,15 @@ function urlBase64ToUint8Array(base64String) {
 </script>
 
 <script> 
+
+    const notificationAudio = new Audio("{{ asset('sound/sound.wav') }}");
+
+    let soundEnabled = false;
+
+    if (localStorage.getItem('soundEnabled') === 'true') {
+        soundEnabled = true;
+    }
+
     document.getElementById('enable-notification')
         .addEventListener('click', async () => {
     
@@ -333,6 +343,20 @@ function urlBase64ToUint8Array(base64String) {
         });
 
         alert('Notifikasi berhasil diaktifkan');
+
+        notificationAudio.play()
+        .then(() => {
+
+            notificationAudio.pause();
+            notificationAudio.currentTime = 0;
+
+            soundEnabled = true;
+            localStorage.setItem('soundEnabled', 'true');
+
+            alert('Suara notifikasi berhasil diaktifkan');
+
+        })
+        .catch(console.error);
 });
 </script> 
 
@@ -345,10 +369,17 @@ if ('serviceWorker' in navigator) {
             console.log('Pesan diterima:', event.data);
 
             if (event.data.action === 'refresh') {
+                if (soundEnabled) {
 
-                alert('REFRESH');
+                    notificationAudio.currentTime = 0;
 
-                window.location.reload();
+                    notificationAudio.play().catch(console.error);
+                    }
+
+                    setTimeout(function () {
+                        alert('ADA PESANAN BARU');
+                        window.location.reload();
+                    }, 3000);
             }
 
         });
@@ -357,6 +388,5 @@ if ('serviceWorker' in navigator) {
 
 }
 </script>
-
 
 @endsection

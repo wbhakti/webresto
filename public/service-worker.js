@@ -22,6 +22,19 @@ self.addEventListener('push', function(event) {
             icon: data.icon,
             badge: data.badge,
             data: data.data
+        }),
+
+        self.clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        }).then(function(clients) {
+    
+            clients.forEach(function(client) {
+                client.postMessage({
+                    action: 'refresh'
+                });
+            });
+    
         })
     );
 });
