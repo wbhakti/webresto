@@ -59,7 +59,7 @@ Route::post('/subscribe', 'App\Http\Controllers\AdminController@subscribe')->nam
 
 Route::get('/test-notification', function () {
 
-    $admin = User::find(2);
+    $admin = User::where('role', 'kasir')->first();
 
     if (!$admin) {
         return 'Admin tidak ditemukan';

@@ -328,7 +328,7 @@ class AdminController extends Controller
     
             $updated = DB::table('transactions')
                 ->where('id_transaksi', $request->input('id'))
-                ->update(['status' => 'LUNAS']);
+                ->update(['status' => $request->input('status')]);
     
             if ($updated) {
                 return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui']);

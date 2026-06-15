@@ -272,13 +272,6 @@ class CartController extends Controller
                 ]);
             }
 
-            $admins = User::where('role', 'kasir')->get();
-
-            Notification::send(
-                $admins,
-                new NewOrderNotification($order)
-            );
-
         }catch (\Exception $e) {
             Log::error('Gagal proses data: ' . $e->getMessage());
             return redirect()->route('menu')->with('error', 'status transaksi gagal');
@@ -355,6 +348,35 @@ class CartController extends Controller
                 ->update([ 'bukti_bayar' => $filename, ]);
     
                 $mimage = 'webcubiq/public/invoice/'. $filename;
+
+                // ============= NOTIFIKASI ==============
+                $admin = User::where('role', 'kasir')->first();
+                $transaction = DB::table('transactions')->where('id_transaksi', $request->input('idtransaksi'))->first();
+
+                if (!$admin) {
+                    return 'Admin tidak ditemukan';
+                }
+
+                Log::info('Admin ditemukan', [
+                    'id' => $admin->id,
+                ]);
+
+                Log::info('Subscription', [
+                    'count' => $admin->pushSubscriptions()->count(),
+                ]);
+
+                $order = (object) [
+                    'id_transaction' => $transaction->id_transaksi,
+                    'nama' => $transaction->customer,
+                ];
+
+                $admin->notify(
+                    new NewOrderNotification($order)
+                );
+
+                Log::info('Notifikasi berhasil dikirim');
+
+                // ========================================
                 
                 return response()->json([
                     'success' => true,

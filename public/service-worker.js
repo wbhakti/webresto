@@ -30,9 +30,32 @@ self.addEventListener('notificationclick', function(event) {
 
     event.notification.close();
 
-    const url = event.notification.data?.url || '/dashboard';
+    const url = event.notification.data?.url || '/dashboard/dayTransaction';
 
     event.waitUntil(
-        clients.openWindow(url)
+        clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+        }).then(function(clientList) {
+
+            for (const client of clientList) {
+
+                // Jika dashboard sudah terbuka
+                if (client.url.includes('/dashboard/dayTransaction')) {
+
+                    client.focus();
+
+                    // refresh halaman
+                    client.postMessage({
+                        action: 'refresh'
+                    });
+
+                    return;
+                }
+            }
+
+            // Jika belum ada, buka tab baru
+            return clients.openWindow(url);
+        })
     );
 });

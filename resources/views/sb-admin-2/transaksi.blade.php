@@ -43,6 +43,7 @@
                         <th>ID Transaksi</th>
                         <th>Tanggal Transaksi</th>
                         <th>Pembeli</th>
+                        <th>STATUS</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -54,6 +55,7 @@
                                 <td>{{ $item->id_transaksi }}</td>
                                 <td>{{ $item->addtime }}</td>
                                 <td>{{ $item->customer }}</td>
+                                <td>{{ $item->status }}</td>
                                 <td>
                                     <div class="button-group">
                                         <button type="button" class="btn btn-info mb-2 btn-detail"
@@ -99,7 +101,7 @@
                     <p><b>Nomor Meja:</b> <span id="detailMeja"></span></p>
                     <p><b>Total Bayar:</b> <span id="detailTotal"></span></p>
                     <p><b>Metode Bayar:</b> <span id="detailMetode"></span></p>
-                    <p><b>Status:</b> <span id="detailStatus"></span></p>
+                    <p><b>Status: <span id="detailStatus"></span> </b></p>
                     <p><b>Bukti Bayar:</b> 
                         <a id="detailBuktiLink" href="#" target="_blank">
                             <img id="detailBuktiImg" src="" alt="Bukti Bayar" style="max-width: 100px; max-height: 100px;">
@@ -121,8 +123,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" id="btnProses" class="btn btn-primary" data-id="detailId">PROSES</button>
+                    <button type="submit" id="btnSelesai" class="btn btn-primary">SELESAI</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="btnLunas">LUNAS</button>
                 </div>
             </div>
         </div>
@@ -175,7 +178,24 @@
     $('#detailMetode').text(metode);
     $('#detailMeja').text(meja);
     $('#detailTgl').text(tgl);
-    $('#detailStatus').text(status);
+    
+
+    if (status == "") {
+        $('#detailStatus').text('PENDING');
+        $('#btnSelesai').hide();
+        $('#btnProses').show();
+    }
+    else if (status == "DIPROSES"){
+        $('#btnSelesai').show();
+        $('#btnProses').hide();
+        $('#detailStatus').text(status);
+    } else if (status == "SELESAI"){
+        $('#btnProses').hide();
+        $('#btnSelesai').hide();
+        $('#detailStatus').text(status);
+    }
+
+    
 
     if (bukti) {
         $('#detailBuktiLink').attr('href', "{{ url('webcubiq/public/invoice') }}" + "/" + bukti);
@@ -205,19 +225,11 @@
         $('#detailMenuTable').html("<tr><td colspan='4'>Format menu tidak valid.</td></tr>");
     }
 
-    let btnLunas = $('#btnLunas');
-    btnLunas.data('id', id);
-    if (status === "KONFIRMASI") {
-        btnLunas.show().prop('disabled', false);
-    }  else {
-        btnLunas.hide();
-    }
-
     $('#detailModal').modal('show');
 });
 
-$('#btnLunas').on('click', function() {
-    var transaksiId = $(this).data('id');
+$('#btnSelesai').on('click', function() {
+    var transaksiId = $('#detailId').text();
 
     if (!transaksiId) {
         alert("ID transaksi tidak ditemukan!");
@@ -229,12 +241,41 @@ $('#btnLunas').on('click', function() {
         type: "POST",
         data: {
             id: transaksiId,
+            status: "SELESAI",
             _token: "{{ csrf_token() }}"
         },
         success: function(response) {
             alert(response.message);
-            $('#detailStatus').text("LUNAS");
-            $('#btnLunas').prop('disabled', true);
+            $('#detailStatus').text("SELESAI");
+            $('#detailModal').modal('hide');
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating status:", error);
+            alert("Gagal memperbarui status transaksi. Coba lagi!");
+        }
+    });
+});
+
+$('#btnProses').on('click', function() {
+    var transaksiId = $('#detailId').text();
+
+    if (!transaksiId) {
+        alert("ID transaksi tidak ditemukan!");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('updatestatus') }}",
+        type: "POST",
+        data: {
+            id: transaksiId,
+            status: "DIPROSES",
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(response) {
+            alert(response.message);
+            $('#detailStatus').text("DIPROSES");
             $('#detailModal').modal('hide');
             location.reload();
         },
@@ -294,6 +335,28 @@ function urlBase64ToUint8Array(base64String) {
         alert('Notifikasi berhasil diaktifkan');
 });
 </script> 
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function(registration) {
+
+        navigator.serviceWorker.addEventListener('message', function(event) {
+
+            console.log('Pesan diterima:', event.data);
+
+            if (event.data.action === 'refresh') {
+
+                alert('REFRESH');
+
+                window.location.reload();
+            }
+
+        });
+
+    });
+
+}
+</script>
 
 
 @endsection
