@@ -75,10 +75,16 @@ Notification.requestPermission()
         <!-- Sidebar bg-gradient-primary -->
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
 
+            @if(Session::get('role') == 'admin')
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('dashboard') }}">
                 <div class="sidebar-brand-text mx-2">Food Dashboard<sup></sup></div>
             </a>
+            @else
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('dashboard/dayTransaction') }}">
+                <div class="sidebar-brand-text mx-2">Food Dashboard<sup></sup></div>
+            </a>
+            @endif
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">

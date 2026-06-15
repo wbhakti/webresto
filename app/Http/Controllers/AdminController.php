@@ -32,7 +32,11 @@ class AdminController extends Controller
 
             if ($user) {
                 session(['user_id' => $user->id, 'user_name' => $request->input('username'), 'role' => $user->role]);
-                return redirect()->route('dashboard');
+                if ($user->role == "kasir") {
+                    return redirect()->route('dayTransaction');
+                } else {
+                    return redirect()->route('dashboard');
+                }
             } else {
                 return back()->with('error', 'Username atau password salah');
             }
@@ -306,7 +310,7 @@ class AdminController extends Controller
             $today = Carbon::now();
 
             $dataTransaksi = DB::table('transactions')
-                ->where('addtime', '>=', $today)
+                ->whereDate('addtime', Carbon::today())
                 ->get();
 
             return view('sb-admin-2/transaksi', [
