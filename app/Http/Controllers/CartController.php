@@ -28,19 +28,22 @@ class CartController extends Controller
 
         //HIT table discount
         $productDiscount = 0;
-        $result = DB::table('configuration')->where('parameter', 'diskon')->first();
-        if ($result) {
-            $time = $result->description;
-            $timeArr = explode("-",$time);
-            if (count($timeArr) > 1) {
-                $startTime = $timeArr[0];
-                $endTime = $timeArr[1];
-                $today = Carbon::now()->addHours(7)->format('H:i');
+        $result = DB::table('configuration')->where('parameter', 'diskon')->get();
 
-                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
-                    $discount = $result->value;
-                    if ($request->input('isDiscount') == 1) {
-                        $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+        if ($result) {
+            foreach ($result as $item) {
+                $time = $item->description;
+                $timeArr = explode("-",$time);
+                if (count($timeArr) > 1) {
+                    $startTime = $timeArr[0];
+                    $endTime = $timeArr[1];
+                    $today = Carbon::now()->addHours(7)->format('H:i');
+
+                    if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                        $discount = $item->value;
+                        if ($request->input('isDiscount') == 1) {
+                            $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                        }
                     }
                 }
             }
@@ -61,7 +64,7 @@ class CartController extends Controller
         //sudah ada di cart
         if (isset($cart[$productId])) {
             $cart[$productId]['quantity'] += $quantity;
-            $cart[$productId]['totalDiscount'] = $quantity * $productDiscount;
+            $cart[$productId]['totalDiscount'] = $cart[$productId]['quantity'] * $productDiscount;
         } else {
             //produk baru ke cart
             $cart[$productId] = [
