@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Notification;
 
 class CartController extends Controller
 {
@@ -328,7 +331,7 @@ class CartController extends Controller
                 $font = public_path('arial.ttf');
                 $fontSize = 12;
                 $textColor = imagecolorallocate($tmp, 0, 0, 0);
-                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $timestamp = 'cubiq : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
@@ -347,7 +350,36 @@ class CartController extends Controller
                 ->where('id_transaksi', $request->input('idtransaksi'))
                 ->update([ 'bukti_bayar' => $filename, ]);
     
-                $mimage = 'webkopinggir/public/invoice/'. $filename;
+                $mimage = 'webcubiq/public/invoice/'. $filename;
+
+                // ============= NOTIFIKASI ==============
+                $admin = User::where('role', 'kasir')->first();
+                $transaction = DB::table('transactions')->where('id_transaksi', $request->input('idtransaksi'))->first();
+
+                if (!$admin) {
+                    return 'Admin tidak ditemukan';
+                }
+
+                Log::info('Admin ditemukan', [
+                    'id' => $admin->id,
+                ]);
+
+                Log::info('Subscription', [
+                    'count' => $admin->pushSubscriptions()->count(),
+                ]);
+
+                $order = (object) [
+                    'id_transaction' => $transaction->id_transaksi,
+                    'nama' => $transaction->customer,
+                ];
+
+                $admin->notify(
+                    new NewOrderNotification($order)
+                );
+
+                Log::info('Notifikasi berhasil dikirim');
+
+                // ========================================
                 
                 return response()->json([
                     'success' => true,

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Notifications\NewOrderNotification;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,7 +49,52 @@ Route::get('/dashboard/masterkategori', 'App\Http\Controllers\AdminController@Ma
 Route::post('/postkategori', 'App\Http\Controllers\AdminController@postkategori');
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
+Route::get("/dashboard/dayTransaction", 'App\Http\Controllers\AdminController@dayTransaction')->name('dayTransaction');
 Route::get("/dashboard/settingorder", 'App\Http\Controllers\AdminController@settingorder')->name('settingorder');
 Route::get('/reportTransaction', 'App\Http\Controllers\AdminController@ReportTransaction')->name('ReportTransaction');
 
 Route::post('/updatestatus', 'App\Http\Controllers\AdminController@UpdateStatus')->name('updatestatus');
+
+Route::post('/subscribe', 'App\Http\Controllers\AdminController@subscribe')->name('subscribe');
+
+Route::get('/test-notification', function () {
+
+    $admin = User::where('role', 'kasir')->first();
+
+    if (!$admin) {
+        return 'Admin tidak ditemukan';
+    }
+
+    Log::info('Admin ditemukan', [
+        'id' => $admin->id,
+    ]);
+
+    Log::info('Subscription', [
+        'count' => $admin->pushSubscriptions()->count(),
+    ]);
+
+    $order = (object) [
+        'id_transaction' => 999,
+        'nama' => 'Wisnu',
+    ];
+
+    try {
+
+        $admin->notify(
+            new NewOrderNotification($order)
+        );
+
+        Log::info('Notifikasi berhasil dikirim');
+
+        return 'Notifikasi terkirim';
+
+    } catch (\Exception $e) {
+
+        Log::error('Gagal mengirim notifikasi', [
+            'message' => $e->getMessage(),
+        ]);
+
+        return $e->getMessage();
+    }
+
+});

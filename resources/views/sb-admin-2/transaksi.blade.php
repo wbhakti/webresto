@@ -1,6 +1,7 @@
 @extends('sb-admin-2.layouts.app')
 
 @section('content')
+
 <!-- CSS custom -->
 <link href="{{ asset('vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css">
 
@@ -26,30 +27,12 @@
 <div class="card shadow mb-4 custom-card-header">
     <div class="card-header py-3">
         <div align="center">
-            <h1 class="h3 mb-4 text-gray-800">Data Transaksi</h1>
+            <h1 class="h3 mb-4 text-gray-800">Data Transaksi Hari Ini</h1>
         </div>
-    
-        <form method="GET" action="/dashboard/transaction">
-            <div class="row justify-content-center">
-                <div class="col-sm-4">
-                    <div class="mb-3">
-                        <label for="date_start" class="form-label">Tanggal Awal</label>
-                        <input type="date" class="form-control" id="date_start" name="date_start" 
-                            value="{{ isset($date_start) ? $date_start : old('date_start') }}" required>
-                    </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="mb-3">
-                        <label for="date_end" class="form-label">Tanggal Akhir</label>
-                        <input type="date" class="form-control" id="date_end" name="date_end" 
-                            value="{{ isset($date_end) ? $date_end : old('date_end') }}" required>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-success" name="action" value="report">Tampilkan Data</button>
-            </div>
-        </form>
+        <!-- <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}"> -->
+        <button id="enable-notification">
+            Aktifkan Notifikasi
+        </button>
     </div>
     
     <div class="card-body">
@@ -61,6 +44,7 @@
                         <th>ID Transaksi</th>
                         <th>Tanggal Transaksi</th>
                         <th>Pembeli</th>
+                        <th>STATUS</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -72,6 +56,7 @@
                                 <td>{{ $item->id_transaksi }}</td>
                                 <td>{{ $item->addtime }}</td>
                                 <td>{{ $item->customer }}</td>
+                                <td>{{ $item->status }}</td>
                                 <td>
                                     <div class="button-group">
                                         <button type="button" class="btn btn-info mb-2 btn-detail"
@@ -117,7 +102,7 @@
                     <p><b>Nomor Meja:</b> <span id="detailMeja"></span></p>
                     <p><b>Total Bayar:</b> <span id="detailTotal"></span></p>
                     <p><b>Metode Bayar:</b> <span id="detailMetode"></span></p>
-                    <p><b>Status:</b> <span id="detailStatus"></span></p>
+                    <p><b>Status: <span id="detailStatus"></span> </b></p>
                     <p><b>Bukti Bayar:</b> 
                         <a id="detailBuktiLink" href="#" target="_blank">
                             <img id="detailBuktiImg" src="" alt="Bukti Bayar" style="max-width: 100px; max-height: 100px;">
@@ -139,8 +124,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="submit" id="btnProses" class="btn btn-primary" data-id="detailId">PROSES</button>
+                    <button type="submit" id="btnSelesai" class="btn btn-primary">SELESAI</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="btnLunas">LUNAS</button>
                 </div>
             </div>
         </div>
@@ -193,7 +179,24 @@
     $('#detailMetode').text(metode);
     $('#detailMeja').text(meja);
     $('#detailTgl').text(tgl);
-    $('#detailStatus').text(status);
+    
+
+    if (status == "") {
+        $('#detailStatus').text('PENDING');
+        $('#btnSelesai').hide();
+        $('#btnProses').show();
+    }
+    else if (status == "DIPROSES"){
+        $('#btnSelesai').show();
+        $('#btnProses').hide();
+        $('#detailStatus').text(status);
+    } else if (status == "SELESAI"){
+        $('#btnProses').hide();
+        $('#btnSelesai').hide();
+        $('#detailStatus').text(status);
+    }
+
+    
 
     if (bukti) {
         $('#detailBuktiLink').attr('href', "{{ url('webcubiq/public/invoice') }}" + "/" + bukti);
@@ -223,19 +226,11 @@
         $('#detailMenuTable').html("<tr><td colspan='4'>Format menu tidak valid.</td></tr>");
     }
 
-    let btnLunas = $('#btnLunas');
-    btnLunas.data('id', id);
-    if (status === "KONFIRMASI") {
-        btnLunas.show().prop('disabled', false);
-    }  else {
-        btnLunas.hide();
-    }
-
     $('#detailModal').modal('show');
 });
 
-$('#btnLunas').on('click', function() {
-    var transaksiId = $(this).data('id');
+$('#btnSelesai').on('click', function() {
+    var transaksiId = $('#detailId').text();
 
     if (!transaksiId) {
         alert("ID transaksi tidak ditemukan!");
@@ -247,12 +242,12 @@ $('#btnLunas').on('click', function() {
         type: "POST",
         data: {
             id: transaksiId,
+            status: "SELESAI",
             _token: "{{ csrf_token() }}"
         },
         success: function(response) {
             alert(response.message);
-            $('#detailStatus').text("LUNAS");
-            $('#btnLunas').prop('disabled', true);
+            $('#detailStatus').text("SELESAI");
             $('#detailModal').modal('hide');
             location.reload();
         },
@@ -263,6 +258,135 @@ $('#btnLunas').on('click', function() {
     });
 });
 
+$('#btnProses').on('click', function() {
+    var transaksiId = $('#detailId').text();
+
+    if (!transaksiId) {
+        alert("ID transaksi tidak ditemukan!");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('updatestatus') }}",
+        type: "POST",
+        data: {
+            id: transaksiId,
+            status: "DIPROSES",
+            _token: "{{ csrf_token() }}"
+        },
+        success: function(response) {
+            alert(response.message);
+            $('#detailStatus').text("DIPROSES");
+            $('#detailModal').modal('hide');
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating status:", error);
+            alert("Gagal memperbarui status transaksi. Coba lagi!");
+        }
+    });
+});
+
+
 </script>    
+
+<script>
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+
+    return outputArray;
+}
+</script>
+
+<script> 
+
+    const notificationAudio = new Audio("{{ asset('sound/sound.wav') }}");
+
+    let soundEnabled = false;
+
+    if (localStorage.getItem('soundEnabled') === 'true') {
+        soundEnabled = true;
+    }
+
+    document.getElementById('enable-notification')
+        .addEventListener('click', async () => {
+    
+        const vapidPublicKey = "{{ config('webpush.vapid.public_key') }}";
+        const registration = await navigator.serviceWorker.ready;
+        
+
+        const subscription =
+            await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+            });
+
+        await fetch('{{ route('subscribe') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector(
+                    'meta[name="csrf-token"]'
+                ).content
+            },
+            body: JSON.stringify(subscription)
+        });
+
+        alert('Notifikasi berhasil diaktifkan');
+
+        notificationAudio.play()
+        .then(() => {
+
+            notificationAudio.pause();
+            notificationAudio.currentTime = 0;
+
+            soundEnabled = true;
+            localStorage.setItem('soundEnabled', 'true');
+
+            alert('Suara notifikasi berhasil diaktifkan');
+
+        })
+        .catch(console.error);
+});
+</script> 
+
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function(registration) {
+
+        navigator.serviceWorker.addEventListener('message', function(event) {
+
+            console.log('Pesan diterima:', event.data);
+
+            if (event.data.action === 'refresh') {
+                if (soundEnabled) {
+
+                    notificationAudio.currentTime = 0;
+
+                    notificationAudio.play().catch(console.error);
+                    }
+
+                    setTimeout(function () {
+                        alert('ADA PESANAN BARU');
+                        window.location.reload();
+                    }, 3000);
+            }
+
+        });
+
+    });
+
+}
+</script>
 
 @endsection

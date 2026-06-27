@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Menu Kopinggir Jalan</title>
+        <title>Menu CUBIQ</title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
         <!-- Bootstrap icons-->
@@ -20,7 +20,7 @@
                 padding-top: 56px; /* Sesuaikan nilai ini dengan tinggi navbar */
             }
             .custom-navbar {
-                background-color: #000; 
+                background-color: #409477; 
                 color: white;
             }
             .custom-navbar .btn-outline-dark {
@@ -52,8 +52,8 @@
         @yield('content')
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark" style="background-color: #000 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopinggir Jalan by Star Group 2025</p></div>
+        <footer class="py-5 bg-dark" style="background-color: #409477 !important;">
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; CUBIQ by Star Group 2026</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
