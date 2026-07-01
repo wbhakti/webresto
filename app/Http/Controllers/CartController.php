@@ -198,6 +198,7 @@ class CartController extends Controller
                 'discount' => $subtotaldiscount,
                 'metode_bayar' => $request->input('metode_pembayaran'),
                 'qris_dynamic' => $request->input('qris_dynamic'),
+                'status' => 'BELUM BAYAR',
                 'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s')
             ]);
 
@@ -331,7 +332,7 @@ class CartController extends Controller
                 $font = public_path('arial.ttf');
                 $fontSize = 12;
                 $textColor = imagecolorallocate($tmp, 0, 0, 0);
-                $timestamp = 'cubiq : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
@@ -348,9 +349,9 @@ class CartController extends Controller
 
                 DB::table('transactions')
                 ->where('id_transaksi', $request->input('idtransaksi'))
-                ->update([ 'bukti_bayar' => $filename, ]);
+                ->update([ 'bukti_bayar' => $filename, 'status' => 'SUDAH DI BAYAR', ]);
     
-                $mimage = 'webcubiq/public/invoice/'. $filename;
+                $mimage = 'webkopinggir/public/invoice/'. $filename;
 
                 // ============= NOTIFIKASI ==============
                 $admin = User::where('role', 'kasir')->first();

@@ -311,6 +311,7 @@ class AdminController extends Controller
 
             $dataTransaksi = DB::table('transactions')
                 ->whereDate('addtime', $today )
+                ->orderByDesc('addtime')
                 ->get();
 
             return view('sb-admin-2/transaksi', [
