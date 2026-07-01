@@ -45,11 +45,11 @@
             <div class="text-left text-black">
                 <br>
                 <p dir="auto" class="body"><strong>PENGANTAR</strong></p>
-                <p dir="auto" class="body"><span style="font-weight: 400">Terima kasih Anda telah menggunakan aplikasi CUBIQ Order sebagaimana dimaksud dalam Syarat dan Ketentuan ini.
+                <p dir="auto" class="body"><span style="font-weight: 400">Terima kasih Anda telah menggunakan aplikasi Kopinggir Order sebagaimana dimaksud dalam Syarat dan Ketentuan ini.
                 Dengan telah menggunakan aplikasi ini maka Anda dengan ini menyatakan telah membaca, mengetahui, memahami dan menyetujui 
-                seluruh isi Syarat dan Ketentuan ini, yang merupakan perjanjian antara Anda dengan Star Group Selaku pemilik aplikasi dan resto CUBIQ Jalan.
+                seluruh isi Syarat dan Ketentuan ini, yang merupakan perjanjian antara Anda dengan Star Group Selaku pemilik aplikasi dan resto Kopinggir Jalan.
                 Kami berhak untuk setiap saat melakukan perubahan, penambahan, pengurangan, penggantian, penyesuaian dan/atau modifikasi 
-                terhadap Syarat dan Ketentuan ini, baik sebagian maupun seluruhnya, oleh karenanya Anda diwajibkan untuk dari waktu ke waktu membaca kembali Syarat dan Ketentuan tersebut dalam aplikasi CUBIQ Order.
+                terhadap Syarat dan Ketentuan ini, baik sebagian maupun seluruhnya, oleh karenanya Anda diwajibkan untuk dari waktu ke waktu membaca kembali Syarat dan Ketentuan tersebut dalam aplikasi Kopinggir Order.
                 Syarat dan Ketentuan ini tetap berlaku dan mengikat Anda selama Anda menggunakan aplikasi ini dimana pun Anda berada
                 </span></p>
                 <br>
@@ -57,7 +57,7 @@
             <div class="text-left text-black">
                 <br>
                 <p dir="auto" class="body"><strong>DEFINISI</strong></p>
-                <p dir="auto" class="body"><span style="font-weight: 400">CUBIQ Order adalah aplikasi yang bertujuan untuk mempermudah konsumen CUBIQ Jalan by Star Group untuk melakukan pemesanan minuman atau makanan.
+                <p dir="auto" class="body"><span style="font-weight: 400">Kopinggir Order adalah aplikasi yang bertujuan untuk mempermudah konsumen Kopinggir Jalan by Star Group untuk melakukan pemesanan minuman atau makanan.
                 Dimana konsumen tinggal memilih meja dan duduk untuk memesan menu tanpa harus melakukan antrian pesan di kasir.
                 </span></p>
                 <br>
