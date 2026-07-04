@@ -33,6 +33,8 @@ class CartController extends Controller
         $productDiscount = 0;
         $result = DB::table('configuration')->where('parameter', 'diskon')->get();
 
+        $cart = session()->get('cart', []);
+
         if ($result) {
             foreach ($result as $item) {
                 $time = $item->description;
@@ -42,17 +44,31 @@ class CartController extends Controller
                     $endTime = $timeArr[1];
                     $today = Carbon::now()->addHours(7)->format('H:i');
 
+                    $discount = $item->value;
+                    
                     if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
-                        $discount = $item->value;
+                        
                         if ($request->input('isDiscount') == 1) {
                             $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                        }
+                    } else {
+                        Log::info('Tidak ada');
+                        if (!empty($cart)) { 
+                            // jika chart tidak kosong maka cek apakah item pertama ada diskon
+                            Log::info('ada chart');
+                            $firstItem = reset($cart);
+
+                            if (!empty($firstItem['productDiscount']) && $firstItem['productDiscount'] > 0) {
+                                // Item pertama memiliki diskon
+                                Log::info('ada chart yg diskon');
+                                $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                            }
+
                         }
                     }
                 }
             }
         }
-        
-        $cart = session()->get('cart', []);
 
         if (!empty($cart)) {
             // Ambil merchantId di keranjang
