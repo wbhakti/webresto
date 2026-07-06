@@ -51,8 +51,31 @@ class CartController extends Controller
                         if ($request->input('isDiscount') == 1) {
                             $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
                         }
+
+                        Log::info('Masuk waktu diskon');
+                        if (!empty($cart)) { 
+                            // jika chart tidak kosong maka update semua chart yang tanpa diskon
+                            foreach ($cart as &$item) {
+                                // cek item yg discount atau bukan
+                                $isDiscount = DB::table('menus')
+                                ->where('id', $item['idMenu'])
+                                ->value('is_discount');
+
+                                if ($isDiscount == 1) {
+                                    // hanya update item yang belum mendapat diskon
+                                    if (empty($item['productDiscount']) || $item['productDiscount'] == 0) {
+                                        $productDiscount = (($item['price'] *  $item['quantity'] ) * $discount ) / 100;
+                                        $item['productDiscount'] = $productDiscount;
+                                        $item['totalDiscount'] = $productDiscount;
+                                    }
+                                }
+                               
+                            }
+                            unset($item);
+                        }
+
                     } else {
-                        Log::info('Tidak ada');
+                        Log::info('Waktu diskon habis');
                         if (!empty($cart)) { 
                             // jika chart tidak kosong maka cek apakah item pertama ada diskon
                             Log::info('ada chart');
@@ -61,7 +84,9 @@ class CartController extends Controller
                             if (!empty($firstItem['productDiscount']) && $firstItem['productDiscount'] > 0) {
                                 // Item pertama memiliki diskon
                                 Log::info('ada chart yg diskon');
-                                $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                                if ($request->input('isDiscount') == 1) {
+                                    $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                                }
                             }
 
                         }
