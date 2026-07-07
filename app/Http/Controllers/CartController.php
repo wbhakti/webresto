@@ -31,66 +31,79 @@ class CartController extends Controller
 
         //HIT table discount
         $productDiscount = 0;
-        $result = DB::table('configuration')->where('parameter', 'diskon')->get();
+        $result_pagi = DB::table('configuration')->where('parameter', 'diskon_pagi')->first();
+        $result_malam = DB::table('configuration')->where('parameter', 'diskon_malam')->first();
 
         $cart = session()->get('cart', []);
 
-        if ($result) {
-            foreach ($result as $item) {
-                $time = $item->description;
-                $timeArr = explode("-",$time);
-                if (count($timeArr) > 1) {
-                    $startTime = $timeArr[0];
-                    $endTime = $timeArr[1];
-                    $today = Carbon::now()->addHours(7)->format('H:i');
+        if ($result_pagi) {
+            $time = $result_pagi->description;
+            $timeArr = explode("-",$time);
 
-                    $discount = $item->value;
-                    
-                    if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
-                        
-                        if ($request->input('isDiscount') == 1) {
-                            $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
-                        }
+            if (count($timeArr) > 1) {
+                $startTime = $timeArr[0];
+                $endTime = $timeArr[1];
+                $today = Carbon::now()->addHours(7)->format('H:i');
 
-                        Log::info('Masuk waktu diskon');
-                        if (!empty($cart)) { 
-                            // jika chart tidak kosong maka update semua chart yang tanpa diskon
-                            foreach ($cart as &$item) {
-                                // cek item yg discount atau bukan
-                                $isDiscount = DB::table('menus')
-                                ->where('id', $item['idMenu'])
-                                ->value('is_discount');
-
-                                if ($isDiscount == 1) {
-                                    // hanya update item yang belum mendapat diskon
-                                    if (empty($item['productDiscount']) || $item['productDiscount'] == 0) {
-                                        $productDiscount = (($item['price'] *  $item['quantity'] ) * $discount ) / 100;
-                                        $item['productDiscount'] = $productDiscount;
-                                        $item['totalDiscount'] = $productDiscount;
-                                    }
-                                }
-                               
-                            }
-                            unset($item);
-                        }
-
-                    } else {
-                        Log::info('Waktu diskon habis');
-                        if (!empty($cart)) { 
-                            // jika chart tidak kosong maka cek apakah item pertama ada diskon
-                            Log::info('ada chart');
-                            $firstItem = reset($cart);
-
-                            if (!empty($firstItem['productDiscount']) && $firstItem['productDiscount'] > 0) {
-                                // Item pertama memiliki diskon
-                                Log::info('ada chart yg diskon');
-                                if ($request->input('isDiscount') == 1) {
-                                    $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
-                                }
-                            }
-
-                        }
+                $discount = $result_pagi->value;
+                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                    if ($request->input('isDiscount') == 1) {
+                        $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
                     }
+                } else {
+                    Log::info('Waktu diskon pagi habis');
+                    if (!empty($cart)) { 
+                        // jika chart tidak kosong maka hapus diskon
+                        foreach ($cart as &$item) {
+                            $item['productDiscount'] = 0;
+                            $item['totalDiscount'] = 0;
+                        }
+                        unset($item);
+                    }
+                }
+            }
+        }
+
+        if ($result_malam) {
+            $time = $result_malam->description;
+            $timeArr = explode("-",$time);
+
+            if (count($timeArr) > 1) {
+                $startTime = $timeArr[0];
+                $endTime = $timeArr[1];
+                $today = Carbon::now()->addHours(7)->format('H:i');
+
+                $discount_malam = $result_malam->value;
+
+
+                if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
+                
+                    Log::info('Masuk waktu diskon malam');
+
+                    if (!empty($cart)) { 
+                        // jika chart tidak kosong maka update semua chart yang tanpa diskon
+                        foreach ($cart as &$item) {
+                            // cek item yg discount atau bukan
+                            $isDiscount = DB::table('menus')
+                            ->where('id', $item['idMenu'])
+                            ->value('is_discount');
+
+                            if ($isDiscount == 1) {
+                                // hanya update item yang belum mendapat diskon
+                                $productDiscount = (($item['price'] *  $item['quantity'] ) * $discount_malam ) / 100;
+                                $item['productDiscount'] = $productDiscount;
+                                $item['totalDiscount'] = $productDiscount;
+                            }
+                        }
+                        unset($item);
+                    }
+
+                    if ($request->input('isDiscount') == 1) {
+                        $productDiscount = (($productPrice *  $quantity ) * $discount_malam ) / 100;
+                    }
+
+                } else {
+                    Log::info('Waktu diskon malam habis');
                 }
             }
         }
