@@ -43,12 +43,14 @@ class CartController extends Controller
             if (count($timeArr) > 1) {
                 $startTime = $timeArr[0];
                 $endTime = $timeArr[1];
-                $today = Carbon::now()->addHours(7)->format('H:i');
+                $today = Carbon::now()->format('H:i');
 
                 $discount = $result_pagi->value;
                 if ( strtotime($today) > strtotime($startTime) && strtotime($today) < strtotime($endTime) )  {
                     if ($request->input('isDiscount') == 1) {
                         $productDiscount = (($productPrice *  $quantity ) * $discount ) / 100;
+                    } else {
+                        $productDiscount = 0;
                     }
                 } else {
                     Log::info('Waktu diskon pagi habis');
@@ -71,7 +73,7 @@ class CartController extends Controller
             if (count($timeArr) > 1) {
                 $startTime = $timeArr[0];
                 $endTime = $timeArr[1];
-                $today = Carbon::now()->addHours(7)->format('H:i');
+                $today = Carbon::now()->format('H:i');
 
                 $discount_malam = $result_malam->value;
 
@@ -100,6 +102,8 @@ class CartController extends Controller
 
                     if ($request->input('isDiscount') == 1) {
                         $productDiscount = (($productPrice *  $quantity ) * $discount_malam ) / 100;
+                    } else {
+                        $productDiscount = 0;
                     }
 
                 } else {

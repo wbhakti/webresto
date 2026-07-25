@@ -34,13 +34,36 @@ class HomeController extends Controller
             $cart = session()->get('cart', []);
             $cartCount = count($cart);
 
+            $jamSekarang = now()->format('H:i:s');
+
+            // $dataproduk = DB::table('menus')
+            // ->join('categories', 'menus.kategori', '=', 'categories.id')
+            // ->select('menus.*', 'categories.nama as nama_kategori')
+            // ->where('menus.is_delete', '0')
+            // ->where('menus.is_active', '0')
+            // ->where(function ($q) use ($jamSekarang) {
+            //     $q->whereNull('menus.seasonal_start')
+            //       ->orWhere(function ($q2) use ($jamSekarang) {
+            //           $q2->where('menus.seasonal_start', '<=', $jamSekarang)
+            //              ->where('menus.seasonal_end', '>=', $jamSekarang);
+            //       });
+            // })
+            // ->orderBy('categories.id', 'ASC')
+            // ->orderBy('menus.sku', 'ASC')
+            // ->get();
+
             $dataproduk = DB::table('menus')
             ->join('categories', 'menus.kategori', '=', 'categories.id')
             ->select('menus.*', 'categories.nama as nama_kategori')
-            ->where('menus.is_delete', '0')
-            ->where('menus.is_active', '0')
-            ->orderBy('categories.id', 'ASC')
-            ->orderBy('menus.sku', 'ASC')
+            ->where('menus.is_delete', 0)
+            ->where('menus.is_active', 0)
+            ->where(function ($q) use ($jamSekarang) {
+                $q->whereNull('menus.seasonal_start')
+                ->whereNull('menus.seasonal_end')
+                ->orWhereRaw('? BETWEEN TIME(menus.seasonal_start) AND TIME(menus.seasonal_end)', [$jamSekarang]);
+            })
+            ->orderBy('categories.id')
+            ->orderBy('menus.sku')
             ->get();
 
             $kategori = $request->query('kategori');
