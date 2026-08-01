@@ -150,7 +150,7 @@
                 </div>
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="large-button" id="sendWaQris">Konfirmasi</button>
+                <button type="button" class="large-button" id="sendWaQris">Konfirmasi Disini</button>
             </div>
         </div>
     </div>
@@ -175,11 +175,11 @@
         <div class="modal-content">
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
-                    <h4 class="alert-heading">Transaksi Gagal</h4>
-                    <p>Silahkan lanjut konfirmasi, Terimakasih</p>
+                    <h4 class="alert-heading">Upload Bukti Bayar Gagal</h4>
+                    <p>Silahkan klik konfirmasi untuk melanjutkan pemesanan!, Terimakasih</p>
                 </div>
                 <div class="modal-footer justify-content-center">
-                    <button type="button" class="large-button" id="sendWaQrisFail">Konfirmasi</button>
+                    <button type="button" class="large-button" id="sendWaQrisFail">Konfirmasi Disini</button>
                 </div>
             </div>
         </div>
