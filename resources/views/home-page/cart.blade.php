@@ -326,7 +326,8 @@
         const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000278398602150008850027839860303UKE51440014ID.CO.QRIS.WWW0215ID10253704526210303UKE5204581253033605802ID5915KOPINGGIR JALAN6006KLATEN61055743862070703A016304F1DC";
         const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
 
-        const result = makeString(qris, { nominal: nominal });
+        // const result = makeString(qris, { nominal: nominal });
+        const result = makeDynamicQR(qris, nominal);
         document.getElementById("qris_dynamic").value = result;
 
         if (!nama || nama.value.trim() === "") {
