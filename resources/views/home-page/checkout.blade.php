@@ -176,7 +176,10 @@
             <div class="modal-body">
                 <div class="alert alert-warning" role="alert">
                     <h4 class="alert-heading">Transaksi Gagal</h4>
-                    <p>Silahkan Ke Kasir, Terimakasih</p>
+                    <p>Silahkan lanjut konfirmasi, Terimakasih</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="large-button" id="sendWaQrisFail">Konfirmasi</button>
                 </div>
             </div>
         </div>
@@ -317,14 +320,93 @@ function downloadQR() {
                     let modal = new bootstrap.Modal(document.getElementById("modalUploadError"));
                     modal.show();
                 }, 1000);
+
+                //GAGAL
+                document.getElementById("sendWaQrisFail").addEventListener("click", function() {
+                    // Data Pesanan
+                    let phoneWa = "{{ $phone_wa }}";
+                    let idTransaksi = "{{ $idtransaksi }}";
+                    let nama = "{{ $nama }}";
+                    let meja = "{{ $meja }}";
+                    let metodePembayaran = "{{ $metodePembayaran }}";
+                    let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
+                    let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
+                    let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
+
+                        // Detail Pesanan
+                    let pesanDetail = "";
+                    @foreach ($details as $item)
+                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                    @endforeach
+
+                    // Format Pesan WhatsApp
+                    let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
+                                    `ID Transaksi: ${idTransaksi}%0A` +
+                                    `Nama: ${nama}%0A` +
+                                    `Nomor Meja: ${meja}%0A` +
+                                    `Metode Pembayaran: ${metodePembayaran}%0A` +
+                                    `Sub Total Pemesanan: ${totalTagihan}%0A` +
+                                    `Diskon: ${totalDiscount}%0A` +
+                                    `Total Pembayaran: ${totalPembayaran}%0A%0A` +
+                                    `Bukti Transfer: GAGAL UPLOAD%0A%0A` +
+                                    `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
+
+                    let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
+
+                    document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
+
+                    // Buka WhatsApp
+                    window.open(waLink, '_blank');
+                    modal.hide();
+                });
             }
         }).catch(error => {
             console.error('Error:', error);
-            // Error: Optionally hide modal or show error message
+
             setTimeout(() => {
                 modalUpload.hide();
-                alert("Upload gagal! Silakan ke kasir.");
+                let modal = new bootstrap.Modal(document.getElementById("modalUploadError"));
+                modal.show();
             }, 1000);
+
+            //GAGAL
+            document.getElementById("sendWaQrisFail").addEventListener("click", function() {
+                    // Data Pesanan
+                    let phoneWa = "{{ $phone_wa }}";
+                    let idTransaksi = "{{ $idtransaksi }}";
+                    let nama = "{{ $nama }}";
+                    let meja = "{{ $meja }}";
+                    let metodePembayaran = "{{ $metodePembayaran }}";
+                    let totalDiscount = "Rp {{ number_format($discount, 0, ',', '.') }}";
+                    let totalTagihan = "Rp {{ number_format($totalTagihan, 0, ',', '.') }}";
+                    let totalPembayaran = "Rp {{ number_format(($totalTagihan-$discount), 0, ',', '.') }}";
+
+                        // Detail Pesanan
+                    let pesanDetail = "";
+                    @foreach ($details as $item)
+                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                    @endforeach
+
+                    // Format Pesan WhatsApp
+                    let waMessage = `Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A` +
+                                    `ID Transaksi: ${idTransaksi}%0A` +
+                                    `Nama: ${nama}%0A` +
+                                    `Nomor Meja: ${meja}%0A` +
+                                    `Metode Pembayaran: ${metodePembayaran}%0A` +
+                                    `Sub Total Pemesanan: ${totalTagihan}%0A` +
+                                    `Diskon: ${totalDiscount}%0A` +
+                                    `Total Pembayaran: ${totalPembayaran}%0A%0A` +
+                                    `Bukti Transfer: GAGAL UPLOAD%0A%0A` +
+                                    `*Detail Pesanan:*%0A` + pesanDetail + `%0A%0A `;
+
+                    let waLink = `https://wa.me/${phoneWa}?text=${waMessage}`;
+
+                    document.getElementById('buktiPembayaranPreview').classList.remove('d-none');
+
+                    // Buka WhatsApp
+                    window.open(waLink, '_blank');
+                    modal.hide();
+                });
             
         });  
     });
