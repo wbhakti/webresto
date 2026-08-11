@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 
-class ApiController  extends Controller
+class ApiCustomerController  extends Controller
 {
     public function LoginUser(Request $request)
     {

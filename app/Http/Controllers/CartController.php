@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Services\FirebaseService;
 
 class CartController extends Controller
 {
@@ -220,7 +221,7 @@ class CartController extends Controller
     {   
         try{
 
-            $idTransaksi = 'ORDER'.Carbon::now()->addHours(7)->format('YmdHis');
+            $idTransaksi = 'ORDER'.Carbon::now()->format('YmdHis');
             $merchant = DB::table('merchants')->first();
             $components = explode(",", $merchant->table_name);
             $mmeja = $components[$request->input('meja')];
@@ -257,7 +258,7 @@ class CartController extends Controller
                 'metode_bayar' => $request->input('metode_pembayaran'),
                 'qris_dynamic' => $request->input('qris_dynamic'),
                 'status' => 'BELUM BAYAR',
-                'addtime' => Carbon::now()->addHours(7)->format('Y-m-d H:i:s')
+                'addtime' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             session()->forget('cart');
@@ -294,7 +295,7 @@ class CartController extends Controller
             if($transaction->metode_bayar == 'qris'){
 
                 $textHeading = 'Order berhasil dibuat!';
-                $textBody = 'Segera lakukan pembayaran untuk proses pengantaran makanan!';
+                $textBody = 'Segera lakukan pembayaran untuk proses pemesanan makanan!';
 
                 return view('home-page.checkout', [
                     'phone_wa' => $phone_wa,
@@ -439,6 +440,20 @@ class CartController extends Controller
                 Log::info('Notifikasi berhasil dikirim');
 
                 // ========================================
+
+                $firebase = app(FirebaseService::class);
+                $firebase->sendToToken(
+                    $admin->fcm_token,
+                    'Order Baru',
+                    'Ada order baru dari ' . $transaction->customer,
+                    [
+                        'type' => 'NEW_ORDER',
+                        'idTransaksi' => $transaction->id_transaksi,
+                        'customer' => $transaction->customer,
+                        'meja' => $transaction->meja,
+                        'status' => $transaction->status,
+                    ]
+                );
                 
                 return response()->json([
                     'success' => true,

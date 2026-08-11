@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ApiUserController;
+use App\Http\Controllers\ApiCustomerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,14 +21,22 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('apikey')->group(function () {
-    Route::post('/login', [ApiController::class, 'LoginUser']);
-    Route::post('/register', [ApiController::class, 'RegistrationUser']);
-    Route::post('/delete', [ApiController::class, 'DeleteUser']);
-    Route::post('/history', [ApiController::class, 'History']);
-    Route::post('/checkout', [ApiController::class, 'Checkout']);
-    Route::post('/upload-struk', [ApiController::class, 'UploadStruk']);
-    Route::post('/detail-order', [ApiController::class, 'Detail']);
-    Route::get('/menu', [ApiController::class, 'Menu']);
-    Route::get('/merchant', [ApiController::class, 'Merchant']);
-    Route::post('/status-order', [ApiController::class, 'Status']);
+    Route::post('/login', [ApiCustomerController::class, 'LoginUser']);
+    Route::post('/register', [ApiCustomerController::class, 'RegistrationUser']);
+    Route::post('/delete', [ApiCustomerController::class, 'DeleteUser']);
+    Route::post('/history', [ApiCustomerController::class, 'History']);
+    Route::post('/checkout', [ApiCustomerController::class, 'Checkout']);
+    Route::post('/upload-struk', [ApiCustomerController::class, 'UploadStruk']);
+    Route::post('/detail-order', [ApiCustomerController::class, 'Detail']);
+    Route::get('/menu', [ApiCustomerController::class, 'Menu']);
+    Route::get('/merchant', [ApiCustomerController::class, 'Merchant']);
+    Route::post('/status-order', [ApiCustomerController::class, 'Status']);
+
+
+    // ADMIN
+    Route::post('/user/login', [ApiUserController::class, 'LoginAdmin']);
+    Route::post('/transaction/history', [ApiUserController::class, 'HistoryTransaction']);
+    Route::post('/user/save-fcm-token', [ApiUserController::class, 'SaveFCM']);
+    Route::post('/transaction/updateStatus', [ApiUserController::class, 'UpdateStatus']);
+    Route::post('/user/notification', [ApiUserController::class, 'Notification']);
 });
