@@ -30,9 +30,6 @@
             <h1 class="h3 mb-4 text-gray-800">Data Transaksi Hari Ini</h1>
         </div>
         <!-- <meta name="vapid-public-key" content="{{ config('webpush.vapid.public_key') }}"> -->
-        <button id="enable-notification">
-            Aktifkan Notifikasi
-        </button>
     </div>
     
     <div class="card-body">
@@ -305,87 +302,6 @@ function urlBase64ToUint8Array(base64String) {
     }
 
     return outputArray;
-}
-</script>
-
-<script> 
-
-    const notificationAudio = new Audio("{{ asset('sound/sound.wav') }}");
-
-    let soundEnabled = false;
-
-    if (localStorage.getItem('soundEnabled') === 'true') {
-        soundEnabled = true;
-    }
-
-    document.getElementById('enable-notification')
-        .addEventListener('click', async () => {
-    
-        const vapidPublicKey = "{{ config('webpush.vapid.public_key') }}";
-        const registration = await navigator.serviceWorker.ready;
-        
-
-        const subscription =
-            await registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-            });
-
-        await fetch('{{ route('subscribe') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector(
-                    'meta[name="csrf-token"]'
-                ).content
-            },
-            body: JSON.stringify(subscription)
-        });
-
-        alert('Notifikasi berhasil diaktifkan');
-
-        notificationAudio.play()
-        .then(() => {
-
-            notificationAudio.pause();
-            notificationAudio.currentTime = 0;
-
-            soundEnabled = true;
-            localStorage.setItem('soundEnabled', 'true');
-
-            alert('Suara notifikasi berhasil diaktifkan');
-
-        })
-        .catch(console.error);
-});
-</script> 
-
-<script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then(function(registration) {
-
-        navigator.serviceWorker.addEventListener('message', function(event) {
-
-            console.log('Pesan diterima:', event.data);
-
-            if (event.data.action === 'refresh') {
-                if (soundEnabled) {
-
-                    notificationAudio.currentTime = 0;
-
-                    notificationAudio.play().catch(console.error);
-                    }
-
-                    setTimeout(function () {
-                        alert('ADA PESANAN BARU');
-                        window.location.reload();
-                    }, 3000);
-            }
-
-        });
-
-    });
-
 }
 </script>
 

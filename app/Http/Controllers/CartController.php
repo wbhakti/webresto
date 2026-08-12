@@ -7,8 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Notifications\NewOrderNotification;
-use Illuminate\Support\Facades\Notification;
 use App\Services\FirebaseService;
 
 class CartController extends Controller
@@ -423,21 +421,6 @@ class CartController extends Controller
                 Log::info('Admin ditemukan', [
                     'id' => $admin->id,
                 ]);
-
-                Log::info('Subscription', [
-                    'count' => $admin->pushSubscriptions()->count(),
-                ]);
-
-                $order = (object) [
-                    'id_transaction' => $transaction->id_transaksi,
-                    'nama' => $transaction->customer,
-                ];
-
-                $admin->notify(
-                    new NewOrderNotification($order)
-                );
-
-                Log::info('Notifikasi berhasil dikirim');
 
                 // ========================================
 
