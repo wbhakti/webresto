@@ -122,6 +122,16 @@
     </div>
 </div>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+
+    if (event.persisted) {
+        window.location.reload();
+    }
+
+});
+</script>
+
 <section class="py-4">
 
     <div class="container px-4 px-lg-5 mt-0">

@@ -165,7 +165,16 @@ class CartController extends Controller
         $merchant = DB::table('merchants')->first();
         $cartCount = count($cart);
 
-        return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
+        // return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
+        return response()
+        ->view('home-page.cart', compact(
+            'cart',
+            'merchant',
+            'cartCount'
+        ))
+        ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
     }
 
     public function remove($id)
@@ -177,7 +186,10 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
+        // return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
+        return redirect()
+        ->route('cart.view')
+        ->with('success', 'Item berhasil dihapus dari keranjang.');
     }
 
     public function update(Request $request, $id)
@@ -414,29 +426,36 @@ class CartController extends Controller
                 $admin = User::where('role', 'kasir')->first();
                 $transaction = DB::table('transactions')->where('id_transaksi', $request->input('idtransaksi'))->first();
 
-                if (!$admin) {
-                    return 'Admin tidak ditemukan';
+                try {
+                    if (!$admin) {
+                        Log::warning('Admin kasir tidak ditemukan');
+                    } elseif (empty($admin->fcm_token)) {
+                        Log::warning('FCM token admin kosong', [
+                            'admin_id' => $admin->id,
+                        ]);
+                    } else {
+                        $firebase = app(FirebaseService::class);
+                        $firebase->sendToToken(
+                            $admin->fcm_token,
+                            'Order Baru',
+                            'Ada order baru dari ' . $transaction->customer,
+                            [
+                                'type' => 'NEW_ORDER',
+                                'idTransaksi' => $transaction->id_transaksi,
+                                'customer' => $transaction->customer,
+                                'meja' => $transaction->meja,
+                                'status' => $transaction->status,
+                            ]
+                        );
+                    }
+
+                    
+                } catch (\Exception $e) {
+                    Log::error('Gagal kirim FCM', [
+                        'admin_id' => $admin->id,
+                        'error' => $e->getMessage(),
+                    ]);
                 }
-
-                Log::info('Admin ditemukan', [
-                    'id' => $admin->id,
-                ]);
-
-                // ========================================
-
-                $firebase = app(FirebaseService::class);
-                $firebase->sendToToken(
-                    $admin->fcm_token,
-                    'Order Baru',
-                    'Ada order baru dari ' . $transaction->customer,
-                    [
-                        'type' => 'NEW_ORDER',
-                        'idTransaksi' => $transaction->id_transaksi,
-                        'customer' => $transaction->customer,
-                        'meja' => $transaction->meja,
-                        'status' => $transaction->status,
-                    ]
-                );
                 
                 return response()->json([
                     'success' => true,

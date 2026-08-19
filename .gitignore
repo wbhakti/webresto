@@ -5,7 +5,7 @@
 /public/storage
 /storage/*.key
 /storage/
-/public/invoice
+/public/invoice/
 /vendor
 .env
 .env.backup

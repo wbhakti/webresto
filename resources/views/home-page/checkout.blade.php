@@ -57,8 +57,20 @@
                         </div>
                         <div class="text-end">
                             <strong>Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</strong>
-                            @if ($item['product_discount'] != 0)
-                            <br><small class="text-muted">-Rp {{ number_format($item['quantity'] * $item['product_discount'], 0, ',', '.') }}</small>
+                            @php
+                                $productDiscount = $item['product_discount'] ?? 0;
+                            @endphp
+
+                            @if ($productDiscount > 0)
+                                <br>
+                                <small class="text-muted">
+                                    -Rp {{ number_format(
+                                        $item['quantity'] * $productDiscount,
+                                        0,
+                                        ',',
+                                        '.'
+                                    ) }}
+                                </small>
                             @endif
                         </div>
                     </li>
