@@ -41,12 +41,20 @@ Route::get('/dashboard/masterdiskon', 'App\Http\Controllers\AdminController@Mast
 Route::post('/postDiskon', 'App\Http\Controllers\AdminController@postDiskon');
 Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');
 Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
-Route::get('/dashboard/mastermenu', 'App\Http\Controllers\AdminController@MasterMenu')->name('MasterMenu');
-Route::post('/postmenu', 'App\Http\Controllers\AdminController@postmenu');
-Route::post('/ActivedMenu', 'App\Http\Controllers\AdminController@ActivedMenu');
+
+
 Route::post('/CloseOrder', 'App\Http\Controllers\AdminController@CloseOrder');
-Route::get('/dashboard/masterkategori', 'App\Http\Controllers\AdminController@MasterKategori')->name('MasterKategori');
-Route::post('/postkategori', 'App\Http\Controllers\AdminController@postkategori');
+
+//Products
+Route::get('/dashboard/masterProducts', 'App\Http\Controllers\AdminController@MasterProducts')->name('MasterProducts');
+Route::post('/addProducts', 'App\Http\Controllers\AdminController@AddProducts');
+Route::post('/editProducts', 'App\Http\Controllers\AdminController@EditProducts');
+Route::post('/activedProducts', 'App\Http\Controllers\AdminController@ActivedProducts');
+
+//Categories
+Route::get('/dashboard/masterCategories', 'App\Http\Controllers\AdminController@MasterCategories')->name('MasterCategories');
+Route::post('/addCategories', 'App\Http\Controllers\AdminController@AddCategories');
+Route::post('/editCategories', 'App\Http\Controllers\AdminController@EditCategories');
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
 Route::get("/dashboard/dayTransaction", 'App\Http\Controllers\AdminController@dayTransaction')->name('dayTransaction');

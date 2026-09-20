@@ -51,21 +51,21 @@
                 @foreach ($details as $item)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div class="text-start">
-                            <strong>Menu : {{ $item['menu_id'] }}</strong> <br>
-                            {{ $item['quantity'] }}x @Rp {{ number_format($item['price'], 0, ',', '.') }} 
-                            <br><small class="text-muted">Catatan: {{ $item['note'] }}</small>
+                            <strong>Menu : {{ $item->product_name }}</strong> <br>
+                            {{ $item->quantity }}x @Rp {{ number_format($item->price, 0, ',', '.') }} 
+                            <br><small class="text-muted">Catatan: {{ $item->note }}</small>
                         </div>
                         <div class="text-end">
-                            <strong>Rp {{ number_format($item['quantity'] * $item['price'], 0, ',', '.') }}</strong>
+                            <strong>Rp {{ number_format($item->quantity * $item->price, 0, ',', '.') }}</strong>
                             @php
-                                $productDiscount = $item['product_discount'] ?? 0;
+                                $productDiscount = $item->discount ?? 0;
                             @endphp
 
                             @if ($productDiscount > 0)
                                 <br>
                                 <small class="text-muted">
                                     -Rp {{ number_format(
-                                        $item['quantity'] * $productDiscount,
+                                        $item->quantity * $productDiscount,
                                         0,
                                         ',',
                                         '.'
@@ -84,7 +84,6 @@
                     <div class="qr-wrapper">
                     </div>
                     <div id="output" class="output-box"></div>
-                    <!-- <img src="{{ $qrisImage }}" alt="QRIS Payment" class="img-fluid" style="max-width: 300px;"> -->
                     <div id="qrcode"></div>
                     <script type="text/javascript">
                         const qrBox = document.getElementById("qrcode");
@@ -213,6 +212,54 @@ function downloadQR() {
 </script>
 
 <script>
+async function downloadQRNew() {
+    const img = document.querySelector("#qrcode img");
+
+    if (!img) {
+        alert("QR belum dibuat.");
+        return;
+    }
+
+    try {
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+
+        const file = new File(
+            [blob],
+            "qris-dinamis.png",
+            { type: blob.type || "image/png" }
+        );
+
+        // iPhone / iPad
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+                files: [file],
+                title: "QRIS Dinamis"
+            });
+
+            return;
+        }
+
+        // Browser yang tidak mendukung share file
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "qris-dinamis.png";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         let isQRIS = {{ $isQRIS ? 'true' : 'false' }};
 
@@ -234,7 +281,7 @@ function downloadQR() {
                 // Detail Pesanan
                 let pesanDetail = "";
                 @foreach ($details as $item)
-                pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
                 @endforeach
 
                 // Format Pesan WhatsApp
@@ -303,7 +350,7 @@ function downloadQR() {
                         // Detail Pesanan
                     let pesanDetail = "";
                     @foreach ($details as $item)
-                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                        pesanDetail += "{{ $item->product_name}} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
@@ -349,7 +396,7 @@ function downloadQR() {
                         // Detail Pesanan
                     let pesanDetail = "";
                     @foreach ($details as $item)
-                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                        pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
@@ -397,7 +444,7 @@ function downloadQR() {
                         // Detail Pesanan
                     let pesanDetail = "";
                     @foreach ($details as $item)
-                        pesanDetail += "{{ $item['menu_id'] }} [{{ $item['quantity'] }}] Rp {{ ($item['price'] * $item['quantity']) - ($item['product_discount'] * $item['quantity']) }} %0A";
+                        pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp

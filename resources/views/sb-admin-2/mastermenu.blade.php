@@ -28,7 +28,16 @@
 <div class="card shadow mb-4 custom-card-header">
     <div class="card-header py-3">
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Data Master Menu</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0 text-gray-800">Data Master Produk</h1>
+            <button
+                id="toggleButton"
+                class="btn btn-success"
+                data-toggle="modal"
+                data-target="#addModal">
+                Tambah Produk Baru
+            </button>
+        </div>
         
     </div>   
 
@@ -38,61 +47,56 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Nama Menu</th>
+                        <th>SKU</th>
+                        <th>Nama Produk</th>
                         <th>Harga</th>
                         <th>Kategori</th>
-                        <th>Diskon</th>
-                        <th></th>
+                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if($data->isNotEmpty())
-                    @foreach ($data as $item)
+                    @if($products->isNotEmpty())
+                    @foreach ($products as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->nama }}</td>
-                        <td>{{ $item->harga }}</td>
-                        <td>{{ $item->kategori }}</td>
-                        @if($item->is_discount == 1)
-                            <td>{{ "AKTIF" }}</td>
-                        @else
-                            <td>{{ "NON AKTIF" }}</td>
-                        @endif
-                        <!-- <td>
-                            <img src="{{ url('public/img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
-                        </td> -->
+                        <td>{{ $item->sku }}</td>
+                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->price }}</td>
+                        <td>{{ $item->category_id }}</td>
+                        <div class="button-group">
+                            <td>
+                                @if($item->is_active == 1) 
+                                <form method="POST" action="/activedProducts" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="row_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="not_actived" class="btn btn-success mb-2">Aktif</button>
+                                </form> 
+                                @else
+                                <form method="POST" action="/activedProducts" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="row_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="actived" class="btn btn-warning mb-2">Non Aktif</button>
+                                </form> 
+                                @endif
+                            </td>
+                        </div>
                         <div class="button-group">
                         <td>
                             <button type="button" class="btn btn-primary mb-2 btn-edit"
                                     data-rowid="{{ $item->id }}"
-                                    data-nama="{{ $item->nama }}"
-                                    data-harga="{{ $item->harga }}"
-                                    data-kategori="{{ $item->kategori }}"
-                                    data-discount="{{ $item->is_discount }}"
-                                    data-imagemenu="{{ $item->image }}">Edit</button>
+                                    data-name="{{ $item->name }}"
+                                    data-description="{{ $item->description }}"
+                                    data-price="{{ $item->price }}"
+                                    data-cost_price="{{ $item->cost_price }}"
+                                    data-category_id="{{ $item->category_id }}"
+                                    data-image="{{ $item->image }}">Edit</button>
                                 
-                                <form method="POST" action="/postmenu" style="display: inline;">
+                                <form method="POST" action="/editProducts" style="display: inline;">
                                     @csrf
-                                    <input type="hidden" name="menu_id" value="{{ $item->id }}">
+                                    <input type="hidden" name="row_id" value="{{ $item->id }}">
                                     <button type="submit" name="proses" value="delete" class="btn btn-danger mb-2">Delete</button>
                                 </form> 
-
-                                
-                                @if($item->is_active == 1) 
-                                <form method="POST" action="/ActivedMenu" style="display: inline;">
-                                    @csrf
-                                    <input type="hidden" name="menu_id" value="{{ $item->id }}">
-                                    <button type="submit" name="proses" value="actived" class="btn btn-warning mb-2">Non Aktif</button>
-                                </form> 
-                                @else
-                                <form method="POST" action="/ActivedMenu" style="display: inline;">
-                                    @csrf
-                                    <input type="hidden" name="menu_id" value="{{ $item->id }}">
-                                    <button type="submit" name="proses" value="not_actived" class="btn btn-success mb-2">Aktif</button>
-                                </form> 
-                                @endif
-
-                                
                         </td>
                                                                
                         </div>
@@ -105,53 +109,6 @@
         </div>
     </div>
     <hr>
-    <div align="center">
-        <button id="toggleButton" class="btn btn-success">Add New Menu</button>
-    </div>
-    <br>
-    <div id="myForm" style="display: none;">
-        <div class="col-xl-8 col-lg-7 mx-auto">
-            <!-- Project Card Example -->
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form method="POST" action="/postmenu" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row justify-content-center">
-                            <div class="form-group col-sm-6">
-                                <label for="sku"><b>SKU</b></label>
-                                <input type="text" name="sku" class="form-control" required />
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="nama"><b>Nama Menu</b></label>
-                                <input type="text" name="nama" class="form-control" required />
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="harga"><b>Harga Menu</b></label>
-                                <input type="text" name="harga" class="form-control" required />
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="kategori"><b>Kategori</b></label>
-                                <select class="form-control" id="kategori" name="kategori" required>
-                                    <option value="" disabled selected>Pilih Kategori</option>
-                                    @foreach ($datakategori as $kategori)
-                                        <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group col-sm-6">
-                                <label for="img_menu"><b>Image Menu (900x400)</b></label>
-                                <input type="file" name="img_menu" class="form-control" accept="image/*" required />
-                            </div>
-                        </div>
-                        <br />
-                        <div align="center">
-                            <button type="submit" name="proses" value="save" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -164,36 +121,38 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="/postmenu" enctype="multipart/form-data">
+                    <form id="editForm" method="POST" action="/editProducts" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="proses" value="edit">
-                        <input type="hidden" name="menu_id" id="editRowid">
+                        <input type="hidden" name="row_id" id="editRowid">
                         <div class="form-group">
-                            <label for="editnama"><b>Nama Menu</b></label>
-                            <input type="text" name="nama" id="editnama" class="form-control" required />
+                            <label for="editName"><b>Nama Produk</b></label>
+                            <input type="text" name="name" id="editName" class="form-control" required />
                         </div>
                         <div class="form-group">
-                            <label for="editharga"><b>Harga Menu</b></label>
-                            <input type="text" name="harga" id="editharga" class="form-control" required />
+                            <label for="editdescription"><b>Deskripsi Produk</b></label>
+                            <input type="text" name="description" id="editDescription" class="form-control" required />
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="form-group col-sm-6">
+                                <label for="editPrice"><b>Harga Produk</b></label>
+                                <input type="text" name="price" id="editPrice" class="form-control" required />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="editCost_price"><b>Harga Modal</b></label>
+                                <input type="text" name="cost_price" id="editCost_price" class="form-control" required />
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="editkategori"><b>Kategori Menu</b></label>
-                            <select class="form-control" id="editkategori" name="kategori" required>
-                                @foreach ($datakategori as $kategori)
-                                    <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+                            <select class="form-control" id="category_id" name="category_id" required>
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                @foreach ($catagories as $cat)
+                                    <option value="{{ $cat->id }}"
+                                        {{ $cat->id == $item->category_id ? 'selected' : '' }}>
+                                        {{ $cat->name }}
+                                    </option>
                                 @endforeach
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="editdiscount"><b>Diskon Menu</b></label>
-                            <select class="form-control" id="editdiscount" name="discount" required>
-                            @if($item->is_discount == 1)
-                                <option selected="selected" value="1">{{ "AKTIF" }}</option>
-                                <option value="0">{{ "NON AKTIF" }}</option>
-                            @else
-                                <option value="1">{{ "AKTIF" }}</option>
-                                <option selected="selected" value="0">{{ "NON AKTIF" }}</option>
-                            @endif
                             </select>
                         </div>
                         <div class="form-group">
@@ -208,6 +167,68 @@
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Tambah Produk Baru</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm" method="POST" action="/addProducts" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <input type="hidden" name="proses" value="add">
+                        <div class="form-group">
+                            <label for="addsku"><b>SKU</b></label>
+                            <input type="text" name="sku" id="addsku" class="form-control" required />
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="addname"><b>Nama Produk</b></label>
+                            <input type="text" name="name" id="addname" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="adddescription"><b>Deskripsi Produk</b></label>
+                            <input type="text" name="description" id="adddescription" class="form-control" required />
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="form-group col-sm-6">
+                                <label for="addprice"><b>Harga Produk</b></label>
+                                <input type="text" name="price" id="addprice" class="form-control" required />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="addcost_price"><b>Harga Modal</b></label>
+                                <input type="text" name="cost_price" id="addcost_price" class="form-control" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="editkategori"><b>Kategori Menu</b></label>
+                            <select class="form-control" id="category_id" name="category_id" required>
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                @foreach ($catagories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="image"><b>Image</b></label>
+                            <input type="file" name="img_menu" class="form-control" accept="image/*" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>    
+                        
                     </form>
                 </div>
             </div>
@@ -256,18 +277,20 @@ $(document).ready(function() {
         // Edit button click event
         $(document).on('click', '.btn-edit', function() {
             var rowid = $(this).data('rowid');
-            var nama = $(this).data('nama');
-            var harga = $(this).data('harga');
-            var kategori = $(this).data('kategori');
-            var discount = $(this).data('discount');
-            var img = $(this).data('imagemenu');
+            var category_id = $(this).data('category_id');
+            var name = $(this).data('name');
+            var description = $(this).data('description');
+            var price = $(this).data('price');
+            var cost_price = $(this).data('cost_price');
+            var image = $(this).data('image');
 
             $('#editRowid').val(rowid);
-            $('#editnama').val(nama);
-            $('#editharga').val(harga);
-            $('#editkategori').val(kategori);
-            $('#editdiscount').val(discount);
-            $('#currentImage').attr('src', "{{ url('public/img/') }}" + "/" + img);
+            $('#editName').val(name);
+            $('#editDescription').val(description);
+            $('#editPrice').val(price);
+            $('#editCost_price').val(cost_price);
+            $('#editCategory_id').val(category_id);
+            $('#currentImage').attr('src', "{{ url('public/img/') }}" + "/" + image);
 
             $('#editModal').modal('show');
         });

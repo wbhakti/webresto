@@ -115,7 +115,8 @@ class AdminController extends Controller
         }
     }
 
-    public function MasterMenu()
+    // ============== Products ==============
+    public function MasterProducts()
     {
         try {
 
@@ -123,21 +124,56 @@ class AdminController extends Controller
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
 
-            $dataMenu = DB::table('menus')->where('is_delete', '0')->get();
-            $dataKategori = DB::table('categories')->where('is_delete', '0')->get();
+            $dataProducts = DB::table('products')->where('deleted_at', null)->get();
+            $dataCatagories = DB::table('categories')->where('deleted_at', null)->get();
 
             return view('sb-admin-2/mastermenu', [
-                'data' => $dataMenu,
-                'datakategori' => $dataKategori
+                'products' => $dataProducts,
+                'catagories' => $dataCatagories
             ]);
 
         } catch (\Exception $e) {
             Log::error('Gagal memuat data menu: ' . $e->getMessage());
-            return redirect()->route('MasterMerchant')->with('error', 'gagal load menu');
+            return redirect()->route('MasterProducts')->with('error', 'gagal load menu');
         }
     }
 
-    public function postmenu(Request $request)
+    public function AddProducts(Request $request)
+    {
+        try {
+            
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            $file = $request->file('img_menu');
+            $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
+            $file->move(base_path('../public/img'), $filename);
+
+            $maxOrder = DB::table('products')->max('sort_order');
+            $mSortOrder= ($maxOrder ?? 0) + 10;
+
+            DB::table('products')->insert([
+                'category_id' => $request->input('category_id'),
+                'sku' => $request->input('sku'),
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'price' => $request->input('price'),
+                'cost_price' => $request->input('cost_price'),
+                'image' => $filename,
+                'sort_order' => $mSortOrder,
+                'is_active' => true,
+            ]);
+
+            return redirect()->route('MasterProducts')->with('success', 'berhasil tambah data');
+
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('MasterProducts')->with('error', 'gagal simpan data');
+        }
+    }
+
+    public function EditProducts(Request $request)
     {
         try {
             
@@ -152,62 +188,75 @@ class AdminController extends Controller
                     $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
                     $file->move(base_path('../public/img'), $filename);
 
-                    DB::table('menus')
-                    ->where('id', $request->input('menu_id'))
+                    DB::table('products')
+                    ->where('id', $request->input('row_id'))
                     ->update([ 
-                        'nama' => $request->input('nama'),
-                        'harga' => $request->input('harga'),
-                        'kategori' => $request->input('kategori'),
-                        'is_discount' => $request->input('discount'),
+                        'category_id' => $request->input('category_id'),
+                        'name' => $request->input('name'),
+                        'description' => $request->input('description'),
+                        'price' => $request->input('price'),
+                        'cost_price' => $request->input('cost_price'),
                         'image' => $filename,
                     ]);
-
                 }else{
 
-                    DB::table('menus')
-                    ->where('id', $request->input('menu_id'))
+                    DB::table('products')
+                    ->where('id', $request->input('row_id'))
                     ->update([ 
-                        'nama' => $request->input('nama'),
-                        'harga' => $request->input('harga'),
-                        'kategori' => $request->input('kategori'),
-                        'is_discount' => $request->input('discount'),
+                        'category_id' => $request->input('category_id'),
+                        'name' => $request->input('name'),
+                        'description' => $request->input('description'),
+                        'price' => $request->input('price'),
+                        'cost_price' => $request->input('cost_price'),
                     ]);
                 }
 
-                return redirect()->route('MasterMenu')->with('success', 'berhasil edit data');
+                return redirect()->route('MasterProducts')->with('success', 'berhasil edit data');
             }
             else if ($request->input('proses') == 'delete'){
 
-                DB::table('menus')->where('id', $request->input('menu_id'))->update([ 'is_delete' => '1',]);
+                DB::table('products')
+                    ->where('id', $request->input('row_id'))
+                    ->update([ 'deleted_at' => Carbon::now()->format('Y-m-d H:i:s')]);
 
-                return redirect()->route('MasterMenu')->with('success', 'berhasil hapus data');
+                return redirect()->route('MasterProducts')->with('success', 'berhasil hapus data');
             }
-            else{
-                
-                $file = $request->file('img_menu');
-                $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
-                //$file->move(public_path('img'), $filename);
-                $file->move(base_path('../public/img'), $filename);
-
-                DB::table('menus')->insert([
-                    'nama' => $request->input('nama'),
-                    'sku' => $request->input('sku'),
-                    'harga' => $request->input('harga'),
-                    'image' => $filename,
-                    'kategori' => $request->input('kategori'),
-                    'merchant_id' => '1',
-                ]);
-
-                return redirect()->route('MasterMenu')->with('success', 'berhasil tambah data');
-            }
-
         } catch (\Exception $e) {
             Log::error('Gagal proses data: ' . $e->getMessage());
-            return redirect()->route('MasterMenu')->with('error', 'gagal simpan data');
+            return redirect()->route('MasterProducts')->with('error', 'gagal simpan data');
         }
     }
 
-    public function MasterKategori()
+    public function ActivedProducts(Request $request)
+    {
+        try {
+            if (!session()->has('user_id')) {
+                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
+            }
+    
+            if ($request->input('proses') == 'actived'){
+                DB::table('products')
+                ->where('id', $request->input('row_id'))
+                ->update(['is_active' => '0']);
+                return redirect()->route('MasterProducts')->with('success', 'berhasil aktifkan menu');
+            } else if ($request->input('proses') == 'not_actived'){
+                DB::table('products')
+                ->where('id', $request->input('row_id'))
+                ->update(['is_active' => '1']);
+
+                return redirect()->route('MasterProducts')->with('success', 'berhasil non-aktifkan menu');
+            }
+    
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
+        }
+    }
+
+    // ============== Products ==============
+
+    // ============== Categories ==============
+    public function MasterCategories()
     {
         try {
 
@@ -215,7 +264,7 @@ class AdminController extends Controller
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
 
-            $dataKategori = DB::table('categories')->where('is_delete', '0')->get();
+            $dataKategori = DB::table('categories')->where('deleted_at', null)->get();
             return view('sb-admin-2/masterkategori', [
                 'data' => $dataKategori
             ]);
@@ -226,7 +275,33 @@ class AdminController extends Controller
         }
     }
 
-    public function postkategori(Request $request)
+    public function AddCategories(Request $request)
+    {
+        try {
+
+            if (!session()->has('user_id')) {
+                return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
+            }
+
+            $maxOrder = DB::table('categories')->max('sort_order');
+            $mSortOrder= ($maxOrder ?? 0) + 10;
+
+            DB::table('categories')->insert([
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'sort_order' => $mSortOrder,
+                'is_active' => true,
+            ]);
+
+            return redirect()->route('MasterCategories')->with('success', 'berhasil tambah data');
+
+        } catch (\Exception $e) {
+            Log::error('Gagal proses data: ' . $e->getMessage());
+            return redirect()->route('MasterCategories')->with('error', 'gagal simpan data');
+        }
+    }
+
+    public function EditCategories(Request $request)
     {
         try {
 
@@ -237,36 +312,30 @@ class AdminController extends Controller
             if($request->input('proses') == 'edit'){
 
                 DB::table('categories')
-                    ->where('id', $request->input('kategori_id'))
-                    ->update([ 'nama' => $request->input('nama'),]);
+                    ->where('id', $request->input('categories_id'))
+                    ->update([ 'name' => $request->input('name'),
+                    'description' => $request->input('description'),
+                    'is_active' => $request->input('status')]);
 
-                return redirect()->route('MasterKategori')->with('success', 'berhasil edit data');
+                return redirect()->route('MasterCategories')->with('success', 'berhasil edit data');
             }
             else if ($request->input('proses') == 'delete'){
 
-                //DB::table('categories')->where('id', $request->input('kategori_id'))->delete();
                 DB::table('categories')
-                    ->where('id', $request->input('kategori_id'))
-                    ->update([ 'is_delete' => '1',]);
+                    ->where('id', $request->input('categories_id'))
+                    ->update([ 'deleted_at' => Carbon::now()->format('Y-m-d H:i:s')]);
 
-                return redirect()->route('MasterKategori')->with('success', 'berhasil hapus data');
+                return redirect()->route('MasterCategories')->with('success', 'berhasil hapus data');
 
-            }
-            else{
-
-                DB::table('categories')->insert([
-                    'nama' => $request->input('nama'),
-                    'merchant_id' => '1',
-                ]);
-
-                return redirect()->route('MasterKategori')->with('success', 'berhasil tambah data');
             }
 
         } catch (\Exception $e) {
             Log::error('Gagal proses data: ' . $e->getMessage());
-            return redirect()->route('MasterKategori')->with('error', 'gagal simpan data');
+            return redirect()->route('MasterCategories')->with('error', 'gagal edit data');
         }
     }
+
+    // ============== Categories ==============
 
     public function logout(Request $request)
     {
@@ -339,32 +408,6 @@ class AdminController extends Controller
                 return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui']);
             } else {
                 return response()->json(['success' => false, 'message' => 'Data tidak ditemukan']);
-            }
-    
-        } catch (\Exception $e) {
-            Log::error('Gagal proses data: ' . $e->getMessage());
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan sistem'], 500);
-        }
-    }
-
-    public function ActivedMenu(Request $request)
-    {
-        try {
-            if (!session()->has('user_id')) {
-                return response()->json(['success' => false, 'message' => 'You must be logged in to access the menu.'], 401);
-            }
-    
-            if ($request->input('proses') == 'actived'){
-                DB::table('menus')
-                ->where('id', $request->input('menu_id'))
-                ->update(['is_active' => '0']);
-                return redirect()->route('MasterMenu')->with('success', 'berhasil aktifkan menu');
-            } else if ($request->input('proses') == 'not_actived'){
-                DB::table('menus')
-                ->where('id', $request->input('menu_id'))
-                ->update(['is_active' => '1']);
-
-                return redirect()->route('MasterMenu')->with('success', 'berhasil non-aktifkan menu');
             }
     
         } catch (\Exception $e) {

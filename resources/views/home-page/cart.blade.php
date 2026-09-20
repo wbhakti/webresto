@@ -112,11 +112,11 @@
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
     <div class="card" style="min-width: 150px;">
         <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Favorit</div>
-        <img class="card-img-top" src="{{ asset('img/' . $merchant->image) }}" alt="{{ $merchant->nama }}" />
+        <img class="card-img-top" src="{{ asset('img/' . $merchant->logo) }}" alt="{{ $merchant->name }}" />
         <div class="card-body d-flex flex-column justify-content-between text-center">
             <div>
-                <h4 class="fw-bolder mb-1">{{ $merchant->nama }}</h4>
-                <small class="text-muted d-block mb-2">{{ $merchant->deskripsi }}</small>
+                <h4 class="fw-bolder mb-1">{{ $merchant->name }}</h4>
+                <small class="text-muted d-block mb-2">{{ $merchant->address }}</small>
             </div>
         </div>
     </div>
@@ -158,12 +158,10 @@ window.addEventListener('pageshow', function(event) {
 
                             @php $priceDiscount = ""; @endphp
                             @php 
-                                if($item['productDiscount'] == 0) {
+                                if($item['item_discount'] == 0) {
                                     $priceDiscount = "";
                                 } else {
-                                    $mPriceDiscount = number_format(($item['totalDiscount']), 0, ',', '.');
-                                    $priceDiscount = "-Rp $mPriceDiscount" ;
-                                    $rpdiscount += $item['totalDiscount'];
+                                    $priceDiscount = "-Rp" ;
                                 }
                             @endphp
 
@@ -333,12 +331,6 @@ window.addEventListener('pageshow', function(event) {
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
-        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000278398602150008850027839860303UKE51440014ID.CO.QRIS.WWW0215ID10253704526210303UKE5204581253033605802ID5915KOPINGGIR JALAN6006KLATEN61055743862070703A016304F1DC";
-        const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
-
-        // const result = makeString(qris, { nominal: nominal });
-        const result = makeDynamicQR(qris, nominal);
-        document.getElementById("qris_dynamic").value = result;
 
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");

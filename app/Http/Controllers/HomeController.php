@@ -23,8 +23,8 @@ class HomeController extends Controller
     {
         try{
 
-            $dataKategori = [];
-            $dataproduk = [];
+            $dataCategories = [];
+            $dataProducts = [];
 
             $reset = $request->query('reset');
             if ($reset === 'Y') {
@@ -36,52 +36,34 @@ class HomeController extends Controller
 
             $jamSekarang = now()->format('H:i:s');
 
-            // $dataproduk = DB::table('menus')
-            // ->join('categories', 'menus.kategori', '=', 'categories.id')
-            // ->select('menus.*', 'categories.nama as nama_kategori')
-            // ->where('menus.is_delete', '0')
-            // ->where('menus.is_active', '0')
-            // ->where(function ($q) use ($jamSekarang) {
-            //     $q->whereNull('menus.seasonal_start')
-            //       ->orWhere(function ($q2) use ($jamSekarang) {
-            //           $q2->where('menus.seasonal_start', '<=', $jamSekarang)
-            //              ->where('menus.seasonal_end', '>=', $jamSekarang);
-            //       });
-            // })
-            // ->orderBy('categories.id', 'ASC')
-            // ->orderBy('menus.sku', 'ASC')
-            // ->get();
-
-            $dataproduk = DB::table('menus')
-            ->join('categories', 'menus.kategori', '=', 'categories.id')
-            ->select('menus.*', 'categories.nama as nama_kategori')
-            ->where('menus.is_delete', 0)
-            ->where('menus.is_active', 0)
-            ->where(function ($q) use ($jamSekarang) {
-                $q->whereNull('menus.seasonal_start')
-                ->whereNull('menus.seasonal_end')
-                ->orWhereRaw('? BETWEEN TIME(menus.seasonal_start) AND TIME(menus.seasonal_end)', [$jamSekarang]);
-            })
-            ->orderBy('categories.id')
-            ->orderBy('menus.sku')
+            $dataProducts = DB::table('products')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*', 'categories.name as nama_kategori')
+            ->where('products.deleted_at', null)
+            ->where('products.is_active', 1)
+            ->orderBy('categories.sort_order')
+            ->orderBy('products.sort_order')
             ->get();
 
-            $kategori = $request->query('kategori');
+            $mCat = $request->query('categories');
             
-            if (!empty($kategori)) {
-                if ($kategori !== "all") {
-                    $dataproduk = $dataproduk->where('nama_kategori', $kategori);
+            if (!empty($mCat)) {
+                if ($mCat !== "all") {
+                    $dataProducts = $dataProducts->where('category_id', $mCat);
                 }
             }
 
             $merchant = DB::table('merchants')->first();
-            $dataKategori = DB::table('categories')->where('is_delete', '0')->get();
-            $datapromo = DB::table('configuration')->where('parameter', 'popup_banner')->first();
+            $dataCategories = DB::table('categories')
+            ->where('is_active', 1)
+            ->where('deleted_at', null)
+            ->orderBy('sort_order')->get();
+            // $datapromo = DB::table('configuration')->where('parameter', 'popup_banner')->first();
 
             return view('home-page/restoran', [
-                'kategori' => $dataKategori, 
-                'promo' => $datapromo, 
-                'produk' => $dataproduk,
+                'categories' => $dataCategories, 
+                // 'promo' => $datapromo, 
+                'products' => $dataProducts,
                 'merchant' => $merchant,
                 'cartCount' => $cartCount
             ]);

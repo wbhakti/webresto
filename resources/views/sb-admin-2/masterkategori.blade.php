@@ -28,7 +28,16 @@
 <div class="card shadow mb-4 custom-card-header">
     <div class="card-header py-3">
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Data Master Kategori</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h3 mb-0 text-gray-800">Data Master Kategori</h1>
+            <button
+                id="toggleButton"
+                class="btn btn-success"
+                data-toggle="modal"
+                data-target="#addModal">
+                Add New Kategori
+            </button>
+        </div>
     </div>    
 
     <div class="card-body">
@@ -38,7 +47,9 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Kategori</th>
-                        <th></th>
+                        <th>Deskripsi</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,17 +57,28 @@
                     @foreach ($data as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->nama }}</td>
+                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->description }}</td>
+                        <td>
+                            @if($item->is_active == 1)
+                                <span class="badge badge-success">AKTIF</span>
+                            @else
+                                <span class="badge badge-secondary">NON AKTIF</span>
+                            @endif
+                        </td>
                         <div class="button-group">
                         <td>
                             <button type="button" class="btn btn-primary mb-2 btn-edit"
                                     data-rowid="{{ $item->id }}"
-                                    data-nama="{{ $item->nama }}">Edit</button>
-                                <form method="POST" action="/postkategori" style="display: inline;">
-                                    @csrf
-                                    <input type="hidden" name="kategori_id" value="{{ $item->id }}">
-                                    <button type="submit" name="proses" value="delete" class="btn btn-danger mb-2">Delete</button>
-                                </form> 
+                                    data-name="{{ $item->name }}"
+                                    data-description="{{ $item->description }}"
+                                    data-is_active="{{ $item->is_active }}">Edit</button>
+                                    
+                            <form method="POST" action="/editCategories" style="display: inline;">
+                                @csrf
+                                <input type="hidden" name="categories_id" value="{{ $item->id }}">
+                                <button type="submit" name="proses" value="delete" class="btn btn-danger mb-2">Delete</button>
+                            </form> 
                         </td>
                                                                
                         </div>
@@ -70,32 +92,8 @@
         </div>
     </div>
     <hr>
-    <div align="center">
-        <button id="toggleButton" class="btn btn-success">Add New Kategori</button>
-    </div>
+    
     <br>
-    <div id="myForm" style="display: none;">
-        <div class="col-xl-8 col-lg-7 mx-auto">
-            <!-- Project Card Example -->
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <form method="POST" action="/postkategori">
-                        @csrf
-                        <div class="row justify-content-center">
-                            <div class="form-group col-sm-6">
-                                <label for="nama"><b>Nama Kategori</b></label>
-                                <input type="text" name="nama" class="form-control" required />
-                            </div>
-                        </div>
-                        <br />
-                        <div align="center">
-                            <button type="submit" name="proses" value="save" class="btn btn-primary">Save</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
@@ -108,17 +106,59 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm" method="POST" action="/postkategori">
+                    <form id="editForm" method="POST" action="/editCategories">
                         @csrf
                         <input type="hidden" name="proses" value="edit">
-                        <input type="hidden" name="kategori_id" id="editRowid">
+                        <input type="hidden" name="categories_id" id="editRowid">
                         <div class="form-group">
-                            <label for="editNama"><b>Nama Kategori</b></label>
-                            <input type="text" name="nama" id="editNama" class="form-control" required />
+                            <label for="editName"><b>Nama Kategori</b></label>
+                            <input type="text" name="name" id="editName" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="editDescription"><b>Deskripsi</b></label>
+                            <input type="text" name="description" id="editDescription" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="editStatus"><b>Status</b></label>
+                            <select class="form-control" id="editStatus" name="status" required>
+                                <option value="1">AKTIF</option>
+                                <option value="0">NON AKTIF</option>
+                            </select>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" name="proses" value="edit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Tambah Kategori</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addForm" method="POST" action="/addCategories">
+                        @csrf
+                        <div class="form-group">
+                            <label for="addName"><b>Nama Kategori</b></label>
+                            <input type="text" name="name" id="addName" class="form-control" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="addDescription"><b>Deskripsi</b></label>
+                            <input type="text" name="description" id="addDescription" class="form-control" required />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" name="proses" value="add" class="btn btn-primary">Save</button>
                         </div>
                     </form>
                 </div>
@@ -157,20 +197,16 @@ $(document).ready(function() {
 
 <script>
     $(document).ready(function() {
-        $("#toggleButton").click(function() {
-            $("#myForm").toggle();
-        });
-    });
-</script>
-
-<script>
-    $(document).ready(function() {
         $(document).on('click', '.btn-edit', function() {
             var rowid = $(this).data('rowid');
-            var nama = $(this).data('nama');
+            var name = $(this).data('name');
+            var description = $(this).data('description');
+            var is_active = $(this).data('is_active');
             
             $('#editRowid').val(rowid);
-            $('#editNama').val(nama);
+            $('#editName').val(name);
+            $('#editDescription').val(description);
+            $('#editStatus').val(is_active);
 
             $('#editModal').modal('show');
         });
