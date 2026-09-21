@@ -302,6 +302,38 @@ class CartController extends Controller
             $totalTagihan = $transaction->total_bayar;
             $details = json_decode($transaction->details, true);
 
+            // ============= NOTIFIKASI ==============
+            $admin = User::where('role', 'kasir')->first();
+
+            try {
+                if (!$admin) {
+                    Log::warning('Admin kasir tidak ditemukan');
+                } elseif (empty($admin->fcm_token)) {
+                    Log::warning('FCM token admin kosong', [
+                        'admin_id' => $admin->id,
+                    ]);
+                } else {
+                    $firebase = app(FirebaseService::class);
+                    $firebase->sendToToken(
+                        $admin->fcm_token,
+                        'Order Baru',
+                        'Ada order baru dari ' . $transaction->customer,
+                        [
+                            'type' => 'NEW_ORDER',
+                            'idTransaksi' => $transaction->id_transaksi,
+                            'customer' => $transaction->customer,
+                            'meja' => $transaction->meja,
+                            'status' => $transaction->status,
+                        ]
+                    );
+                }
+            } catch (\Exception $e) {
+                Log::error('Gagal kirim FCM', [
+                    'admin_id' => $admin->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             if($transaction->metode_bayar == 'qris'){
 
                 $textHeading = 'Order berhasil dibuat!';
