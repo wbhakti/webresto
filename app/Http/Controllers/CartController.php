@@ -18,14 +18,18 @@ class CartController extends Controller
 
         $timeNow = now()->format('H:i');
 
-        $order = DB::table('merchants')
-        ->where('open', '<=', $timeNow)
-        ->where('closed', '>=', $timeNow)
+        $merchant = DB::table('merchants')
         ->where('id', $request->input('merchantId'))->first();
 
-        if($order){
+        if ($timeNow < $merchant->open) {
             return response()->json([
-                'message' => 'Mohon Maaf Sudah Close Order'
+                'message' => 'Mohon Maaf, order belum dibuka'
+            ]);
+        }
+        
+        if ($timeNow > $merchant->closed) {
+            return response()->json([
+                'message' => 'Mohon Maaf, order sudah ditutup'
             ]);
         }
 
