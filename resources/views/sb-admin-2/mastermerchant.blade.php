@@ -49,19 +49,19 @@
                         
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{ $item->nama }}</td>
-                            <td>{{ $item->deskripsi }}</td>
+                            <td>{{ $item->name }}</td>
+                            <td>{{ $item->address }}</td>
                             <td>
-                                <img src="{{ asset('img/' . $item->image) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
+                                <img src="{{ asset('img/' . $item->logo) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
                             </td>
                             <td>
                                 <div class="button-group">
                                     <div class="button-group">
                                         <button type="button" class="btn btn-primary mb-2 btn-edit"
                                             data-rowid="{{ $item->id }}"
-                                            data-nama="{{ $item->nama }}"
-                                            data-deskripsi="{{ $item->deskripsi }}"
-                                            data-oldimage="{{ $item->image }}">Edit</button>
+                                            data-name="{{ $item->name }}"
+                                            data-address="{{ $item->address }}"
+                                            data-logo="{{ $item->logo }}">Edit</button>
                                     </div>                                    
                                 </div>
                             </td>
@@ -94,20 +94,20 @@
                         <input type="hidden" name="proses" value="edit">
                         <input type="hidden" name="merchant_id" id="editRowid">
                         <div class="form-group">
-                            <label for="editNama"><b>Nama Merchant</b></label>
-                            <input type="text" name="nama" id="editNama" class="form-control" required />
+                            <label for="editName"><b>Nama Merchant</b></label>
+                            <input type="text" name="name" id="editName" class="form-control" required />
                         </div>
                         <div class="form-group">
-                            <label for="editDeskripsi"><b>Deskripsi</b></label>
-                            <textarea name="deskripsi" id="editDeskripsi" class="form-control" rows="4" required></textarea>
+                            <label for="editAddress"><b>Alamat</b></label>
+                            <textarea name="address" id="editAddress" class="form-control" rows="4" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="image"><b>Image</b></label>
-                            <input type="file" name="img_merchant" class="form-control" accept="image/*" />
+                            <label for="logo"><b>Logo</b></label>
+                            <input type="file" name="logo" class="form-control" accept="image/*" />
                         </div>
                         <div class="form-group">
-                            <label><b>Current Image</b></label>
-                            <img id="currentimage" src="" alt="Current Image" style="max-width: 100px; max-height: 100px;">
+                            <label><b>Current Logo</b></label>
+                            <img id="currentimage" src="" alt="Current Logo" style="max-width: 100px; max-height: 100px;">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -161,14 +161,14 @@ $(document).ready(function() {
         // Edit button click event
         $(document).on('click', '.btn-edit', function() {
             var rowid = $(this).data('rowid');
-            var nama = $(this).data('nama');
-            var desc = $(this).data('deskripsi');
-            var imgMerchant = $(this).data('oldimage');
+            var name = $(this).data('name');
+            var address = $(this).data('address');
+            var logo = $(this).data('logo');
             
             $('#editRowid').val(rowid);
-            $('#editNama').val(nama);
-            $('#editDeskripsi').val(desc);
-            $('#currentimage').attr('src', "{{ asset('img/') }}" + "/" + imgMerchant);
+            $('#editName').val(name);
+            $('#editAddress').val(address);
+            $('#currentimage').attr('src', "{{ asset('img/') }}" + "/" + logo);
 
             $('#editModal').modal('show');
         });

@@ -59,13 +59,23 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $item->name }}</td>
                         <td>{{ $item->description }}</td>
-                        <td>
-                            @if($item->is_active == 1)
-                                <span class="badge badge-success">AKTIF</span>
-                            @else
-                                <span class="badge badge-secondary">NON AKTIF</span>
-                            @endif
-                        </td>
+                        <div class="button-group">
+                            <td>
+                                @if($item->is_active == 1) 
+                                <form method="POST" action="/activedCategories" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="row_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="not_actived" class="btn btn-success mb-2">Aktif</button>
+                                </form> 
+                                @else
+                                <form method="POST" action="/activedCategories" style="display: inline;">
+                                    @csrf
+                                    <input type="hidden" name="row_id" value="{{ $item->id }}">
+                                    <button type="submit" name="proses" value="actived" class="btn btn-warning mb-2">Non Aktif</button>
+                                </form> 
+                                @endif
+                            </td>
+                        </div>
                         <div class="button-group">
                         <td>
                             <button type="button" class="btn btn-primary mb-2 btn-edit"

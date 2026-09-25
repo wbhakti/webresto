@@ -116,11 +116,10 @@ Notification.requestPermission()
                     </a>
                     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item" href="{{ url('dashboard/mastermerchant') }}">Merchant</a>
+                            <a class="collapse-item" href="{{ url('dashboard/masterMerchant') }}">Merchant</a>
                             <a class="collapse-item" href="{{ url('dashboard/masterCategories') }}">Kategori</a>
                             <a class="collapse-item" href="{{ url('dashboard/masterProducts') }}">Produk</a>
-                            <a class="collapse-item" href="{{ url('dashboard/masterpromo') }}">Popup Promo</a>
-                            <a class="collapse-item" href="{{ url('dashboard/masterdiskon') }}">Setting Diskon</a>
+                            <a class="collapse-item" href="{{ url('dashboard/masterPromotions') }}">Setting Promotion</a>
                         </div>
                     </div>
                 </li>

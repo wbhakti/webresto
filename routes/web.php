@@ -35,26 +35,34 @@ Route::get('/login', 'App\Http\Controllers\AdminController@Login')->name('Login'
 Route::post('/postlogin', 'App\Http\Controllers\AdminController@postlogin');
 Route::get('/logout', 'App\Http\Controllers\AdminController@logout')->name('logout');
 Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
-Route::get('/dashboard/masterpromo', 'App\Http\Controllers\AdminController@MasterPromo')->name('MasterPromo');
-Route::post('/postPopupPromo', 'App\Http\Controllers\AdminController@postPopupPromo');
-Route::get('/dashboard/masterdiskon', 'App\Http\Controllers\AdminController@MasterDiskon')->name('MasterDiskon');
-Route::post('/postDiskon', 'App\Http\Controllers\AdminController@postDiskon');
-Route::get('/dashboard/mastermerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');
-Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
-
+// Route::get('/dashboard/masterpromo', 'App\Http\Controllers\AdminController@MasterPromo')->name('MasterPromo');
+// Route::post('/postPopupPromo', 'App\Http\Controllers\AdminController@postPopupPromo');
 
 Route::post('/CloseOrder', 'App\Http\Controllers\AdminController@CloseOrder');
 
+
+//Merchants
+Route::get('/dashboard/masterMerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');
+Route::post('/postmerchant', 'App\Http\Controllers\AdminController@postmerchant');
+
 //Products
-Route::get('/dashboard/masterProducts', 'App\Http\Controllers\AdminController@MasterProducts')->name('MasterProducts');
-Route::post('/addProducts', 'App\Http\Controllers\AdminController@AddProducts');
-Route::post('/editProducts', 'App\Http\Controllers\AdminController@EditProducts');
-Route::post('/activedProducts', 'App\Http\Controllers\AdminController@ActivedProducts');
+Route::get('/dashboard/masterProducts', 'App\Http\Controllers\ProductController@MasterProducts')->name('MasterProducts');
+Route::post('/addProducts', 'App\Http\Controllers\ProductController@AddProducts');
+Route::post('/editProducts', 'App\Http\Controllers\ProductController@EditProducts');
+Route::post('/activedProducts', 'App\Http\Controllers\ProductController@ActivedProducts');
 
 //Categories
-Route::get('/dashboard/masterCategories', 'App\Http\Controllers\AdminController@MasterCategories')->name('MasterCategories');
-Route::post('/addCategories', 'App\Http\Controllers\AdminController@AddCategories');
-Route::post('/editCategories', 'App\Http\Controllers\AdminController@EditCategories');
+Route::get('/dashboard/masterCategories', 'App\Http\Controllers\ProductController@MasterCategories')->name('MasterCategories');
+Route::post('/addCategories', 'App\Http\Controllers\ProductController@AddCategories');
+Route::post('/editCategories', 'App\Http\Controllers\ProductController@EditCategories');
+Route::post('/activedCategories', 'App\Http\Controllers\ProductController@ActivedCategories');
+
+//Promotions
+Route::get('/dashboard/masterPromotions', 'App\Http\Controllers\PromotionController@MasterPromotions')->name('MasterPromotions');
+Route::post('/addPromotions', 'App\Http\Controllers\PromotionController@AddPromotions');
+Route::post('/editPromotions', 'App\Http\Controllers\PromotionController@EditPromotions');
+Route::post('/activedPromotions', 'App\Http\Controllers\PromotionController@ActivedPromotions');
+Route::get('/discount/{id}', [PromotionController::class, 'show']);
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
 Route::get("/dashboard/dayTransaction", 'App\Http\Controllers\AdminController@dayTransaction')->name('dayTransaction');
