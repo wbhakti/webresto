@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Notifications\NewOrderNotification;
 use App\Models\User;
+use App\Http\Controllers\PromotionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +63,7 @@ Route::get('/dashboard/masterPromotions', 'App\Http\Controllers\PromotionControl
 Route::post('/addPromotions', 'App\Http\Controllers\PromotionController@AddPromotions');
 Route::post('/editPromotions', 'App\Http\Controllers\PromotionController@EditPromotions');
 Route::post('/activedPromotions', 'App\Http\Controllers\PromotionController@ActivedPromotions');
-Route::get('/discount/{id}', [PromotionController::class, 'show']);
+Route::get('/promotion/{id}', [PromotionController::class, 'show']);
 
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
 Route::get("/dashboard/dayTransaction", 'App\Http\Controllers\AdminController@dayTransaction')->name('dayTransaction');

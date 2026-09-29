@@ -61,6 +61,12 @@
                 <div class="col mb-5">
                     <div class="card h-100">
                         <img class="card-img-top" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
+                        @if($item->is_favorite)
+                            <span class="badge bg-warning text-dark position-absolute"
+                                style="top: 10px; left: 10px;">
+                                <i class="bi bi-star-fill"></i> NEW
+                            </span>
+                        @endif
                         <!-- Product details-->
                         <div class="card-body p-4">
                             <div class="text-center">

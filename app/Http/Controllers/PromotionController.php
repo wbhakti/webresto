@@ -23,7 +23,7 @@ class PromotionController extends Controller {
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
 
-            $dataPromotion = Promotions::get();
+            $dataPromotion = Promotion::get();
             $dataProducts = Product::get();
             $dataCatagories = Category::get();
 
@@ -41,8 +41,12 @@ class PromotionController extends Controller {
 
     public function show($id)
     {
-        $discount =  DB::table('promotions')->where('deleted_at', null)->get();
-        return response()->json($discount);
+        // $promotion = Promotion::findOrFail($id);
+        $promotion = Promotion::with([
+            'products',
+            'categories'
+        ])->findOrFail($id);
+        return response()->json($promotion);
     }
 
     public function AddPromotions(Request $request)

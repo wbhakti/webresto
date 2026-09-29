@@ -151,25 +151,33 @@ window.addEventListener('pageshow', function(event) {
                             </tr>
                         </thead>
                         <tbody>
-                            @php $grandTotal = 0; @endphp
-                            @php $rpdiscount = 0; @endphp
-                            @foreach ($cart as $id => $item)
-                            @php $total = $item['price'] * $item['quantity']; @endphp
-
-                            @php $priceDiscount = ""; @endphp
                             @php 
-                                if($item['item_discount'] == 0) {
+                                $grandTotal = 0; 
+                                $rpdiscount = 0;
+                            @endphp
+                            
+                            @foreach ($cart as $id => $item)
+
+                            @php 
+                                $priceDiscount = "";
+                                $total = $item['price'] * $item['quantity']; 
+                                $subDiscount = $item['product_discount'] * $item['quantity'];
+                                $mPriceDiscount = number_format(($subDiscount), 0, ',', '.');
+                                
+                                if($item['product_discount'] == 0) {
                                     $priceDiscount = "";
                                 } else {
-                                    $priceDiscount = "-Rp" ;
+                                    $priceDiscount = "-Rp $mPriceDiscount" ;
                                 }
+                                $rpdiscount += $subDiscount;
+                                
                             @endphp
 
                             <tr>
                                 <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ url('public/img/' . $item['image']) }}" alt="{{ $item['name'] }}" class="img-fluid me-3 table-image">
-                                        <span>{{ $item['name'] }}</span>
+                                        <img src="{{ url('public/img/' . $item['image']) }}" alt="{{ $item['product_name'] }}" class="img-fluid me-3 table-image">
+                                        <span>{{ $item['product_name'] }}</span>
                                     </div>
                                 </td>
                                 <td colspan="2" class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
@@ -308,7 +316,6 @@ window.addEventListener('pageshow', function(event) {
                             } else {
                                 totalElement.innerText = `Rp ${total} \n  -Rp ${discount} `;
                             }
-                            
                         }
 
                         document.getElementById('discount-total').textContent = `Rp ${data.discount}`;

@@ -323,8 +323,7 @@
                             <label> <b>Pilih Produk</b> </label>
                             <select name="product_ids[]" id="editProductIds" class="form-control"  multiple style="width: 100%;">
                                 @foreach($products as $product)
-                                    <option value="{{ $product->id }}"
-                                        {{ $promotions->products->contains('product_id', $product->id) ? 'selected' : '' }}>
+                                    <option value="{{ $product->id }}">
                                         {{ $product->name }}
                                         - Rp {{ number_format($product->price, 0, ',', '.') }}
                                     </option>

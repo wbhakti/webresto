@@ -34,13 +34,13 @@ class HomeController extends Controller
             $cart = session()->get('cart', []);
             $cartCount = count($cart);
 
-            $jamSekarang = now()->format('H:i:s');
-
             $dataProducts = DB::table('products')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->select('products.*', 'categories.name as nama_kategori')
             ->where('products.deleted_at', null)
             ->where('products.is_active', 1)
+            ->where('categories.is_active', 1)
+            ->orderByDesc('products.is_favorite')
             ->orderBy('categories.sort_order')
             ->orderBy('products.sort_order')
             ->get();
@@ -58,11 +58,9 @@ class HomeController extends Controller
             ->where('is_active', 1)
             ->where('deleted_at', null)
             ->orderBy('sort_order')->get();
-            // $datapromo = DB::table('configuration')->where('parameter', 'popup_banner')->first();
 
             return view('home-page/restoran', [
                 'categories' => $dataCategories, 
-                // 'promo' => $datapromo, 
                 'products' => $dataProducts,
                 'merchant' => $merchant,
                 'cartCount' => $cartCount

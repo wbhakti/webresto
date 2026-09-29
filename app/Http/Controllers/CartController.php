@@ -9,7 +9,9 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Services\FirebaseService;
 use App\Services\QrisService;
-
+use App\Models\Promotion;
+use App\Models\Product;
+use App\Models\Category;
 
 class CartController extends Controller
 {
@@ -33,25 +35,14 @@ class CartController extends Controller
             ]);
         }
 
-        $merchantId = $request->input('merchantId');
         $productId = $request->input('id');
         $productName = $request->input('name');
         $productPrice = $request->input('price');
         $quantity = $request->input('quantity', 1);
         $img = $request->input('productImage');
 
-        //HIT table discount
+        //get cart
         $cart = session()->get('cart', []);
-    
-        if (!empty($cart)) {
-            // Ambil merchantId di keranjang
-            $currentMerchantId = reset($cart)['merchant_id'];
-
-            //reset keranjang
-            if ($currentMerchantId !== $merchantId) {
-                $cart = [];
-            }
-        }
 
         //sudah ada di cart
         if (isset($cart[$productId])) {
@@ -59,12 +50,12 @@ class CartController extends Controller
         } else {
             //produk baru ke cart
             $cart[$productId] = [
-                'merchant_id' => $merchantId,
                 'product_id' => $productId,
-                'name' => $productName,
+                'product_name' => $productName,
                 'price' => $productPrice,
                 'quantity' => $quantity,
-                'item_discount' => '0',
+                'product_discount' => '0',
+                'promotion_id' => '',
                 'note' => '',
                 'image' => $img,
             ];
@@ -86,17 +77,62 @@ class CartController extends Controller
             return redirect('/')->with('error', 'Keranjang belanja Anda kosong.');
         }
 
-        if (!empty($cart)) {
-            // Ambil merchantId
-            $firstProduct = reset($cart);
-            $merchantId = $firstProduct['merchantId'] ?? null;
-        }
-
         // Hit API Merchant
         $merchant = DB::table('merchants')->first();
         $cartCount = count($cart);
 
-        // return view('home-page/cart', compact('cart', 'merchant'), ['cartCount' => $cartCount]);
+        //RESET PROMO
+        foreach ($cart as $key => $item) {
+            $cart[$key]['promotion_id'] = '';
+            $cart[$key]['product_discount'] = 0;
+            session()->put('cart', $cart);
+        }
+
+        // GET PROMO
+        $promotions = Promotion::where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNull('start_at')
+                    ->orWhereTime('start_at', '<=', now()->format('H:i:s'));
+            })
+            ->where(function ($query) {
+                $query->whereNull('end_at')
+                    ->orWhereTime('end_at', '>=', now()->format('H:i:s'));
+            })
+            ->with(['products', 'categories'])
+            ->get();
+
+
+
+        foreach ($promotions as $promotion) {
+            foreach ($cart as $key => $item) {
+                $product = Product::find($item['product_id']);
+
+                if (!$product) {
+                    continue;
+                }
+
+                // Cek apakah produk memenuhi promo
+                if (!$this->isApplicablePromo($promotion, $product)) {
+                    continue;
+                }
+
+                if ($promotion->type === 'percentage') {
+                    $itemDiscount = $item['price'] * ($promotion->value / 100);
+                } elseif ($promotion->discount_type === 'fixed') {
+                    // $itemDiscount =
+                    //     min($promotion->promo_value, $itemTotal);
+                } else {
+                    $itemDiscount = 0;
+                }
+
+                $cart[$key]['promotion_id'] = $promotion->id;
+                $cart[$key]['product_discount'] = $itemDiscount;
+                session()->put('cart', $cart);
+
+            }
+        }
+            
+
         return response()
         ->view('home-page.cart', compact(
             'cart',
@@ -108,6 +144,25 @@ class CartController extends Controller
         ->header('Expires', '0');
     }
 
+    private function isApplicablePromo($promotion, $product)
+    {
+        if ($promotion->scope === 'all') {
+            return true;
+        }
+
+        if ($promotion->scope === 'product') {
+            return $promotion->products
+                ->contains('product_id', $product->id);
+        }
+
+        if ($promotion->scope === 'category') {
+            return $promotion->categories
+                ->contains('category_id', $product->category_id);
+        }
+
+        return false;
+    }
+
     public function remove($id)
     {
         $cart = session()->get('cart', []);
@@ -117,7 +172,6 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        // return redirect()->back()->with('success', 'Item berhasil dihapus dari keranjang.');
         return redirect()
         ->route('cart.view')
         ->with('success', 'Item berhasil dihapus dari keranjang.');
@@ -133,11 +187,14 @@ class CartController extends Controller
             session()->put('cart', $cart);
 
             $itemTotal = $cart[$id]['price'] * $cart[$id]['quantity'];
+            $itemDiscountTotal = $cart[$id]['product_discount'] * $cart[$id]['quantity'];
 
             $grandTotal = 0;
             $resDiscount = 0;
             foreach ($cart as $item) {
                 $grandTotal += $item['price'] * $item['quantity'];
+                $resDiscount += $item['product_discount'] * $item['quantity'];
+
             }
 
             $total = $grandTotal - $resDiscount;
@@ -145,7 +202,7 @@ class CartController extends Controller
             return response()->json([
                 'success' => true,
                 'itemTotal' => number_format($itemTotal, 0, ',', '.'),
-                'productDiscountTotal' => number_format(0, 0, ',', '.'),
+                'productDiscountTotal' => number_format($itemDiscountTotal, 0, ',', '.'),
                 'grandTotal' => number_format($grandTotal, 0, ',', '.'),
                 'discount' => number_format($resDiscount, 0, ',', '.'),
                 'total' => number_format($total, 0, ',', '.')
@@ -168,21 +225,24 @@ class CartController extends Controller
 			$details = [];
 			$subtotal = 0;
             $subtotaldiscount = 0;
+            $idPromotion = '';
 
 			foreach ($cart as $id => $item) {
 				$qty   = (int) ($item['quantity'] ?? 0);
 				$price = (int) ($item['price'] ?? 0);
-                $discount = (int) ($item['item_discount'] ?? 0);
+                $discount = (int) ($item['product_discount'] ?? 0);
                 $subtotal += $qty * $price;
                 $subtotaldiscount += $qty * $discount;
 
+                $idPromotion = $item['promotion_id'];
+
 				$details[] = [
 					'product_id'    => $item['product_id'],
-                    'product_name'  => $item['name'],
+                    'product_name'  => $item['product_name'],
                     'price'         => $price,
                     'quantity'      => $qty,
-                    'discount'      => $subtotaldiscount,
-                    'subtotal'      => $subtotal,
+                    'discount'      => $qty * $discount,
+                    'subtotal'      => $qty * $price,
 					'note'          => '-',
 				];
 			}
@@ -220,8 +280,16 @@ class CartController extends Controller
                     'subtotal'      => $item['subtotal'],
 					'note'          => $item['note'],
                 ]);
-                
 			}
+
+            if ($idPromotion != ''){
+                DB::table('promotion_usages')->insert([
+                    'promotion_id'    => $idPromotion,
+                    'transaction_id'  => $transactionId,
+                    'customer_id'     => $request->input('nama'),
+                    'discount_amount' => $subtotaldiscount
+                ]);
+            }
             
 
             session()->forget('cart');
@@ -425,4 +493,6 @@ class CartController extends Controller
         }
     }
     
+
+
 }
