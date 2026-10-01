@@ -36,22 +36,21 @@ class ApiUserController extends Controller
                     'username' => $user->username,
                     'expires_at' => $expiresAt
                 ]);
-                $token = $this->encryptAES128($tokenData);
 
+                $session = $this->encryptAES128($tokenData);
                 //update ke DB
 
-                DB::table('users')->where('id', $user->id)->update([ 'token' => $token, 'fcm_token' => $fcm_token, 'device' => $device]);
+                DB::table('users')->where('id', $user->id)->update([ 'session' => $session, 'fcm_token' => $fcm_token, 'device' => $device]);
 
                 return response()->json([
                     'endpoint' => 'user_login',
                     'responseCode' => '0',
                     'responseMessage' => 'login success',
                     'data' => [
-                        'id' => $user->id,
-                        'username' => $user->username,
-                        'role' => $user->role,
-                        // 'firebase_id' => $user->id_firebase,
-                        'token' => $token,
+                        'id'        => $user->id,
+                        'username'  => $user->username,
+                        'role'      => $user->role,
+                        'token'     => $session,
                     ]
                 ], 200);
                 
@@ -134,8 +133,8 @@ class ApiUserController extends Controller
                 $today = Carbon::now('Asia/Jakarta');
 
                 $dataTransaksi = DB::table('transactions')
-                ->whereDate('addtime', $today )
-                ->orderByDesc('addtime')
+                ->whereDate('created_at', $today )
+                ->orderByDesc('created_at')
                 ->get();
 
                 if ($dataTransaksi) {
@@ -208,12 +207,12 @@ class ApiUserController extends Controller
             $tokenCheck = $this->validateUserToken($request->input('token'));
             if ($tokenCheck['status']) {
                 $updated = DB::table('transactions')
-                ->where('id_transaksi', $request->input('id_transaksi'))
+                ->where('transaction_id', $request->input('id_transaksi'))
                 ->update(['status' => $request->input('status')]);
     
                 if ($updated) {
                     $transaction = DB::table('transactions')
-                    ->where('id_transaksi', $request->input('id_transaksi'))
+                    ->where('transaction_id', $request->input('id_transaksi'))
                     ->first();
 
                     $data = [
@@ -361,7 +360,7 @@ class ApiUserController extends Controller
             //cek token di table
             $user = DB::table('users')
             ->where('username', $tokenData['username'])
-            ->where('token', $token)
+            ->where('session', $token)
             ->first();
 
             if ($user){
