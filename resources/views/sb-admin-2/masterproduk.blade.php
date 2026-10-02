@@ -63,7 +63,7 @@
                         <td>{{ $item->sku }}</td>
                         <td>{{ $item->name }}</td>
                         <td>{{ $item->price }}</td>
-                        <td>{{ $item->category_id }}</td>
+                        <td>{{ $item->category->name }}</td>
                         <div class="button-group">
                             <td>
                                 @if($item->is_active == 1) 
@@ -144,12 +144,11 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="editkategori"><b>Kategori Menu</b></label>
-                            <select class="form-control" id="category_id" name="category_id" required>
+                            <label for="editCategory_id"><b>Kategori Menu</b></label>
+                            <select class="form-control" id="editCategory_id" name="category_id" required>
                                 <option value="" disabled selected>Pilih Kategori</option>
                                 @foreach ($catagories as $cat)
-                                    <option value="{{ $cat->id }}"
-                                        {{ $cat->id == $item->category_id ? 'selected' : '' }}>
+                                    <option value="{{ $cat->id }}">
                                         {{ $cat->name }}
                                     </option>
                                 @endforeach

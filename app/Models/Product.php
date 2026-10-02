@@ -20,4 +20,9 @@ class Product extends Model
         'sort_order',
         'is_active',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
 }

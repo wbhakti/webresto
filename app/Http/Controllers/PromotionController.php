@@ -27,14 +27,14 @@ class PromotionController extends Controller {
             $dataProducts = Product::get();
             $dataCatagories = Category::get();
 
-            return view('sb-admin-2/masterPromotions', [
+            return view('sb-admin-2/masterpromotions', [
                 'promotions' => $dataPromotion,
                 'products' => $dataProducts,
                 'categories' => $dataCatagories
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Gagal memuat data menu: ' . $e->getMessage());
+            Log::error('Gagal memuat data promo: ' . $e->getMessage());
             return redirect()->route('MasterPromotions')->with('error', 'gagal load promo');
         }
     }

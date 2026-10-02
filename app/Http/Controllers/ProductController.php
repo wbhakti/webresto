@@ -21,10 +21,10 @@ class ProductController extends Controller
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
 
-            $dataProducts = Product::get();
+            $dataProducts = Product::with('category')->get();
             $dataCatagories = Category::get();
 
-            return view('sb-admin-2/mastermenu', [
+            return view('sb-admin-2/masterproduk', [
                 'products' => $dataProducts,
                 'catagories' => $dataCatagories
             ]);

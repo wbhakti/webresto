@@ -21,7 +21,6 @@
 
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
     <div class="card" style="min-width: 150px;">
-        <!-- <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Favorit</div> -->
         <img class="card-img-top" src="{{ asset('img/' . $merchant->logo) }}" alt="{{ $merchant->name }}" />
         <div class="card-body d-flex flex-column justify-content-between text-center">
             <div>
@@ -49,6 +48,22 @@
                 @endforeach
             </select>            
         </div>
+
+        <div class="mb-4 mt-3">
+            <div class="input-group">
+                <input type="text"
+                    id="searchMenu"
+                    class="form-control form-control-lg"
+                    placeholder="Cari menu..."
+                    autocomplete="off">
+
+                <button class="btn btn-outline-secondary"
+                        type="button"
+                        id="clearSearch">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
         
         <!-- List makanan -->
         <div class="text-center">
@@ -58,7 +73,8 @@
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
             @if($products->isNotEmpty())
                 @foreach ($products as $item)
-                <div class="col mb-5">
+                <div class="col mb-5 product-item"
+                    data-name="{{ strtolower($item->name) }}">
                     <div class="card h-100">
                         <img class="card-img-top" data-bs-toggle="modal" data-bs-target="#modal{{ $item->id }}" src="{{ url('public/img/' . $item->image) }}" alt="..." onerror="this.onerror=null;this.src='{{ asset('img/default-img.jpeg') }}';" style="width: 100%; height: 150px; object-fit: cover;"/>
                         @if($item->is_favorite)
@@ -72,14 +88,6 @@
                             <div class="text-center">
                                 <!-- Product name with modal trigger-->
                                 <h5 class="fw-bolder" style="font-size: 14px;" >{{ $item->name }}</h5>
-                                <!-- Product reviews-->
-                                <!-- <div class="d-flex justify-content-center small text-warning mb-2">
-                                    <div class="bi-star-fill"></div>
-                                    <div class="bi-star-fill"></div>
-                                    <div class="bi-star-fill"></div>
-                                    <div class="bi-star-fill"></div>
-                                    <div class="bi-star-fill"></div>
-                                </div> -->
                                 <!-- Product price-->
                                 Rp {{ number_format($item->price , 0, ',', '.') }}
                             </div>
@@ -127,6 +135,19 @@
                     </div>
                 </div>
                 @endforeach
+
+                <div id="noSearchResult"
+                    class="d-none text-center w-100 py-5">
+
+                    <h5 class="fw-bold text-muted">
+                        Menu tidak ditemukan
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Coba gunakan kata kunci lain.
+                    </p>
+
+                </div>
                 
             @else
 
@@ -217,6 +238,64 @@
         myModal.show();
     }
 </script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.getElementById('searchMenu');
+    const clearButton = document.getElementById('clearSearch');
+    const products = document.querySelectorAll('.product-item');
+    const noResult = document.getElementById('noSearchResult');
+
+    searchInput.addEventListener('input', function () {
+
+        const keyword = this.value
+            .toLowerCase()
+            .trim();
+
+        let found = 0;
+
+        products.forEach(function (product) {
+
+            const name = product.dataset.name || '';
+            const sku = product.dataset.sku || '';
+
+            const match =
+                name.includes(keyword) ||
+                sku.includes(keyword);
+
+            product.style.display = match ? '' : 'none';
+
+            if (match) {
+                found++;
+            }
+
+        });
+
+        if (found === 0) {
+            noResult.classList.remove('d-none');
+        } else {
+            noResult.classList.add('d-none');
+        }
+
+    });
+
+    clearButton.addEventListener('click', function () {
+
+        searchInput.value = '';
+
+        products.forEach(function (product) {
+            product.style.display = '';
+        });
+
+        noResult.classList.add('d-none');
+
+        searchInput.focus();
+    });
+
+    });
+</script>
+
 
 
 @endsection
