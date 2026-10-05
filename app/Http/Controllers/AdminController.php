@@ -92,7 +92,7 @@ class AdminController extends Controller
 
                     DB::table('merchants')
                     ->where('id', $request->input('merchant_id'))
-                    ->update([ 'nama' => $request->input('nama'), 'deskripsi' => $request->input('deskripsi'), 'image' => $filename]);
+                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'), 'image' => $filename]);
 
                     return redirect()->route('MasterMerchant')->with('success', 'berhasil edit data');
 
@@ -100,7 +100,7 @@ class AdminController extends Controller
 
                     DB::table('merchants')
                     ->where('id', $request->input('merchant_id'))
-                    ->update([ 'nama' => $request->input('nama'), 'deskripsi' => $request->input('deskripsi'),]);
+                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time')]);
 
                     return redirect()->route('MasterMerchant')->with('success', 'berhasil edit data');
                 }

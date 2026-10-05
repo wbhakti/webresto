@@ -38,7 +38,7 @@
                     <tr>
                         <th>No</th>
                         <th>Nama Merchant</th>
-                        <th>Lokasi Merchant</th>
+                        <th>Jam Buka</th>
                         <th>Image Merchant</th>
                         <th></th>
                     </tr>
@@ -50,7 +50,10 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $item->name }}</td>
-                            <td>{{ $item->address }}</td>
+                            <td>{{ \Carbon\Carbon::parse($item->open)->format('H:i') }}
+                            -
+                            {{ \Carbon\Carbon::parse($item->closed)->format('H:i') }}
+                        </td>
                             <td>
                                 <img src="{{ asset('img/' . $item->logo) }}" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
                             </td>
@@ -58,10 +61,7 @@
                                 <div class="button-group">
                                     <div class="button-group">
                                         <button type="button" class="btn btn-primary mb-2 btn-edit"
-                                            data-rowid="{{ $item->id }}"
-                                            data-name="{{ $item->name }}"
-                                            data-address="{{ $item->address }}"
-                                            data-logo="{{ $item->logo }}">Edit</button>
+                                            data-item='@json($item)'>Edit</button>
                                     </div>                                    
                                 </div>
                             </td>
@@ -97,9 +97,17 @@
                             <label for="editName"><b>Nama Merchant</b></label>
                             <input type="text" name="name" id="editName" class="form-control" required />
                         </div>
-                        <div class="form-group">
-                            <label for="editAddress"><b>Alamat</b></label>
-                            <textarea name="address" id="editAddress" class="form-control" rows="4" required></textarea>
+                        {{-- JAM --}}
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label for="editopen_time"> <b>Jam Buka</b> </label>
+                                <input type="time" name="open_time" id="editopen_time" class="form-control" required>
+                            </div>
+
+                            <div class="form-group col-sm-6">
+                                <label for="editclosed_time"> <b>Jam Tutup</b> </label>
+                                <input type="time" name="closed_time" id="editclosed_time" class="form-control" required>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="logo"><b>Logo</b></label>
@@ -160,15 +168,13 @@ $(document).ready(function() {
     $(document).ready(function() {
         // Edit button click event
         $(document).on('click', '.btn-edit', function() {
-            var rowid = $(this).data('rowid');
-            var name = $(this).data('name');
-            var address = $(this).data('address');
-            var logo = $(this).data('logo');
+            var data = $(this).data('item');
             
-            $('#editRowid').val(rowid);
-            $('#editName').val(name);
-            $('#editAddress').val(address);
-            $('#currentimage').attr('src', "{{ asset('img/') }}" + "/" + logo);
+            $('#editRowid').val(data.id);
+            $('#editName').val(data.name);
+            $('#editopen_time').val(data.open);
+            $('#editclosed_time').val(data.closed);
+            $('#currentimage').attr('src', "{{ asset('img/') }}" + "/" + data.logo);
 
             $('#editModal').modal('show');
         });
