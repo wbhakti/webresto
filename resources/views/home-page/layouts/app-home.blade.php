@@ -20,7 +20,7 @@
                 padding-top: 56px; /* Sesuaikan nilai ini dengan tinggi navbar */
             }
             .custom-navbar {
-                background-color: #000; 
+                background-color: #630918; 
                 color: white;
             }
             .custom-navbar .btn-outline-dark {
@@ -52,7 +52,7 @@
         @yield('content')
         
         <!-- Footer-->
-        <footer class="py-5 bg-dark" style="background-color: #000 !important;">
+        <footer class="py-5 bg-dark" style="background-color: #630918 !important;">
             <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopinggir Jalan by Star Group 2025</p></div>
         </footer>
         <!-- Bootstrap core JS-->
