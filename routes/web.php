@@ -36,8 +36,6 @@ Route::get('/login', 'App\Http\Controllers\AdminController@Login')->name('Login'
 Route::post('/postlogin', 'App\Http\Controllers\AdminController@postlogin');
 Route::get('/logout', 'App\Http\Controllers\AdminController@logout')->name('logout');
 Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
-// Route::get('/dashboard/masterpromo', 'App\Http\Controllers\AdminController@MasterPromo')->name('MasterPromo');
-// Route::post('/postPopupPromo', 'App\Http\Controllers\AdminController@postPopupPromo');
 
 Route::post('/CloseOrder', 'App\Http\Controllers\AdminController@CloseOrder');
 
@@ -65,6 +63,7 @@ Route::post('/editPromotions', 'App\Http\Controllers\PromotionController@EditPro
 Route::post('/activedPromotions', 'App\Http\Controllers\PromotionController@ActivedPromotions');
 Route::get('/promotion/{id}', [PromotionController::class, 'show']);
 
+//Transaction
 Route::get("/dashboard/transaction", 'App\Http\Controllers\AdminController@transaction')->name('transaction');
 Route::get("/dashboard/dayTransaction", 'App\Http\Controllers\AdminController@dayTransaction')->name('dayTransaction');
 Route::get("/dashboard/settingorder", 'App\Http\Controllers\AdminController@settingorder')->name('settingorder');

@@ -28,45 +28,6 @@
     </style>
 </head>
 
-<script>
-(async function() {
-    try {
-        const permission = await Notification.requestPermission();
-
-        if (permission !== 'granted') {
-            return;
-        }
-
-        const registration = await navigator.serviceWorker.register('/service-worker.js');
-
-        console.log('Service Worker terdaftar');
-
-        // lanjutkan subscribe push notification
-    } catch (error) {
-        console.error(error);
-    }
-})();
-</script>
-
-<script>
-if ('serviceWorker' in navigator && 'PushManager' in window) {
-    navigator.serviceWorker.register('/service-worker.js')
-        .then(function(registration) {
-            console.log('Service Worker berhasil didaftarkan');
-        })
-        .catch(function(error) {
-            console.error('Service Worker gagal:', error);
-        });
-}
-</script>
-
-<script>
-Notification.requestPermission()
-    .then(permission => {
-        console.log(permission);
-    });
-</script>
-
 <body id="page-top">
 
     <!-- Page Wrapper -->
@@ -96,8 +57,6 @@ Notification.requestPermission()
             <div class="sidebar-heading">
                 Menu
             </div>
-
-            
 
             <!-- Nav Item - Pages Collapse Menu -->
             
@@ -134,7 +93,6 @@ Notification.requestPermission()
                     <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
                             <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
-                            <a class="collapse-item" href="{{ url('dashboard/settingorder') }}">Setting Order</a>
                         </div>
                     </div>
                 </li>
