@@ -58,7 +58,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>ID Transaksi</th>
+                        <th>Nomer Invoice</th>
                         <th>Tanggal Transaksi</th>
                         <th>Pembeli</th>
                         <th></th>
@@ -69,21 +69,22 @@
                         @foreach ($data as $item)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->id_transaksi }}</td>
-                                <td>{{ $item->addtime }}</td>
+                                <td>{{ $item->invoice_number }}</td>
+                                <td>{{ $item->created_at }}</td>
                                 <td>{{ $item->customer }}</td>
                                 <td>
                                     <div class="button-group">
                                         <button type="button" class="btn btn-info mb-2 btn-detail"
-                                                data-id="{{ $item->id_transaksi }}"
+                                                data-id="{{ $item->transaction_id }}"
+                                                data-invoice="{{ $item->invoice_number }}"
                                                 data-nama="{{ $item->customer }}"
-                                                data-total="{{ $item->total_bayar }}"
-                                                data-metode="{{ $item->metode_bayar }}"
-                                                data-meja="{{ $item->meja }}"
-                                                data-bukti="{{ $item->bukti_bayar }}"
-                                                data-tgl="{{ $item->addtime }}"
-                                                data-status="{{ $item->status }}"
-                                                data-menu='@json($item->details)'>Detail</button>                                
+                                                data-total="{{ $item->grand_total }}"
+                                                data-metode="{{ $item->payment_method }}"
+                                                data-meja="{{ $item->table_id }}"
+                                                data-bukti="{{ $item->payment_proof }}"
+                                                data-tgl="{{ $item->created_at }}"
+                                                data-status="{{ $item->order_status }}"
+                                                data-details="{{ $item->details }}" >Detail</button>                                
                                     </div>
                                 </td>                                
                             </tr>
@@ -112,7 +113,8 @@
                 </div>
                 <div class="modal-body">
                     <p><b>Tgl Transaksi:</b> <span id="detailTgl"></span></p>
-                    <p><b>ID Transaksi:</b> <span id="detailId"></span></p>
+                    <p><b>Id Transaksi:</b> <span id="detailId"></span></p>
+                    <p><b>Nomer Invoice:</b> <span id="detailInvoice"></span></p>
                     <p><b>Nama Pembeli:</b> <span id="detailNama"></span></p>
                     <p><b>Nomor Meja:</b> <span id="detailMeja"></span></p>
                     <p><b>Total Bayar:</b> <span id="detailTotal"></span></p>
@@ -178,13 +180,14 @@
 <script>
     $(document).on('click', '.btn-detail', function() {
     var id = $(this).data('id');
+    var invoice = $(this).data('invoice');
     var nama = $(this).data('nama');
     var total = $(this).data('total');
     var metode = $(this).data('metode');
     var meja = $(this).data('meja');
     var bukti = $(this).data('bukti');
     var tgl = $(this).data('tgl');
-    var menuData = $(this).data('menu'); // Ambil data menu
+    var details = $(this).data('details');
     var status = $(this).data('status');
 
     $('#detailId').text(id);
@@ -194,6 +197,8 @@
     $('#detailMeja').text(meja);
     $('#detailTgl').text(tgl);
     $('#detailStatus').text(status);
+    $('#detailInvoice').text(invoice);
+    
 
     if (bukti) {
         $('#detailBuktiLink').attr('href', "{{ url('webkopinggir/public/invoice') }}" + "/" + bukti);
@@ -204,16 +209,14 @@
     }
 
     try {
-        var menuArray = JSON.parse(JSON.parse(menuData));
         var menuList = "";
-
-        menuArray.forEach(function(menu) {
+        details.forEach(function(item) {
             menuList += `
                 <tr>
-                    <td>${menu.menu_id}</td>
+                    <td>${item.product_name}</td>
                     <td>-</td>
-                    <td>${menu.quantity}</td>
-                    <td>Rp ${menu.price.toLocaleString()}</td>
+                    <td>${item.quantity}</td>
+                    <td>Rp ${item.price.toLocaleString()}</td>
                 </tr>`;
         });
 

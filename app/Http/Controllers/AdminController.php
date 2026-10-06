@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Transaction;
 
 class AdminController extends Controller
 {
@@ -129,11 +130,12 @@ class AdminController extends Controller
             if (!session()->has('user_id')) {
                 return redirect()->route('Login')->with('error', 'You must be logged in to access the menu.');
             }
-    
-            $dataTransaksi = DB::table('transactions')
-                ->where('addtime', '>=', $request->date_start . ' 00:00:00')
-                ->where('addtime', '<=', $request->date_end . ' 23:59:59')
-                ->get();
+
+            $dataTransaksi = Transaction::with('details')
+            ->where('created_at', '>=', $request->date_start . ' 00:00:00')
+            ->where('created_at', '<=', $request->date_end . ' 23:59:59')
+            ->orderBy('created_at', 'desc')
+            ->get();
             
                 return view('sb-admin-2/mastertransaksi', [
                     'data' => $dataTransaksi,

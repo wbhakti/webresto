@@ -263,7 +263,7 @@ class CartController extends Controller
                 'tax' => '0',
                 'service_charge' => '0',
                 'grand_total' => $subtotal - $subtotaldiscount,
-                'payment_status' => 'BELUM BAYAR',
+                'payment_status' => 'UNPAID',
                 'payment_method' => $request->input('metode_pembayaran'),
                 'order_status' => 'PENDING',
                 'notes' => '',
@@ -437,7 +437,7 @@ class CartController extends Controller
 
                 DB::table('transactions')
                 ->where('transaction_id', $request->input('idtransaksi'))
-                ->update([ 'payment_proof' => $filename, 'payment_status' => 'SUDAH DI BAYAR','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
+                ->update([ 'payment_proof' => $filename, 'payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
     
                 $mimage = 'webkopinggir/public/invoice/'. $filename;
 

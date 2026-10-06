@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 use App\Services\FirebaseService;
+use App\Models\Transaction;
 
 class ApiUserController extends Controller
 {
@@ -132,9 +133,9 @@ class ApiUserController extends Controller
 
                 $today = Carbon::now('Asia/Jakarta');
 
-                $dataTransaksi = DB::table('transactions')
+                $dataTransaksi = Transaction::with('details')
                 ->whereDate('created_at', $today )
-                ->orderByDesc('created_at')
+                ->orderBy('created_at', 'desc')
                 ->get();
 
                 if ($dataTransaksi) {
@@ -144,27 +145,27 @@ class ApiUserController extends Controller
                         'responseMessage' => 'history success',
                         'data' => $dataTransaksi->map(function ($item) {
                             return [
-                                'rowId' => $item->rowid,
-                                'idTransaksi' => $item->id_transaksi,
-                                'nomorHp' => $item->nomor_hp,
+                                'transactionId' => $item->transaction_id,
+                                'invoiceNumber' => $item->invoice_number,
+                                'nomorHp' => $item->customer_hp,
                                 'customer' => $item->customer,
-                                'meja' => $item->meja,
+                                'table' => $item->table_id,
                                 'details' => collect(json_decode($item->details, true))->map(function ($detail) {
                                     return [
-                                        'menuId' => $detail['menu_id'],
+                                        'menuId' => $detail['product_name'],
                                         'note' => $detail['note'],
                                         'quantity' => $detail['quantity'],
                                         'price' => $detail['price'],
-                                        'productDiscount' => $detail['product_discount'],
+                                        'productDiscount' => $detail['discount'],
                                     ];
                                 })->values(),
-                                'totalBayar' => $item->total_bayar,
+                                'grandTotal' => $item->grand_total,
                                 'discount' => $item->discount,
-                                'metodeBayar' => $item->metode_bayar,
-                                'buktiBayar' => $item->bukti_bayar? url('webkopinggir/public/invoice/' . $item->bukti_bayar): null,
-                                'status' => $item->status,
-                                'addTime' => $item->addtime,
-                                'qrisDynamic' => $item->qris_dynamic,
+                                'paymentMethod' => $item->payment_method,
+                                'paymentProof' => $item->payment_proof? url('webkopinggir/public/invoice/' . $item->payment_proof): null,
+                                'orderStatus' => $item->order_status,
+                                'addTime' => $item->created_at,
+                                'qrCode' => $item->qr_code,
                             ];
                         })
                     ], 200);
@@ -206,53 +207,64 @@ class ApiUserController extends Controller
         try {
             $tokenCheck = $this->validateUserToken($request->input('token'));
             if ($tokenCheck['status']) {
-                $updated = DB::table('transactions')
-                ->where('transaction_id', $request->input('id_transaksi'))
-                ->update(['status' => $request->input('status')]);
-    
-                if ($updated) {
-                    $transaction = DB::table('transactions')
-                    ->where('transaction_id', $request->input('id_transaksi'))
+
+                $transactionId = $request->input('id_transaksi');
+                $status = $request->input('status');
+
+                $transaction = Transaction::with('details')
+                    ->where('transaction_id', $transactionId)
                     ->first();
 
-                    $data = [
-                        'rowId' => $transaction->rowid,
-                        'idTransaksi' => $transaction->id_transaksi,
-                        'nomorHp' => $transaction->nomor_hp,
-                        'customer' => $transaction->customer,
-                        'meja' => $transaction->meja,
-                        'details' => collect(json_decode($transaction->details, true))->map(function ($item) {
-                            return [
-                                'menuId' => $item['menu_id'],
-                                'note' => $item['note'],
-                                'quantity' => $item['quantity'],
-                                'price' => $item['price'],
-                                'productDiscount' => $item['product_discount'],
-                            ];
-                        }),
-                        'totalBayar' => $transaction->total_bayar,
-                        'discount' => $transaction->discount,
-                        'metodeBayar' => $transaction->metode_bayar,
-                        'buktiBayar' => $transaction->bukti_bayar? url('webkopinggir/public/invoice/' . $transaction->bukti_bayar): null,
-                        'status' => $transaction->status,
-                        'addTime' => $transaction->addtime,
-                        'qrisDynamic' => $transaction->qris_dynamic,
-                    ];
-
-                    return response()->json([
-                        'endpoint' => 'update_status_transaction',
-                        'responseCode' => '0',
-                        'responseMessage' => 'Status berhasil diperbarui',
-                        'data' => $data
-                    ], 200);
-                } else {
+                if (!$transaction) {
                     return response()->json([
                         'endpoint' => 'update_status_transaction',
                         'responseCode' => '1',
-                        'responseMessage' => 'Update Status failed',
-                        'data' => null
-                    ], 200);
+                        'responseMessage' => 'Transaksi tidak ditemukan',
+                        'data' => $transactionId
+                    ], 404);
                 }
+
+                // Update status
+                $transaction->order_status = $status;
+                $transaction->save();
+
+                // Refresh data setelah update
+                $transaction->load('details');
+                // $ite = Transaction::with('details')
+                // ->where('transaction_id', $transactionId)
+                // ->first();
+
+    
+                $data = [
+                    'transactionId' => $transactionId,
+                    'invoiceNumber' => $transaction->invoice_number,
+                    'nomorHp' => $transaction->customer_hp,
+                    'customer' => $transaction->customer,
+                    'table' => $transaction->table_id,
+                    'details' => collect(json_decode($transaction->details, true))->map(function ($detail) {
+                        return [
+                            'menuId' => $detail['product_name'],
+                            'note' => $detail['note'],
+                            'quantity' => $detail['quantity'],
+                            'price' => $detail['price'],
+                            'productDiscount' => $detail['discount'],
+                        ];
+                    })->values(),
+                    'grandTotal' => $transaction->grand_total,
+                    'discount' => $transaction->discount,
+                    'paymentMethod' => $transaction->payment_method,
+                    'paymentProof' => $transaction->payment_proof? url('webkopinggir/public/invoice/' . $transaction->payment_proof): null,
+                    'orderStatus' => $transaction->order_status,
+                    'addTime' => $transaction->created_at,
+                    'qrCode' => $transaction->qr_code,
+                ];
+
+                return response()->json([
+                    'endpoint' => 'update_status_transaction',
+                    'responseCode' => '0',
+                    'responseMessage' => 'Status berhasil diperbarui',
+                    'data' => $data
+                ], 200);
 
             } else {
                 return response()->json([

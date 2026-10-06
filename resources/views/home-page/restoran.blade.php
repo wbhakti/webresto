@@ -5,7 +5,7 @@
 
 <style>
     .categories-select {
-        border: 2px solid #033800;
+        border: 1px solid #033800;
         border-radius: 5px;
         padding: 10px;
         font-size: 1.2rem;
@@ -17,6 +17,16 @@
         border-color: #033800;
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     }
+
+    #searchMenu {
+        border-color: #033800;
+    }
+
+    #searchMenu:focus {
+        border-color: #033800;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
 </style>
 
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
