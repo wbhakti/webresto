@@ -87,12 +87,12 @@ class AdminController extends Controller
 
                 if ($request->hasFile('img_merchant')){
                     $file = $request->file('img_merchant');
-                    $filename = $file->getClientOriginalName().'.jpg';
+                    $filename = $file->getClientOriginalName();
                     $file->move(public_path('img'), $filename);
 
                     DB::table('merchants')
                     ->where('id', $request->input('merchant_id'))
-                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'), 'image' => $filename]);
+                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'), 'logo' => $filename]);
 
                     return redirect()->route('MasterMerchant')->with('success', 'berhasil edit data');
 

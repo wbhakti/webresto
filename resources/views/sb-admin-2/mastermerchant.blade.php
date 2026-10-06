@@ -111,7 +111,7 @@
                         </div>
                         <div class="form-group">
                             <label for="logo"><b>Logo</b></label>
-                            <input type="file" name="logo" class="form-control" accept="image/*" />
+                            <input type="file" name="img_merchant" class="form-control" accept="image/*" />
                         </div>
                         <div class="form-group">
                             <label><b>Current Logo</b></label>
