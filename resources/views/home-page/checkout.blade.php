@@ -200,14 +200,51 @@
 
 
 <script>
-function downloadQR() {
+async function downloadQR() {
     const img = document.querySelector("#qrcode img");
-    if (!img) return alert("QR belum dibuat.");
 
-    const link = document.createElement("a");
-    link.download = "qris-dinamis.png";
-    link.href = img.src;
-    link.click();
+    if (!img) {
+        alert("QR belum dibuat.");
+        return;
+    }
+
+    try {
+        // Ambil gambar QR
+        const response = await fetch(img.src);
+        const blob = await response.blob();
+
+        const file = new File(
+            [blob],
+            "qris-dinamis.png",
+            { type: blob.type || "image/png" }
+        );
+
+        // iOS / Android modern
+        if (
+            navigator.share &&
+            navigator.canShare &&
+            navigator.canShare({ files: [file] })
+        ) {
+            await navigator.share({
+                files: [file],
+                title: "QRIS Dinamis"
+            });
+
+            return;
+        }
+
+        // Fallback
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+
+    } catch (error) {
+        console.error(error);
+
+        // Jangan tampilkan error kalau user menutup share sheet
+        if (error.name !== "AbortError") {
+            alert("QR gagal disimpan.");
+        }
+    }
 }
 </script>
 
@@ -281,7 +318,8 @@ async function downloadQRNew() {
                 // Detail Pesanan
                 let pesanDetail = "";
                 @foreach ($details as $item)
-                pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
+                    pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
+                    pesanDetail += "Catatan : {{ $item->note }} %0A";
                 @endforeach
 
                 // Format Pesan WhatsApp
@@ -351,6 +389,7 @@ async function downloadQRNew() {
                     let pesanDetail = "";
                     @foreach ($details as $item)
                         pesanDetail += "{{ $item->product_name}} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
+                        pesanDetail += "Catatan : {{ $item->note }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
@@ -397,6 +436,7 @@ async function downloadQRNew() {
                     let pesanDetail = "";
                     @foreach ($details as $item)
                         pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
+                        pesanDetail += "Catatan : {{ $item->note }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
@@ -445,6 +485,7 @@ async function downloadQRNew() {
                     let pesanDetail = "";
                     @foreach ($details as $item)
                         pesanDetail += "{{ $item->product_name }} [{{ $item->quantity }}] Rp {{ ($item->price * $item->quantity) - ($item->discount * $item->quantity) }} %0A";
+                        pesanDetail += "Catatan : {{ $item->note }} %0A";
                     @endforeach
 
                     // Format Pesan WhatsApp
