@@ -77,12 +77,14 @@ class PromotionController extends Controller {
                 'end_at'        => $request->end_time,
                 'is_active'     => true,
                 'scope'         => $request->scope,
+                'created_at'    => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             if ($request->scope === 'category') {
                 foreach ($request->category_ids ?? [] as $categoryId) {
                     $promotion->categories()->create([
-                        'category_id' => $categoryId
+                        'category_id' => $categoryId,
+                        'created_at'  => Carbon::now()->format('Y-m-d H:i:s')
                     ]);
                 }
             }
@@ -90,7 +92,8 @@ class PromotionController extends Controller {
             if ($request->scope === 'product') {
                 foreach ($request->product_ids ?? [] as $productId) {
                     $promotion->products()->create([
-                        'product_id' => $productId
+                        'product_id' => $productId,
+                        'created_at' => Carbon::now()->format('Y-m-d H:i:s')
                     ]);
                 }
             }
@@ -138,6 +141,7 @@ class PromotionController extends Controller {
                         'scope'         => $request->scope,
                         'start_at'      => $request->start_time,
                         'end_at'        => $request->end_time,
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
                     ]);
             
                     // Hapus relasi lama
@@ -153,6 +157,7 @@ class PromotionController extends Controller {
                             PromotionProduct::create([
                                 'promotion_id' => $promotion->id,
                                 'product_id'   => $productId,
+                                'updated_at'    => Carbon::now()->format('Y-m-d H:i:s')
                             ]);
                         }
                     }
@@ -164,6 +169,7 @@ class PromotionController extends Controller {
                             PromotionCategory::create([
                                 'promotion_id' => $promotion->id,
                                 'category_id'  => $categoryId,
+                                'updated_at'    => Carbon::now()->format('Y-m-d H:i:s')
                             ]);
                         }
                     }
