@@ -21,11 +21,9 @@ class Transaction extends Model
 
 
 // order_status 
-// PENDING
-// NEW
-// CONFIRMED
+// UNPAID
+// PAID
 // PROCESSING
-// READY
 // COMPLETED
 // CANCELLED
 

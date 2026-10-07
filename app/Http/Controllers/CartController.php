@@ -265,7 +265,7 @@ class CartController extends Controller
                 'grand_total' => $subtotal - $subtotaldiscount,
                 'payment_status' => 'UNPAID',
                 'payment_method' => $request->input('metode_pembayaran'),
-                'order_status' => 'PENDING',
+                'order_status' => 'UNPAID',
                 'notes' => '',
             ]);
 
@@ -437,7 +437,7 @@ class CartController extends Controller
 
                 DB::table('transactions')
                 ->where('transaction_id', $request->input('idtransaksi'))
-                ->update([ 'payment_proof' => $filename,'order_status' => 'NEW', 'payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
+                ->update([ 'payment_proof' => $filename, 'order_status' => 'PAID','payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
     
                 $mimage = 'fivestar/public/invoice/'. $filename;
 
