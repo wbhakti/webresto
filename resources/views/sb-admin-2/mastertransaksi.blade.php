@@ -201,8 +201,8 @@
     
 
     if (bukti) {
-        $('#detailBuktiLink').attr('href', "{{ url('webkopinggir/public/invoice') }}" + "/" + bukti);
-        $('#detailBuktiImg').attr('src', "{{ url('webkopinggir/public/invoice') }}" + "/" + bukti).show();
+        $('#detailBuktiLink').attr('href', "{{ url('fivestar/public/invoice') }}" + "/" + bukti);
+        $('#detailBuktiImg').attr('src', "{{ url('fivestar/public/invoice') }}" + "/" + bukti).show();
     } else {
         $('#detailBuktiLink').attr('href', '#');
         $('#detailBuktiImg').hide();

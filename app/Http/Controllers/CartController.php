@@ -420,7 +420,7 @@ class CartController extends Controller
                 $font = public_path('arial.ttf');
                 $fontSize = 12;
                 $textColor = imagecolorallocate($tmp, 0, 0, 0);
-                $timestamp = 'kopinggir : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
+                $timestamp = 'fivestar : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
                 $xTimestamp = 20;
                 $yTimestamp = 50;
 
@@ -437,9 +437,9 @@ class CartController extends Controller
 
                 DB::table('transactions')
                 ->where('transaction_id', $request->input('idtransaksi'))
-                ->update([ 'payment_proof' => $filename, 'payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
+                ->update([ 'payment_proof' => $filename,'order_status' => 'NEW', 'payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
     
-                $mimage = 'webkopinggir/public/invoice/'. $filename;
+                $mimage = 'fivestar/public/invoice/'. $filename;
 
                 // ============= NOTIFIKASI ==============
                 $admin = User::where('role', 'kasir')->first();

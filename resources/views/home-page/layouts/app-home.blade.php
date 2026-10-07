@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Menu Kopinggir Jalan</title>
+        <title>Menu FiveStar</title>
         <!-- Favicon-->
-        <link rel="icon" type="image/x-icon" href="{{ asset('assets/favicon.ico') }}" />
+        <link rel="icon" type="image/png" href="{{ asset('appicon.png') }}">
         <!-- Bootstrap icons-->
         <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
@@ -53,7 +53,7 @@
         
         <!-- Footer-->
         <footer class="py-5 bg-dark" style="background-color: #630918 !important;">
-            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; Kopinggir Jalan by Star Group 2025</p></div>
+            <div class="container"><p class="m-0 text-center" style="color: #fff">Copyright &copy; FiveStar 2026</p></div>
         </footer>
         <!-- Bootstrap core JS-->
         <script src="{{ asset('frontend-vendor/bootstrap-5.2.3-dist/js/bootstrap.bundle.min.js') }}"></script>
