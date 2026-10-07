@@ -212,6 +212,31 @@ class CartController extends Controller
         return response()->json(['success' => false]);
     }
 
+    public function updateNote(Request $request, $id)
+    {
+        $request->validate([
+            'note' => 'nullable|string|max:255',
+        ]);
+
+        $cart = session()->get('cart', []);
+
+        if (!isset($cart[$id])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan di cart.'
+            ], 404);
+        }
+
+        $cart[$id]['note'] = $request->note;
+
+        session()->put('cart', $cart);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Catatan berhasil disimpan.'
+        ]);
+    }
+
     public function checkout(Request $request)
     {   
         try{
@@ -243,7 +268,7 @@ class CartController extends Controller
                     'quantity'      => $qty,
                     'discount'      => $qty * $discount,
                     'subtotal'      => $qty * $price,
-					'note'          => '-',
+					'note'          => $item['note'],
 				];
 			}
 

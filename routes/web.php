@@ -27,6 +27,7 @@ Route::post('/cart/add', 'App\Http\Controllers\CartController@addToCart')->name(
 Route::get('/cart', 'App\Http\Controllers\CartController@viewCart')->name('cart.view');
 Route::delete('/cart/{id}', 'App\Http\Controllers\CartController@remove')->name('cart.remove');
 Route::post('/update-cart/{id}', 'App\Http\Controllers\CartController@update')->name('cart.update');
+Route::post('/update-cart-note/{id}', 'App\Http\Controllers\CartController@updateNote')->name('cart.update-note');
 Route::post('/checkout', 'App\Http\Controllers\CartController@checkout')->name('checkout');
 Route::get('/success/{id}', 'App\Http\Controllers\CartController@success')->name('success');
 Route::post('/upload-pembayaran', 'App\Http\Controllers\CartController@upload')->name('upload');
