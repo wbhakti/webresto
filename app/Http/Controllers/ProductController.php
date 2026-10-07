@@ -45,7 +45,7 @@ class ProductController extends Controller
 
             $file = $request->file('img_menu');
             $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
-            $file->move(base_path('../public/img'), $filename);
+            $file->move(public_path('img'), $filename);
 
             $maxOrder = DB::table('products')->max('sort_order');
             $mSortOrder= ($maxOrder ?? 0) + 10;
@@ -60,6 +60,7 @@ class ProductController extends Controller
                 'image' => $filename,
                 'sort_order' => $mSortOrder,
                 'is_active' => true,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             return redirect()->route('MasterProducts')->with('success', 'berhasil tambah data');
@@ -83,7 +84,8 @@ class ProductController extends Controller
                 if ($request->hasFile('img_menu')){
                     $file = $request->file('img_menu');
                     $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
-                    $file->move(base_path('../public/img'), $filename);
+                    $file->move(public_path('img'), $filename);
+                    
 
                     $product = Product::findOrFail($request->row_id);
                     // Update data product
@@ -94,6 +96,7 @@ class ProductController extends Controller
                         'price'         => $request->price,
                         'cost_price'    => $request->cost_price,
                         'image'         => $filename,
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
                     ]);
 
                 }else{
@@ -106,6 +109,7 @@ class ProductController extends Controller
                         'description'   => $request->description,
                         'price'         => $request->price,
                         'cost_price'    => $request->cost_price,
+                        'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
                     ]);
                 }
 
@@ -184,6 +188,7 @@ class ProductController extends Controller
                 'description' => $request->input('description'),
                 'sort_order' => $mSortOrder,
                 'is_active' => true,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             return redirect()->route('MasterCategories')->with('success', 'berhasil tambah data');
@@ -210,6 +215,7 @@ class ProductController extends Controller
                     'name'          => $request->name,
                     'description'   => $request->description,
                     'is_active'     => $request->status,
+                    'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
                 ]);
 
                 return redirect()->route('MasterCategories')->with('success', 'berhasil edit data');

@@ -276,22 +276,23 @@ class CartController extends Controller
 
             // Simpan data ke database
             $transactionId = DB::table('transactions')->insertGetId([
-                'invoice_number' => $invoiceNumber,
-                'source' => 'WEB ORDER',
-                'customer' => $request->input('nama'),
-                'customer_hp' => '',
-                'table_id' => $mmeja,
-                'cashier_id' => '',
-                'qr_code' => $qrisDynamic,
-                'subtotal' => $subtotal,
-                'discount' => $subtotaldiscount,
-                'tax' => '0',
-                'service_charge' => '0',
-                'grand_total' => $subtotal - $subtotaldiscount,
-                'payment_status' => 'UNPAID',
-                'payment_method' => $request->input('metode_pembayaran'),
-                'order_status' => 'UNPAID',
-                'notes' => '',
+                'invoice_number'    => $invoiceNumber,
+                'source'            => 'WEB ORDER',
+                'customer'          => $request->input('nama'),
+                'customer_hp'       => '',
+                'table_id'          => $mmeja,
+                'cashier_id'        => '',
+                'qr_code'           => $qrisDynamic,
+                'subtotal'          => $subtotal,
+                'discount'          => $subtotaldiscount,
+                'tax'               => '0',
+                'service_charge'    => '0',
+                'grand_total'       => $subtotal - $subtotaldiscount,
+                'payment_status'    => 'UNPAID',
+                'payment_method'    => $request->input('metode_pembayaran'),
+                'order_status'      => 'UNPAID',
+                'notes'             => '',
+                'created_at'        => Carbon::now()->format('Y-m-d H:i:s')
             ]);
 
             foreach ($details as $item) {
@@ -304,6 +305,7 @@ class CartController extends Controller
                     'discount'      => $item['discount'],
                     'subtotal'      => $item['subtotal'],
 					'note'          => $item['note'],
+                    'created_at'    => Carbon::now()->format('Y-m-d H:i:s')
                 ]);
 			}
 
@@ -312,7 +314,8 @@ class CartController extends Controller
                     'promotion_id'    => $idPromotion,
                     'transaction_id'  => $transactionId,
                     'customer_id'     => $request->input('nama'),
-                    'discount_amount' => $subtotaldiscount
+                    'discount_amount' => $subtotaldiscount,
+                    'used_at'         => Carbon::now()->format('Y-m-d H:i:s')
                 ]);
             }
             
