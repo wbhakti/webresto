@@ -44,7 +44,7 @@ class ProductController extends Controller
             }
 
             $file = $request->file('img_menu');
-            $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
+            $filename = $request->input('category_id').'_'.date('YmdHis').'.jpg';
             $file->move(public_path('img'), $filename);
 
             $maxOrder = DB::table('products')->max('sort_order');
@@ -83,7 +83,7 @@ class ProductController extends Controller
 
                 if ($request->hasFile('img_menu')){
                     $file = $request->file('img_menu');
-                    $filename = $request->input('kategori').'_'.date('YmdHis').'.jpg';
+                    $filename = $request->input('category_id').'_'.date('YmdHis').'.jpg';
                     $file->move(public_path('img'), $filename);
                     
 
