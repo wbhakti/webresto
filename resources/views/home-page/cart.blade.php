@@ -191,7 +191,7 @@ window.addEventListener('pageshow', function(event) {
                                 <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
                                         <img
-                                            src="{{ url('public/img/' . $item['image']) }}"
+                                            src="{{ asset('img/' . $item['image']) }}"
                                             alt="{{ $item['product_name'] }}"
                                             class="img-fluid me-3 table-image"
                                         >
