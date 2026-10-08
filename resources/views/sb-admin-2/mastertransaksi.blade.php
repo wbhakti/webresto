@@ -214,7 +214,7 @@
             menuList += `
                 <tr>
                     <td>${item.product_name}</td>
-                    <td>-</td>
+                    <td>${item.note}</td>
                     <td>${item.quantity}</td>
                     <td>Rp ${item.price.toLocaleString()}</td>
                 </tr>`;

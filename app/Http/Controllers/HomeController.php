@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -54,6 +55,22 @@ class HomeController extends Controller
             }
 
             $merchant = DB::table('merchants')->first();
+            $now = Carbon::now();
+
+            $openTime = Carbon::createFromFormat('H:i', $merchant->open);
+            $closedTime = Carbon::createFromFormat('H:i', $merchant->closed);
+
+            if (!$merchant->is_active) {
+                $merchantStatus = 'inactive';
+            } elseif ($now->lt($openTime)) {
+                $merchantStatus = 'before_open';
+            } elseif ($now->gt($closedTime)) {
+                $merchantStatus = 'after_close';
+            } else {
+                $merchantStatus = 'open';
+            }
+
+
             $dataCategories = DB::table('categories')
             ->where('is_active', 1)
             ->where('deleted_at', null)
@@ -63,7 +80,8 @@ class HomeController extends Controller
                 'categories' => $dataCategories, 
                 'products' => $dataProducts,
                 'merchant' => $merchant,
-                'cartCount' => $cartCount
+                'cartCount' => $cartCount,
+                'merchantStatus' => $merchantStatus
             ]);
 
         }catch (\Exception $e) {
