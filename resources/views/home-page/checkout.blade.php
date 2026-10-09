@@ -102,7 +102,9 @@
 
                     </script>
                     <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-success mt-2" onclick="downloadQR()">Download QR Code</button>
+                        <button type="submit" class="btn btn-success mt-2" onclick="downloadQR('{{ $invoiceNumber }}')">
+                            Download / Simpan QRIS
+                        </button>
                     </div>
                     <div class="text-left">
                         <p class="fw-bold"><br>Panduan Bayar QRIS</p>
@@ -198,9 +200,10 @@
     </div>
 </div>
 
-
 <script>
-async function downloadQR() {
+
+
+async function downloadQR(invoiceNumber) {
     const img = document.querySelector("#qrcode img");
 
     if (!img) {
@@ -209,90 +212,104 @@ async function downloadQR() {
     }
 
     try {
-        // Ambil gambar QR
         const response = await fetch(img.src);
+
+        if (!response.ok) {
+            throw new Error("Gagal mengambil gambar QR.");
+        }
+
         const blob = await response.blob();
+        const pngBlob = await convertToPNG(blob);
+
+        // Sanitasi nama file
+        const safeInvoiceNumber = String(invoiceNumber)
+            .replace(/[^a-zA-Z0-9_-]/g, "_");
+
+        const fileName = `QRIS-${safeInvoiceNumber}.png`;
 
         const file = new File(
-            [blob],
-            "qris-dinamis.png",
-            { type: blob.type || "image/png" }
+            [pngBlob],
+            fileName,
+            { type: "image/png" }
         );
 
-        // iOS / Android modern
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(
+            navigator.userAgent
+        );
+
         if (
+            isMobile &&
             navigator.share &&
             navigator.canShare &&
             navigator.canShare({ files: [file] })
         ) {
             await navigator.share({
                 files: [file],
-                title: "QRIS Dinamis"
+                title: fileName
             });
 
             return;
         }
 
-        // Fallback
-        const url = URL.createObjectURL(blob);
-        window.open(url, "_blank");
-
-    } catch (error) {
-        console.error(error);
-
-        // Jangan tampilkan error kalau user menutup share sheet
-        if (error.name !== "AbortError") {
-            alert("QR gagal disimpan.");
-        }
-    }
-}
-</script>
-
-<script>
-async function downloadQRNew() {
-    const img = document.querySelector("#qrcode img");
-
-    if (!img) {
-        alert("QR belum dibuat.");
-        return;
-    }
-
-    try {
-        const response = await fetch(img.src);
-        const blob = await response.blob();
-
-        const file = new File(
-            [blob],
-            "qris-dinamis.png",
-            { type: blob.type || "image/png" }
-        );
-
-        // iPhone / iPad
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-                files: [file],
-                title: "QRIS Dinamis"
-            });
-
-            return;
-        }
-
-        // Browser yang tidak mendukung share file
-        const url = URL.createObjectURL(blob);
-
+        // Download untuk komputer dan browser lainnya
+        const url = URL.createObjectURL(pngBlob);
         const link = document.createElement("a");
+
         link.href = url;
-        link.download = "qris-dinamis.png";
+        link.download = fileName;
 
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        link.remove();
 
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
 
     } catch (error) {
+        if (error.name === "AbortError") return;
+
         console.error(error);
+        alert("Gagal mengunduh QRIS.");
     }
+}
+
+function convertToPNG(blob) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        const url = URL.createObjectURL(blob);
+
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = image.naturalWidth;
+            canvas.height = image.naturalHeight;
+
+            const context = canvas.getContext("2d");
+
+            if (!context) {
+                URL.revokeObjectURL(url);
+                reject(new Error("Canvas tidak tersedia."));
+                return;
+            }
+
+            context.drawImage(image, 0, 0);
+
+            canvas.toBlob((png) => {
+                URL.revokeObjectURL(url);
+
+                if (png) {
+                    resolve(png);
+                } else {
+                    reject(new Error("Konversi PNG gagal."));
+                }
+            }, "image/png");
+        };
+
+        image.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error("Gambar QR tidak dapat dibaca."));
+        };
+
+        image.src = url;
+    });
 }
 </script>
 
