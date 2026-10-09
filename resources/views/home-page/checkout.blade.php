@@ -201,115 +201,187 @@
 </div>
 
 <script>
+// ========================================
+// 1. MEMBUAT FRAME QR CODE
+// ========================================
+function createQRFrame(invoiceNumber) {
+    const qrCanvas = document.querySelector("#qrcode canvas");
 
-
-async function downloadQR(invoiceNumber) {
-    const img = document.querySelector("#qrcode img");
-
-    if (!img) {
-        alert("QR belum dibuat.");
-        return;
+    if (!qrCanvas || !qrCanvas.width || !qrCanvas.height) {
+        throw new Error("QR Code belum tersedia.");
     }
 
+    const padding = 40;
+    const qrSize = 320;
+    const headerHeight = 85;
+    const footerHeight = 75;
+
+    const frameWidth = qrSize + padding * 2;
+    const frameHeight = headerHeight + qrSize + footerHeight;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = frameWidth;
+    canvas.height = frameHeight;
+
+    const ctx = canvas.getContext("2d");
+
+    // Background putih
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, frameWidth, frameHeight);
+
+    // Border hijau tua
+    ctx.strokeStyle = "#033800";
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+    ctx.roundRect(
+        3, 3,
+        frameWidth - 6,
+        frameHeight - 6,
+        24
+    );
+    ctx.stroke();
+
+    // Judul
+    ctx.fillStyle = "#033800";
+    ctx.font = "bold 27px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("SCAN QR CODE", frameWidth / 2, 43);
+
+    // QR Code
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+        qrCanvas,
+        padding,
+        headerHeight,
+        qrSize,
+        qrSize
+    );
+
+    // Garis pemisah
+    ctx.strokeStyle = "#D9E2D7";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(padding, headerHeight + qrSize + 18);
+    ctx.lineTo(frameWidth - padding, headerHeight + qrSize + 18);
+    ctx.stroke();
+
+    // Label invoice
+    ctx.fillStyle = "#333333";
+    ctx.font = "16px Arial";
+    ctx.fillText(
+        "INVOICE",
+        frameWidth / 2,
+        headerHeight + qrSize + 38
+    );
+
+    // Nomor invoice
+    ctx.fillStyle = "#033800";
+    ctx.font = "bold 18px Arial";
+
+    let invoiceText = String(invoiceNumber);
+    const maxTextWidth = frameWidth - 40;
+
+    while (
+        ctx.measureText(invoiceText).width > maxTextWidth &&
+        invoiceText.length > 4
+    ) {
+        invoiceText = invoiceText.slice(0, -1);
+    }
+
+    if (invoiceText !== String(invoiceNumber)) {
+        invoiceText += "...";
+    }
+
+    ctx.fillText(
+        invoiceText,
+        frameWidth / 2,
+        headerHeight + qrSize + 59
+    );
+
+    return canvas;
+}
+
+
+// ========================================
+// 2. CANVAS MENJADI PNG BLOB
+// ========================================
+function canvasToBlob(canvas) {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(blob => {
+            if (blob) {
+                resolve(blob);
+            } else {
+                reject(new Error("Gagal membuat gambar PNG."));
+            }
+        }, "image/png");
+    });
+}
+
+
+// ========================================
+// 3. DOWNLOAD / SHARE QR CODE
+// ========================================
+async function downloadQR(invoiceNumber) {
     try {
-        const response = await fetch(img.src);
+        const filename =
+            String(invoiceNumber)
+                .replace(/[^a-zA-Z0-9_-]/g, "_") + ".png";
 
-        if (!response.ok) {
-            throw new Error("Gagal mengambil gambar QR.");
-        }
+        // Buat frame
+        const framedCanvas = createQRFrame(invoiceNumber);
 
-        const blob = await response.blob();
-        const pngBlob = await convertToPNG(blob);
+        // Konversi ke PNG
+        const blob = await canvasToBlob(framedCanvas);
 
-        // Sanitasi nama file
-        const safeInvoiceNumber = String(invoiceNumber)
-            .replace(/[^a-zA-Z0-9_-]/g, "_");
+        const file = new File([blob], filename, {
+            type: "image/png"
+        });
 
-        const fileName = `QRIS-${safeInvoiceNumber}.png`;
-
-        const file = new File(
-            [pngBlob],
-            fileName,
-            { type: "image/png" }
-        );
-
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(
-            navigator.userAgent
-        );
+        // iPhone / iPad: gunakan Share Sheet jika mendukung file
+        const isIOS =
+            /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" &&
+             navigator.maxTouchPoints > 1);
 
         if (
-            isMobile &&
+            isIOS &&
             navigator.share &&
             navigator.canShare &&
             navigator.canShare({ files: [file] })
         ) {
             await navigator.share({
                 files: [file],
-                title: fileName
+                title: "QR Code " + invoiceNumber
             });
 
             return;
         }
 
-        // Download untuk komputer dan browser lainnya
-        const url = URL.createObjectURL(pngBlob);
+        // Fallback: download PNG
+        const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
 
         link.href = url;
-        link.download = fileName;
+        link.download = filename;
 
         document.body.appendChild(link);
         link.click();
         link.remove();
 
-        setTimeout(() => URL.revokeObjectURL(url), 10000);
+        setTimeout(() => {
+            URL.revokeObjectURL(url);
+        }, 60000);
 
     } catch (error) {
-        if (error.name === "AbortError") return;
+        if (error.name === "AbortError") {
+            return;
+        }
 
-        console.error(error);
-        alert("Gagal mengunduh QRIS.");
+        console.error("Download QR error:", error);
+        alert("Gagal menyimpan QR Code: " + error.message);
     }
-}
-
-function convertToPNG(blob) {
-    return new Promise((resolve, reject) => {
-        const image = new Image();
-        const url = URL.createObjectURL(blob);
-
-        image.onload = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = image.naturalWidth;
-            canvas.height = image.naturalHeight;
-
-            const context = canvas.getContext("2d");
-
-            if (!context) {
-                URL.revokeObjectURL(url);
-                reject(new Error("Canvas tidak tersedia."));
-                return;
-            }
-
-            context.drawImage(image, 0, 0);
-
-            canvas.toBlob((png) => {
-                URL.revokeObjectURL(url);
-
-                if (png) {
-                    resolve(png);
-                } else {
-                    reject(new Error("Konversi PNG gagal."));
-                }
-            }, "image/png");
-        };
-
-        image.onerror = () => {
-            URL.revokeObjectURL(url);
-            reject(new Error("Gambar QR tidak dapat dibaca."));
-        };
-
-        image.src = url;
-    });
 }
 </script>
 
