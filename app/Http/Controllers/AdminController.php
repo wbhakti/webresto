@@ -91,9 +91,10 @@ class AdminController extends Controller
                     $filename = $file->getClientOriginalName();
                     $file->move(public_path('img'), $filename);
 
+
                     DB::table('merchants')
                     ->where('id', $request->input('merchant_id'))
-                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'), 'logo' => $filename]);
+                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'),'is_active' => $request->input('is_active'), 'logo' => $filename]);
 
                     return redirect()->route('MasterMerchant')->with('success', 'berhasil edit data');
 
@@ -101,7 +102,7 @@ class AdminController extends Controller
 
                     DB::table('merchants')
                     ->where('id', $request->input('merchant_id'))
-                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time')]);
+                    ->update([ 'name' => $request->input('name'), 'open' => $request->input('open_time'),'closed' => $request->input('closed_time'),'is_active' => $request->input('is_active')]);
 
                     return redirect()->route('MasterMerchant')->with('success', 'berhasil edit data');
                 }

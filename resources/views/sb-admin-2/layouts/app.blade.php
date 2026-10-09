@@ -59,51 +59,267 @@
             </div>
 
             <!-- Nav Item - Pages Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url('dashboard') }}">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <!-- Nav Item - Master -->
+            <li class="nav-item">
+
+            <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#collapseMaster"
+            aria-expanded="false"
+            aria-controls="collapseMaster">
+
+                <i class="fas fa-fw fa-database"></i>
+                <span>Master</span>
+            </a>
+
+            <div id="collapseMaster"
+                class="collapse"
+                aria-labelledby="headingMaster"
+                data-parent="#accordionSidebar">
+
+                <div class="bg-white py-2 collapse-inner rounded">
+
+                    <!-- Merchant -->
+                    <a class="collapse-item"
+                    href="{{ url('dashboard/masterMerchant') }}">
+                        <i class="fas fa-store fa-fw mr-2"></i>
+                        Merchant
+                    </a>
+
+                    <!-- Kategori -->
+                    <a class="collapse-item"
+                    href="{{ url('dashboard/masterCategories') }}">
+                        <i class="fas fa-tags fa-fw mr-2"></i>
+                        Kategori
+                    </a>
+
+                    <!-- Produk -->
+                    <a class="collapse-item"
+                    href="{{ url('dashboard/masterProducts') }}">
+                        <i class="fas fa-utensils fa-fw mr-2"></i>
+                        Produk
+                    </a>
+
+                    <!-- Promo -->
+                    <a class="collapse-item"
+                    href="{{ url('dashboard/masterPromotions') }}">
+                        <i class="fas fa-bullhorn fa-fw mr-2"></i>
+                        Promotion
+                    </a>
+
+                </div>
+            </div>
+            </li>
+            <li class="nav-item">
+                <!-- <a class="nav-link" href="{{ url('dashboard/transaction') }}"> -->
+                <!-- <i class="fas fa-fw fa-chart-area"></i> -->
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
+                aria-expanded="true" aria-controls="collapseThree">
+                <i class="fas fa-fw fa-cog"></i>
+                <span>Order</span>
+                </a>
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                         <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
+                    </div>
+                </div>
+            </li>
             
-            @if(Session::get('role') == 'admin')
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('dashboard') }}">
-                        <i class="fas fa-fw fa-home"></i>
-                        <span>Dashboard</span>
+            <!-- Nav Item - Laporan -->
+            <li class="nav-item">
+
+            <a class="nav-link collapsed"
+            href="#"
+            data-toggle="collapse"
+            data-target="#collapseLaporan"
+            aria-expanded="false"
+            aria-controls="collapseLaporan">
+
+                <i class="fas fa-fw fa-chart-bar"></i>
+                <span>Laporan</span>
+            </a>
+
+            <div id="collapseLaporan"
+                class="collapse"
+                aria-labelledby="headingLaporan"
+                data-parent="#accordionSidebar">
+
+                <div class="bg-white py-2 collapse-inner rounded">
+
+                    <!-- Dashboard Penjualan -->
+                    <a class="collapse-item"
+                    href="{{ url('laporan/dashboard') }}">
+                        <i class="fas fa-chart-line fa-fw mr-2"></i>
+                        Dashboard Penjualan
                     </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                    aria-expanded="true" aria-controls="collapseTwo">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Master</span>
+
+
+                    <!-- ========================= -->
+                    <!-- PENJUALAN -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Penjualan
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/penjualan/periode') }}">
+                        <i class="fas fa-calendar-alt fa-fw mr-2"></i>
+                        Periode
                     </a>
-                    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item" href="{{ url('dashboard/masterMerchant') }}">Merchant</a>
-                            <a class="collapse-item" href="{{ url('dashboard/masterCategories') }}">Kategori</a>
-                            <a class="collapse-item" href="{{ url('dashboard/masterProducts') }}">Produk</a>
-                            <a class="collapse-item" href="{{ url('dashboard/masterPromotions') }}">Setting Promotion</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <!-- <a class="nav-link" href="{{ url('dashboard/transaction') }}"> -->
-                        <!-- <i class="fas fa-fw fa-chart-area"></i> -->
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree"
-                    aria-expanded="true" aria-controls="collapseThree">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Order</span>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/penjualan/per-hari') }}">
+                        <i class="fas fa-calendar-day fa-fw mr-2"></i>
+                        Per Hari
                     </a>
-                    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item" href="{{ url('dashboard/transaction') }}">Transaksi</a>
-                        </div>
-                    </div>
-                </li>
-            @else
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url('dashboard/dayTransaction') }}">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Transaksi</span>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/penjualan/per-jam') }}">
+                        <i class="fas fa-clock fa-fw mr-2"></i>
+                        Per Jam
                     </a>
-                </li>
-            @endif
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/penjualan/per-kasir') }}">
+                        <i class="fas fa-user fa-fw mr-2"></i>
+                        Per Kasir
+                    </a>
+
+
+                    <!-- ========================= -->
+                    <!-- PRODUK -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Produk
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/produk/terlaris') }}">
+                        <i class="fas fa-trophy fa-fw mr-2"></i>
+                        Produk Terlaris
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/produk/terendah') }}">
+                        <i class="fas fa-arrow-down fa-fw mr-2"></i>
+                        Produk Terendah
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/produk/per-kategori') }}">
+                        <i class="fas fa-tags fa-fw mr-2"></i>
+                        Per Kategori
+                    </a>
+
+
+                    <!-- ========================= -->
+                    <!-- PEMBAYARAN -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Pembayaran
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/pembayaran/cash') }}">
+                        <i class="fas fa-money-bill-wave fa-fw mr-2"></i>
+                        Cash
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/pembayaran/qris') }}">
+                        <i class="fas fa-qrcode fa-fw mr-2"></i>
+                        QRIS
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/pembayaran/transfer') }}">
+                        <i class="fas fa-university fa-fw mr-2"></i>
+                        Transfer
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/pembayaran/edc') }}">
+                        <i class="fas fa-credit-card fa-fw mr-2"></i>
+                        EDC
+                    </a>
+
+
+                    <!-- ========================= -->
+                    <!-- PROMO -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Promo
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/promo/penggunaan') }}">
+                        <i class="fas fa-bullhorn fa-fw mr-2"></i>
+                        Penggunaan Promo
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/promo/diskon') }}">
+                        <i class="fas fa-percent fa-fw mr-2"></i>
+                        Total Diskon
+                    </a>
+
+
+                    <!-- ========================= -->
+                    <!-- OPERASIONAL -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Operasional
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/shift-kasir') }}">
+                        <i class="fas fa-user-clock fa-fw mr-2"></i>
+                        Shift Kasir
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/cancel-refund') }}">
+                        <i class="fas fa-undo fa-fw mr-2"></i>
+                        Cancel / Refund
+                    </a>
+
+
+                    <!-- ========================= -->
+                    <!-- PROFIT -->
+                    <!-- ========================= -->
+
+                    <h6 class="collapse-header">
+                        Profit
+                    </h6>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/profit/hpp') }}">
+                        <i class="fas fa-boxes fa-fw mr-2"></i>
+                        HPP
+                    </a>
+
+                    <a class="collapse-item"
+                    href="{{ url('laporan/profit/gross-profit') }}">
+                        <i class="fas fa-chart-pie fa-fw mr-2"></i>
+                        Gross Profit
+                    </a>
+
+                </div>
+            </div>
+            </li>
+            
             
             
             <!-- Divider -->

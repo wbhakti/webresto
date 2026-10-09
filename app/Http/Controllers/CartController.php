@@ -368,7 +368,8 @@ class CartController extends Controller
                     'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
-                    'idtransaksi' => $id
+                    'idtransaksi' => $id,
+                    'invoiceNumber' => $transaction->invoice_number
                 ]);
 
             }else{
@@ -388,7 +389,8 @@ class CartController extends Controller
                     'discount' => $transaction->discount,
                     'totalTagihan' => $totalTagihan,
                     'details' => $details,
-                    'idtransaksi' => $id
+                    'idtransaksi' => $id,
+                    'invoiceNumber' => $transaction->invoice_number
                 ]);
             }
 
