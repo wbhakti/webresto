@@ -31,6 +31,7 @@ Route::post('/update-cart-note/{id}', 'App\Http\Controllers\CartController@updat
 Route::post('/checkout', 'App\Http\Controllers\CartController@checkout')->name('checkout');
 Route::get('/success/{id}', 'App\Http\Controllers\CartController@success')->name('success');
 Route::post('/upload-pembayaran', 'App\Http\Controllers\CartController@upload')->name('upload');
+Route::get('/payment/status/{invoice}', 'App\Http\Controllers\CartController@status')->name('status');
 
 //admin
 Route::get('/login', 'App\Http\Controllers\AdminController@Login')->name('Login');

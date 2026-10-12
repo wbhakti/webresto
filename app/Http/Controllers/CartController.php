@@ -12,6 +12,7 @@ use App\Services\QrisService;
 use App\Models\Promotion;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Transaction;
 
 class CartController extends Controller
 {
@@ -402,127 +403,279 @@ class CartController extends Controller
 
     public function upload(Request $request)
     {
-        try{
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            'idtransaksi' => 'required|integer',
+        ]);
 
-            if ($request->hasFile('bukti_pembayaran')) {
-                $image = $request->file('bukti_pembayaran');
-                $filename = 'buktitransfer_'.$request->input('idtransaksi').'.jpg';
+        $tmp = null;
+        $source = null;
+        $filename = 'buktitransfer_' . $request->input('idtransaksi') . '.jpg';
+        $directory = public_path('invoice');
+        $outputPath = $directory . DIRECTORY_SEPARATOR . $filename;
 
-                //kompres image
-                $mimeType = $image->getMimeType();
-                
-                // Set a maximum height and width
-                $width = 600;
-                $height = 1000;
+        try {
+            $image = $request->file('bukti_pembayaran');
+            $imagePath = $image->getRealPath();
+            $mimeType = $image->getMimeType();
 
-                // Get new dimensions
-                list($width_orig, $height_orig) = getimagesize($image->getRealPath());
+            // Pastikan gambar valid.
+            $imageInfo = getimagesize($imagePath);
 
-                $ratio_orig = $width_orig/$height_orig;
+            if ($imageInfo === false) {
+                throw new \RuntimeException('File gambar tidak valid.');
+            }
 
-                if ($width/$height > $ratio_orig) {
-                    $width = $height*$ratio_orig;
-                } else {
-                    $height = $width/$ratio_orig;
-                }
+            $widthOrig = $imageInfo[0];
+            $heightOrig = $imageInfo[1];
 
-                // Resample
-                $tmp = imagecreatetruecolor($width, $height);
-                // $tmp = imagecreatetruecolor($newWidth, $newHeight);
+            if ($widthOrig <= 0 || $heightOrig <= 0) {
+                throw new \RuntimeException('Dimensi gambar tidak valid.');
+            }
 
-                if ($mimeType === 'image/jpeg') {
-                    $source = imagecreatefromjpeg($image->getRealPath());
-                } elseif ($mimeType === 'image/png'){
-                    $source = imagecreatefrompng($image->getRealPath());
-                    imagealphablending($tmp, false);
-                    imagesavealpha($tmp, true);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                    ]);
-                }
+            // Batas dimensi maksimal: 600 x 1000, tanpa memperbesar gambar.
+            $scale = min(
+                600 / $widthOrig,
+                1000 / $heightOrig,
+                1
+            );
 
-                // Resize gambar
-                // imagecopyresampled($tmp, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-                imagecopyresampled($tmp, $source, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+            $width = max(1, (int) round($widthOrig * $scale));
+            $height = max(1, (int) round($heightOrig * $scale));
 
-                // Tambahkan teks
-                $font = public_path('arial.ttf');
-                $fontSize = 12;
-                $textColor = imagecolorallocate($tmp, 0, 0, 0);
-                $timestamp = 'fivestar : ' . Carbon::now()->addHours(7)->format('Y-m-d H:i:s');
-                $xTimestamp = 20;
-                $yTimestamp = 50;
-
-                imagettftext($tmp, $fontSize, 0, $xTimestamp, $yTimestamp, $textColor, $font, $timestamp);
-
-                if ($mimeType === 'image/jpeg') {
-                    imagejpeg($tmp, public_path('invoice') . '/' . $filename, 80); // JPEG kualitas 80%
-                } elseif ($mimeType === 'image/png') {
-                    imagepng($tmp, public_path('invoice') . '/' . $filename, 8); // PNG kompresi level 8
-                }
-
-                imagedestroy($tmp);
-                imagedestroy($source);
-
-                DB::table('transactions')
-                ->where('transaction_id', $request->input('idtransaksi'))
-                ->update([ 'payment_proof' => $filename, 'order_status' => 'PAID','payment_status' => 'PAID','updated_at' => Carbon::now()->format('Y-m-d H:i:s') ]);
-    
-                $mimage = 'fivestar/public/invoice/'. $filename;
-
-                // ============= NOTIFIKASI ==============
-                $admin = User::where('role', 'kasir')->first();
-                $transaction = DB::table('transactions')->where('transaction_id', $request->input('idtransaksi'))->first();
-
-                try {
-                    if (!$admin) {
-                        Log::warning('Admin kasir tidak ditemukan');
-                    } elseif (empty($admin->fcm_token)) {
-                        Log::warning('FCM token admin kosong', [
-                            'admin_id' => $admin->id,
-                        ]);
-                    } else {
-                        $firebase = app(FirebaseService::class);
-                        $firebase->sendToToken(
-                            $admin->fcm_token,
-                            'Order Baru',
-                            'Ada order baru dari ' . $transaction->customer,
-                            [
-                                'type' => 'NEW_ORDER',
-                                'idTransaksi' => $transaction->transaction_id,
-                                'customer' => $transaction->customer,
-                                'meja' => $transaction->table_id,
-                                'status' => $transaction->payment_status,
-                            ]
-                        );
+            // Baca gambar sumber.
+            if ($mimeType === 'image/jpeg') {
+                $source = imagecreatefromjpeg($imagePath);
+            } elseif ($mimeType === 'image/png') {
+                /*
+                * Abaikan hanya warning iCCP tertentu.
+                * Warning PHP lainnya tetap diteruskan.
+                */
+                set_error_handler(function (
+                    $severity,
+                    $message,
+                    $file,
+                    $line
+                ) {
+                    if (strpos(
+                        $message,
+                        'iCCP: known incorrect sRGB profile'
+                    ) !== false) {
+                        return true;
                     }
 
-                    
-                } catch (\Exception $e) {
-                    Log::error('Gagal kirim FCM', [
-                        'admin_id' => $admin->id,
-                        'error' => $e->getMessage(),
-                    ]);
+                    return false;
+                });
+
+                try {
+                    $source = imagecreatefrompng($imagePath);
+                } finally {
+                    restore_error_handler();
                 }
-                
+            } else {
                 return response()->json([
-                    'success' => true,
-                    'imageUrl' => url($mimage),
+                    'success' => false,
+                    'message' => 'Format gambar tidak didukung.',
+                ], 422);
+            }
+
+            if ($source === false) {
+                throw new \RuntimeException('Gagal membaca gambar.');
+            }
+
+            // Buat kanvas JPEG dengan latar belakang putih.
+            $tmp = imagecreatetruecolor($width, $height);
+
+            if ($tmp === false) {
+                throw new \RuntimeException('Gagal membuat kanvas gambar.');
+            }
+
+            $white = imagecolorallocate($tmp, 255, 255, 255);
+            imagefill($tmp, 0, 0, $white);
+
+            // Resize gambar sesuai dimensi yang dihitung.
+            if (!imagecopyresampled(
+                $tmp,
+                $source,
+                0,
+                0,
+                0,
+                0,
+                $width,
+                $height,
+                $widthOrig,
+                $heightOrig
+            )) {
+                throw new \RuntimeException('Gagal mengubah ukuran gambar.');
+            }
+
+            // Tambahkan watermark.
+            $font = public_path('arial.ttf');
+
+            if (!file_exists($font)) {
+                throw new \RuntimeException('File font arial.ttf tidak ditemukan.');
+            }
+
+            $fontSize = 12;
+            $textColor = imagecolorallocate($tmp, 0, 0, 0);
+            $timestamp = 'fivestar : ' .
+                Carbon::now('Asia/Jakarta')->format('Y-m-d H:i:s');
+
+            imagettftext(
+                $tmp,
+                $fontSize,
+                0,
+                20,
+                min(50, $height - 5),
+                $textColor,
+                $font,
+                $timestamp
+            );
+
+            // Pastikan direktori tujuan tersedia.
+            if (!is_dir($directory)) {
+                if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+                    throw new \RuntimeException(
+                        'Gagal membuat direktori invoice.'
+                    );
+                }
+            }
+
+            if (!is_writable($directory)) {
+                throw new \RuntimeException(
+                    'Direktori invoice tidak dapat ditulisi.'
+                );
+            }
+
+            // Semua output disimpan sebagai JPEG.
+            if (!imagejpeg($tmp, $outputPath, 80)) {
+                throw new \RuntimeException('Gagal menyimpan gambar.');
+            }
+
+            // Bersihkan resource GD.
+            imagedestroy($tmp);
+            $tmp = null;
+
+            imagedestroy($source);
+            $source = null;
+
+            // Update transaksi setelah gambar berhasil disimpan.
+            $updated = DB::table('transactions')
+                ->where('transaction_id', $request->input('idtransaksi'))
+                ->update([
+                    'payment_proof' => $filename,
+                    'order_status' => 'PAID',
+                    'payment_status' => 'PAID',
+                    'updated_at' => Carbon::now('Asia/Jakarta')
+                        ->format('Y-m-d H:i:s'),
+                ]);
+
+            $transaction = DB::table('transactions')
+                ->where('transaction_id', $request->input('idtransaksi'))
+                ->first();
+
+            if (!$transaction) {
+                throw new \RuntimeException('Transaksi tidak ditemukan.');
+            }
+
+            // Notifikasi FCM tidak boleh menggagalkan upload.
+            try {
+                $admin = User::where('role', 'kasir')->first();
+
+                if (!$admin) {
+                    Log::warning('Admin kasir tidak ditemukan');
+                } elseif (empty($admin->fcm_token)) {
+                    Log::warning('FCM token admin kosong', [
+                        'admin_id' => $admin->id,
+                    ]);
+                } else {
+                    $firebase = app(FirebaseService::class);
+
+                    $firebase->sendToToken(
+                        $admin->fcm_token,
+                        'Order Baru',
+                        'Ada order baru dari ' . $transaction->customer,
+                        [
+                            'type' => 'NEW_ORDER',
+                            'idTransaksi' => $transaction->transaction_id,
+                            'customer' => $transaction->customer,
+                            'meja' => $transaction->table_id,
+                            'status' => $transaction->payment_status,
+                        ]
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::error('Gagal kirim FCM', [
+                    'error' => $e->getMessage(),
                 ]);
             }
-    
-            return response()->json(['success' => false]);
 
-        }catch (\Exception $e) {
-            Log::error('Gagal upload bukti pembayaran: ' . $e->getMessage());
+            return response()->json([
+                'success' => true,
+                'imageUrl' => url('invoice/' . $filename),
+            ]);
+
+        } catch (\Throwable $e) {
+            Log::error('Gagal upload bukti pembayaran', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat mengupload file.'
+                'message' => 'Terjadi kesalahan saat mengupload file.',
             ], 500);
+
+        } finally {
+            if ($tmp !== null && $tmp !== false) {
+                imagedestroy($tmp);
+            }
+
+            if ($source !== null && $source !== false) {
+                imagedestroy($source);
+            }
         }
     }
     
+    public function status($invoice)
+    {
+        $merchant = DB::table('merchants')->first();
+        $phone_wa = $merchant->phone; 
 
+        $transaction = Transaction::where(
+            'invoice_number',
+            $invoice
+        )->firstOrFail();
+
+        $details = DB::table('transaction_items')->where('transaction_id', $transaction->transaction_id)->get();
+        
+        $pesanDetail= '';
+        
+        foreach ($details as $item) {
+            $pesanDetail = $pesanDetail. $item->product_name.' ['.$item->quantity.'] Rp '.($item->price * $item->quantity) - ($item->discount * $item->quantity).'%0A';
+            $pesanDetail = $pesanDetail.'Catatan : '.$item->note.' %0A';
+        }
+
+        $mimage = 'fivestar/public/invoice/'. $transaction->payment_proof;
+        $waMessage = 'Hallo, saya ingin mengkonfirmasi pesanan saya.%0A%0A'.
+                    'ID Transaksi: '.$invoice.'%0A'.
+                    'Nama: '.$transaction->customer.'%0A'.
+                    'Nomor Meja: '.$transaction->table_id.'%0A'.
+                    'Metode Pembayaran: '.$transaction->payment_method.'%0A'.
+                    'Sub Total Pemesanan: Rp '.number_format($transaction->subtotal, 0, ',', '.').'%0A'.
+                    'Diskon: Rp '.number_format($transaction->discount, 0, ',', '.').'%0A'.
+                    'Total Pembayaran: Rp '.number_format($transaction->grand_total, 0, ',', '.').'%0A%0A'.
+                    'Bukti Transfer: Rp '.url($mimage).'%0A%0A'.
+                    '*Detail Pesanan:*%0A'.$pesanDetail.'%0A%0A ';
+
+        $waLink = 'https://wa.me/'.$phone_wa.'?text='.$waMessage;
+
+        return view('home-page/status', [
+            'transaction' => $transaction, 
+            'whatsappUrl' => $waLink,
+            'cartCount' => 0
+        ]);
+    }
 
 }
