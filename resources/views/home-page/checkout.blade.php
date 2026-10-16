@@ -86,35 +86,6 @@
 }
 
 /* =====================================
-   STATUS ALERT
-===================================== */
-
-.payment-alert {
-    background: var(--payment-success-bg);
-    color: #166534;
-    border: 1px solid var(--payment-success-border);
-    border-left: 5px solid var(--payment-success);
-    border-radius: 12px;
-    padding: 17px 18px;
-    margin-bottom: 20px;
-}
-
-.payment-alert h5 {
-    color: #166534;
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 1.4;
-    margin-bottom: 6px;
-}
-
-.payment-alert p {
-    color: #166534;
-    font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 0;
-}
-
-/* =====================================
    CARD
 ===================================== */
 
@@ -674,6 +645,9 @@
         margin: 4px 0 0;
     }
 }
+
+
+
 </style>
 
 <script src="{{ asset('qriscode/qrcode.min.js')}}"></script>
@@ -688,12 +662,6 @@
 
 <main class="payment-page">
     <div class="payment-container">
-
-        <!-- STATUS TRANSAKSI -->
-        <div class="payment-alert" role="status">
-            <h5>{{ $head }}</h5>
-            <p>{{ $body }}</p>
-        </div>
 
         <!-- INFORMASI PEMESANAN -->
         <section class="payment-card payment-collapse-card">
@@ -841,6 +809,30 @@
 
         <!-- PEMBAYARAN QRIS -->
         @if ($isQRIS)
+
+            <!-- PANDUAN PEMBAYARAN -->
+            <section class="payment-card payment-collapse-card"> 
+                <button class="payment-collapse-toggle" 
+                    type="button" 
+                    data-bs-toggle="collapse" 
+                    data-bs-target="#collapsePayment" 
+                    aria-expanded="false" 
+                    aria-controls="collapsePayment"> 
+
+                    <span>📋 Panduan Pembayaran</span> 
+                    <span class="collapse-label">Tampilkan</span>
+                </button> 
+                <div class="collapse" id="collapsePayment"> 
+                    <ol class="payment-steps"> 
+                        <li>Scan QRIS menggunakan aplikasi pembayaran Anda.</li> 
+                        <li>Pastikan nominal pembayaran sesuai total tagihan di atas.</li> 
+                        <li>Selesaikan pembayaran dan simpan bukti transaksi.</li> 
+                        <li>Upload bukti pembayaran melalui formulir di bawah.</li> 
+                        <li>Setelah proses upload, tekan tombol konfirmasi untuk melanjutkan melalui WhatsApp.</li> 
+                    </ol> 
+                </div> 
+            </section>
+            
             <section class="payment-card">
                 <h5 class="payment-section-title">
                     📲 Pembayaran QRIS
@@ -880,21 +872,6 @@
                         membukanya dari perangkat lain.
                     </p>
                 </div>
-            </section>
-
-            <!-- PANDUAN PEMBAYARAN -->
-            <section class="payment-card">
-                <h5 class="payment-section-title">
-                    📋 Panduan Pembayaran
-                </h5>
-
-                <ol class="payment-steps">
-                    <li>Scan QRIS menggunakan aplikasi pembayaran Anda.</li>
-                    <li>Pastikan nominal pembayaran sesuai total tagihan di atas.</li>
-                    <li>Selesaikan pembayaran dan simpan bukti transaksi.</li>
-                    <li>Upload bukti pembayaran melalui formulir di bawah.</li>
-                    <li>Setelah proses upload, tekan tombol konfirmasi untuk melanjutkan melalui WhatsApp.</li>
-                </ol>
             </section>
 
             <!-- UPLOAD BUKTI PEMBAYARAN -->
