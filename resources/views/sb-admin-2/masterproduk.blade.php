@@ -289,7 +289,7 @@ $(document).ready(function() {
             $('#editPrice').val(price);
             $('#editCost_price').val(cost_price);
             $('#editCategory_id').val(category_id);
-            $('#currentImage').attr('src', "{{ url('public/img/') }}" + "/" + image);
+            $('#currentImage').attr('src', "{{ url('fivestar/public/img/') }}" + "/" + image);
 
             $('#editModal').modal('show');
         });
