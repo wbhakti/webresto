@@ -104,6 +104,20 @@
         font-size: 10px; /* Ukuran font lebih kecil */
         padding: 2px 6px; /* Kurangi padding */
     }
+
+    .product-note {
+        font-size: 12px;
+    }
+
+    @media (max-width: 768px) {
+        .product-note {
+            font-size: 8px;
+        }
+
+        .product-note::placeholder {
+            font-size: 10px;
+        }
+    }
 }
 
 </style>
@@ -111,12 +125,11 @@
 <!-- Header -->
 <div class="d-flex flex-wrap justify-content-center" style="gap: 1rem;">
     <div class="card" style="min-width: 150px;">
-        <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Favorit</div>
-        <img class="card-img-top" src="{{ asset('img/' . $merchant->image) }}" alt="{{ $merchant->nama }}" />
+        <img class="card-img-top" src="{{ asset('img/' . $merchant->logo) }}" alt="{{ $merchant->name }}" />
         <div class="card-body d-flex flex-column justify-content-between text-center">
             <div>
-                <h4 class="fw-bolder mb-1">{{ $merchant->nama }}</h4>
-                <small class="text-muted d-block mb-2">{{ $merchant->deskripsi }}</small>
+                <h4 class="fw-bolder mb-1">{{ $merchant->name }}</h4>
+                <small class="text-muted d-block mb-2">{{ $merchant->address }}</small>
             </div>
         </div>
     </div>
@@ -151,45 +164,126 @@ window.addEventListener('pageshow', function(event) {
                             </tr>
                         </thead>
                         <tbody>
-                            @php $grandTotal = 0; @endphp
-                            @php $rpdiscount = 0; @endphp
-                            @foreach ($cart as $id => $item)
-                            @php $total = $item['price'] * $item['quantity']; @endphp
-
-                            @php $priceDiscount = ""; @endphp
                             @php 
-                                if($item['productDiscount'] == 0) {
+                                $grandTotal = 0; 
+                                $rpdiscount = 0;
+                            @endphp
+                            
+                            @foreach ($cart as $id => $item)
+
+                            @php 
+                                $priceDiscount = "";
+                                $total = $item['price'] * $item['quantity']; 
+                                $subDiscount = $item['product_discount'] * $item['quantity'];
+                                $mPriceDiscount = number_format(($subDiscount), 0, ',', '.');
+                                
+                                if($item['product_discount'] == 0) {
                                     $priceDiscount = "";
                                 } else {
-                                    $mPriceDiscount = number_format(($item['totalDiscount']), 0, ',', '.');
                                     $priceDiscount = "-Rp $mPriceDiscount" ;
-                                    $rpdiscount += $item['totalDiscount'];
                                 }
+                                $rpdiscount += $subDiscount;
+                                
                             @endphp
 
                             <tr>
+                                <!-- Nama Produk -->
                                 <td colspan="2" class="font-isi-nama">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{ url('public/img/' . $item['image']) }}" alt="{{ $item['name'] }}" class="img-fluid me-3 table-image">
-                                        <span>{{ $item['name'] }}</span>
+                                        <img
+                                            src="{{ asset('img/' . $item['image']) }}"
+                                            alt="{{ $item['product_name'] }}"
+                                            class="img-fluid me-3 table-image"
+                                        >
+
+                                        <span>{{ $item['product_name'] }}</span>
                                     </div>
                                 </td>
-                                <td colspan="2" class="font-isi-harga">Rp {{ number_format($item['price'], 0, ',', '.') }}</td>
+
+                                <!-- Harga -->
+                                <td colspan="2" class="font-isi-harga">
+                                    Rp {{ number_format($item['price'], 0, ',', '.') }}
+                                </td>
+
+                                <!-- Jumlah -->
                                 <td colspan="3" class="font-isi-jumlah">
                                     <div class="input-group">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, -1)">-</button>
-                                        <input type="text" class="form-control text-center jml-input" value="{{ $item['quantity'] }}" readonly id="quantity-{{ $id }}">
-                                        <button class="btn btn-outline-secondary btn-sm" type="button" onclick="updateQuantity({{ $id }}, 1)">+</button>
+                                        <button
+                                            class="btn btn-outline-secondary btn-sm"
+                                            type="button"
+                                            onclick="updateQuantity({{ $id }}, -1)"
+                                        >
+                                            -
+                                        </button>
+
+                                        <input
+                                            type="text"
+                                            class="form-control text-center jml-input"
+                                            value="{{ $item['quantity'] }}"
+                                            readonly
+                                            id="quantity-{{ $id }}"
+                                        >
+
+                                        <button
+                                            class="btn btn-outline-secondary btn-sm"
+                                            type="button"
+                                            onclick="updateQuantity({{ $id }}, 1)"
+                                        >
+                                            +
+                                        </button>
                                     </div>
                                 </td>
-                                <td colspan="2" class="font-isi-total" id="total-{{ $id }}">Rp {{ number_format($total, 0, ',', '.') }} </br> {{$priceDiscount}}</td>
-                                <td colspan="2"> 
-                                    <form action="{{ route('cart.remove', $id) }}" method="POST" style="display:inline;">
+
+                                <!-- Total -->
+                                <td colspan="2"
+                                    class="font-isi-total"
+                                    id="total-{{ $id }}">
+
+                                    Rp {{ number_format($total, 0, ',', '.') }}
+
+                                    @if($priceDiscount)
+                                        <br>
+                                        {{ $priceDiscount }}
+                                    @endif
+
+                                </td>
+
+                                <!-- Delete -->
+                                <td colspan="2">
+                                    <form
+                                        action="{{ route('cart.remove', $id) }}"
+                                        method="POST"
+                                        style="display:inline;"
+                                    >
                                         @csrf
                                         @method('DELETE')
-                                        <!-- <i class="bi-trash"></i> -->
+
                                         <button type="submit" class="bi-trash"></button>
                                     </form>
+                                </td>
+                            </tr>
+
+                            <!-- NOTE PRODUK -->
+                            <tr>
+                                <td colspan="11" class="pb-3">
+
+                                    <div class="input-group input-group-sm">
+
+                                        <span class="input-group-text bg-white">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            class="form-control form-control-sm product-note"
+                                            id="note-{{ $id }}"
+                                            value="{{ $item['note'] ?? '' }}"
+                                            placeholder="Tambah catatan..."
+                                            maxlength="255"
+                                            data-id="{{ $id }}"
+                                        >
+                                    </div>
+
                                 </td>
                             </tr>
                             @php $grandTotal += $total; @endphp
@@ -279,6 +373,7 @@ window.addEventListener('pageshow', function(event) {
 @endif
 
 <script>
+    //UPDATE QTY
     function updateQuantity(itemId, change) {
         const quantityInput = document.getElementById(`quantity-${itemId}`);
         let currentQuantity = parseInt(quantityInput.value);
@@ -310,7 +405,6 @@ window.addEventListener('pageshow', function(event) {
                             } else {
                                 totalElement.innerText = `Rp ${total} \n  -Rp ${discount} `;
                             }
-                            
                         }
 
                         document.getElementById('discount-total').textContent = `Rp ${data.discount}`;
@@ -322,23 +416,52 @@ window.addEventListener('pageshow', function(event) {
                 });
         }
     }
+    
 </script>
 
 <script src="{{ asset('qriscode/qrisDynamic.js')}}"></script>
 <script src="{{ asset('qriscode/qrisConverter.js')}}"></script>
 
 <script>
+
+    document.querySelectorAll('.product-note').forEach(function(input) {
+        input.addEventListener('change', function() {
+
+            const itemId = this.dataset.id;
+            const note = this.value;
+
+            fetch(`/update-cart-note/${itemId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    note: note
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+
+                if (!data.success) {
+                    alert(data.message || 'Gagal menyimpan catatan.');
+                }
+
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Gagal menyimpan catatan.');
+            });
+
+        });
+
+    });
+
     document.getElementById('checkout-button').addEventListener('click', function(event) {
 
         var nama = document.getElementById('nama');
         var meja = document.getElementById('meja');
         var metodePembayaran = document.getElementById('metode_pembayaran');
-        const qris = "00020101021126650013ID.CO.BCA.WWW011893600014000278398602150008850027839860303UKE51440014ID.CO.QRIS.WWW0215ID10253704526210303UKE5204581253033605802ID5915KOPINGGIR JALAN6006KLATEN61055743862070703A016304F1DC";
-        const nominal = document.getElementById("total-bayar").innerHTML.replace("Rp ","").replace(".","");
-
-        // const result = makeString(qris, { nominal: nominal });
-        const result = makeDynamicQR(qris, nominal);
-        document.getElementById("qris_dynamic").value = result;
 
         if (!nama || nama.value.trim() === "") {
             alert("Nama harus diisi!");
