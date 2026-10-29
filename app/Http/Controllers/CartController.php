@@ -319,6 +319,38 @@ class CartController extends Controller
                     'used_at'         => Carbon::now()->format('Y-m-d H:i:s')
                 ]);
             }
+
+            // Notifikasi FCM tidak boleh menggagalkan upload.
+            try {
+                $admin = User::where('role', 'kasir')->first();
+
+                if (!$admin) {
+                    Log::warning('Admin kasir tidak ditemukan');
+                } elseif (empty($admin->fcm_token)) {
+                    Log::warning('FCM token admin kosong', [
+                        'admin_id' => $admin->id,
+                    ]);
+                } else {
+                    $firebase = app(FirebaseService::class);
+
+                    $firebase->sendToToken(
+                        $admin->fcm_token,
+                        'Order Baru',
+                        'Ada order baru dari ' . $request->input('nama'),
+                        [
+                            'type' => 'NEW_ORDER',
+                            'idTransaksi' => (string) $transactionId,
+                            'customer' => $request->input('nama'),
+                            'meja' => (string) $mmeja,
+                            'status' => 'UNPAID',
+                        ]
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::error('Gagal kirim FCM', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
             
 
             session()->forget('cart');
@@ -593,13 +625,13 @@ class CartController extends Controller
 
                     $firebase->sendToToken(
                         $admin->fcm_token,
-                        'Order Baru',
-                        'Ada order baru dari ' . $transaction->customer,
+                        'Order Sudah Di Bayar',
+                        'Ada order baru sudah di bayar dari ' . $transaction->customer,
                         [
                             'type' => 'NEW_ORDER',
-                            'idTransaksi' => $transaction->transaction_id,
+                            'idTransaksi' => (string) $transaction->transaction_id,
                             'customer' => $transaction->customer,
-                            'meja' => $transaction->table_id,
+                            'meja' => (string) $transaction->table_id,
                             'status' => $transaction->payment_status,
                         ]
                     );
