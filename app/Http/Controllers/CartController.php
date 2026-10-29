@@ -380,7 +380,7 @@ class CartController extends Controller
             $nama = $transaction->customer;
             $meja = $transaction->table_id;
             $qrisDynamic = $transaction->qr_code;
-            $totalTagihan = $transaction->grand_total;
+            $totalTagihan = $transaction->subtotal;
             $details = DB::table('transaction_items')->where('transaction_id', $id)->get();
 
             if($transaction->payment_method == 'qris'){
