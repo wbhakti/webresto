@@ -160,8 +160,8 @@ class AdminController extends Controller
             $today = Carbon::now('Asia/Jakarta');
 
             $dataTransaksi = DB::table('transactions')
-                ->whereDate('addtime', $today )
-                ->orderByDesc('addtime')
+                ->whereDate('created_at', $today )
+                ->orderByDesc('created_at')
                 ->get();
 
             return view('sb-admin-2/transaksi', [
