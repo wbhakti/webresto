@@ -644,7 +644,7 @@ class CartController extends Controller
 
             return response()->json([
                 'success' => true,
-                'imageUrl' => url('invoice/' . $filename),
+                'imageUrl' => url('webkopinggir/public/invoice/' . $filename),
             ]);
 
         } catch (\Throwable $e) {
