@@ -265,7 +265,7 @@
     <div class="report-filter mb-4">
 
         <form method="GET"
-              action="{{ url('/laporan/dashboard') }}">
+              action="{{ url('/dashboard') }}">
 
             <div class="form-row align-items-end">
 

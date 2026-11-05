@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Notifications\NewOrderNotification;
 use App\Models\User;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProdukTerlarisController;
+use App\Http\Controllers\LaporanKategoriController;
+use App\Http\Controllers\ProdukTerendahController;
+use App\Http\Controllers\LaporanPenjualanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,10 +42,34 @@ Route::get('/payment/status/{invoice}', 'App\Http\Controllers\CartController@sta
 Route::get('/login', 'App\Http\Controllers\AdminController@Login')->name('Login');
 Route::post('/postlogin', 'App\Http\Controllers\AdminController@postlogin');
 Route::get('/logout', 'App\Http\Controllers\AdminController@logout')->name('logout');
-Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
+// Route::get('/dashboard', 'App\Http\Controllers\AdminController@dashboard')->name('dashboard');
+
+
+//LAPORAN
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/laporan/produk/terlaris', [ProdukTerlarisController::class,'index'])->name('laporan.produk.terlaris');
+Route::get('/laporan/produk/per-kategori', [LaporanKategoriController::class,'index'])->name('laporan.produk.per-kategori');
+Route::get('/laporan/produk/terendah', [ProdukTerendahController::class,'index'])->name('laporan.produk.terendah');
+Route::prefix('laporan/penjualan')->name('laporan.penjualan.')->group(function () {
+
+    Route::get('/periode', [
+        LaporanPenjualanController::class,
+        'periode'
+    ])->name('periode');
+
+    Route::get('/perhari', [
+        LaporanPenjualanController::class,
+        'perHari'
+    ])->name('perhari');
+
+    Route::get('/jam', [
+        LaporanPenjualanController::class,
+        'perJam'
+    ])->name('jam');
+
+});
 
 Route::post('/CloseOrder', 'App\Http\Controllers\AdminController@CloseOrder');
-
 
 //Merchants
 Route::get('/dashboard/masterMerchant', 'App\Http\Controllers\AdminController@MasterMerchant')->name('MasterMerchant');

@@ -18,6 +18,7 @@
 
     <!-- Custom styles for this template-->
     <script src="{{ asset('vendor/jquery/jquery.min.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
     <style>
     .sidebar {
@@ -62,7 +63,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url('dashboard') }}">
                     <i class="fas fa-fw fa-home"></i>
-                    <span>Dashboard</span>
+                    <span>Dashboard Penjualan</span>
                 </a>
             </li>
             <!-- Nav Item - Master -->
@@ -153,14 +154,6 @@
 
                 <div class="bg-white py-2 collapse-inner rounded">
 
-                    <!-- Dashboard Penjualan -->
-                    <a class="collapse-item"
-                    href="{{ url('laporan/dashboard') }}">
-                        <i class="fas fa-chart-line fa-fw mr-2"></i>
-                        Dashboard Penjualan
-                    </a>
-
-
                     <!-- ========================= -->
                     <!-- PENJUALAN -->
                     <!-- ========================= -->
@@ -176,13 +169,13 @@
                     </a>
 
                     <a class="collapse-item"
-                    href="{{ url('laporan/penjualan/per-hari') }}">
+                    href="{{ url('laporan/penjualan/perhari') }}">
                         <i class="fas fa-calendar-day fa-fw mr-2"></i>
                         Per Hari
                     </a>
 
                     <a class="collapse-item"
-                    href="{{ url('laporan/penjualan/per-jam') }}">
+                    href="{{ url('laporan/penjualan/jam') }}">
                         <i class="fas fa-clock fa-fw mr-2"></i>
                         Per Jam
                     </a>
