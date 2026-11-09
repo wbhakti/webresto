@@ -147,6 +147,7 @@
         color: #858796;
     }
 </style>
+@endpush
 
 <div class="container-fluid">
 
@@ -432,7 +433,7 @@
                     dari {{ $products->total() }} produk
                 </small>
 
-                {{ $products->links() }}
+                {{ $products->links('pagination::bootstrap-4') }}
 
             </div>
 
